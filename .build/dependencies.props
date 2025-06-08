@@ -1,0 +1,13 @@
+
+<Project>
+  <PropertyGroup Label="NuGet Package Reference Versions">
+    <MicrosoftNETTestSdkPackageReferenceVersion>16.1.1</MicrosoftNETTestSdkPackageReferenceVersion>
+    <NerdBankGitVersioningPackageReferenceVersion>[3.5.73-alpha]</NerdBankGitVersioningPackageReferenceVersion>
+    <MicrosoftCodeAnalysisAnalyzersPackageReferenceVersion>3.11.0</MicrosoftCodeAnalysisAnalyzersPackageReferenceVersion>
+    <MicrosoftCodeAnalysisCSharpPackageReferenceVersion>4.12.0</MicrosoftCodeAnalysisCSharpPackageReferenceVersion>
+    <MicrosoftCodeAnalysisCSharpWorkspacesPackageReferenceVersion>4.13.0</MicrosoftCodeAnalysisCSharpWorkspacesPackageReferenceVersion>
+    <MicrosoftNETTestSdkPackageReferenceVersion>17.13.0</MicrosoftNETTestSdkPackageReferenceVersion>
+    <NUnitPackageReferenceVersion>4.3.2</NUnitPackageReferenceVersion>
+    <NUnit3TestAdapterPackageReferenceVersion>5.0.0</NUnit3TestAdapterPackageReferenceVersion>
+  </PropertyGroup>
+</Project>

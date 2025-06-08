@@ -1,0 +1,44 @@
+<Project>
+
+  <PropertyGroup>
+    <RepositoryRoot>$(MSBuildThisFileDirectory)</RepositoryRoot>
+    <LangVersion>12.0</LangVersion>
+    <GitHubOrganization>NightOwl888</GitHubOrganization>
+    <GitHubProject>SPDX.CodeAnalysis</GitHubProject>
+    <Product>$(GitHubProject)</Product>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Version Settings">
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Assembly Signing">
+    <AssemblyOriginatorKeyFile>$(RepositoryRoot).build/key.snk</AssemblyOriginatorKeyFile>
+    <PublicKey>002400000480000094000000060200000024000052534131000400000100010095ca785807791154b166eb91b40c95a9e02bd978310c8202af4d18f4746b9416aea50922de2fa43c39cdb0b4462085dba5cd760abf81227bebae7078c7205e2983b08cd02e75bb46fdbd15898d97aa3c9d6fbdfc2c42e4644f093a85388f28442b9a8ae2abb6bc82ef992b55d8d3d2ff389026267cd08160b5fac3be89c5aecf</PublicKey>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Assembly Publishing">
+    <IsPublishable>false</IsPublishable>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Copyright Info">
+    <Company>$(GitHubProject)</Company>
+    <CurrentYear Condition=" '$(CurrentYear)' == '' ">$([System.DateTime]::UtcNow.Year.ToString())</CurrentYear>
+    <BeginCopyrightYear>2025</BeginCopyrightYear>
+    <CopyrightYearRange>$(BeginCopyrightYear) - $(CurrentYear)</CopyrightYearRange>
+    <CopyrightYearRange Condition=" '$(BeginCopyrightYear)' == '$(CurrentYear)' ">$(CurrentYear)</CopyrightYearRange>
+    <Copyright>Copyright © $(CopyrightYearRange) $(Company)</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup Label="SourceLink Settings: https://github.com/dotnet/sourcelink/blob/main/README.md">
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(BUILD_REPOSITORY_PROVIDER)' == 'GitHub' Or '$(BUILD_REPOSITORY_PROVIDER)' == 'TfsGit' " Label="Deterministic builds: https://github.com/clairernovotny/DeterministicBuilds#readme">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+</Project>

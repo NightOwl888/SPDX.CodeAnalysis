@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup Label="NuGet Package Properties">
+    <IsPackable>true</IsPackable>
+    <!-- This is the new symbols format (the only one currently supported at NuGet.org) -->
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Authors>NightOwl888</Authors>
+    <PackageProjectUrl>https://github.com/$(GitHubOrganization)/$(GitHubProject)/</PackageProjectUrl>
+    <!--<PackageIconUrl>https://raw.githubusercontent.com/$(GitHubOrganization)/$(GitHubProject)/main/branding/netfx-icon-128x128.jpg</PackageIconUrl>
+    <PackageIcon>netfx-icon-128x128.png</PackageIcon>-->
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <ReleaseNotesUrl Condition=" '$(PackageVersion)' != '' ">https://github.com/$(GitHubOrganization)/$(GitHubProject)/releases/tag/v$(PackageVersion)</ReleaseNotesUrl>
+    <PackageReleaseNotes>$(ReleaseNotesUrl)</PackageReleaseNotes>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="$(PackageReadmeFile)"/>
+    <!--<None Include="$(RepositoryRoot)branding\$(PackageIcon)" Pack="true" PackagePath="$(PackageIcon)" Visible="false"/>-->
+  </ItemGroup>
+</Project>

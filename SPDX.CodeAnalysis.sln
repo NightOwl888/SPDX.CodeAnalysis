@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		.build\dependencies.props = .build\dependencies.props
+		.build\nuget.props = .build\nuget.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C2EF017A-5599-40FA-A1C4-E30C8587B058}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+		src\Directory.Build.targets = src\Directory.Build.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis", "src\SPDX.CodeAnalysis\SPDX.CodeAnalysis.csproj", "{5DE39870-229A-472A-ABFC-BC4DB90967D3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A73EE4A7-5330-4CC7-9349-84F425B88B64}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		FUNDING.yml = FUNDING.yml
+		LICENSE.txt = LICENSE.txt
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E2E910FF-6635-4D9D-A7BE-39037849DC4E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.Tests", "tests\SPDX.CodeAnalysis.Tests\SPDX.CodeAnalysis.Tests.csproj", "{DF5B02A4-9B3E-4E0B-921E-2360C9BA5EE1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5DE39870-229A-472A-ABFC-BC4DB90967D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DE39870-229A-472A-ABFC-BC4DB90967D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DE39870-229A-472A-ABFC-BC4DB90967D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DE39870-229A-472A-ABFC-BC4DB90967D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF5B02A4-9B3E-4E0B-921E-2360C9BA5EE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF5B02A4-9B3E-4E0B-921E-2360C9BA5EE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF5B02A4-9B3E-4E0B-921E-2360C9BA5EE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF5B02A4-9B3E-4E0B-921E-2360C9BA5EE1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5DE39870-229A-472A-ABFC-BC4DB90967D3} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
+		{DF5B02A4-9B3E-4E0B-921E-2360C9BA5EE1} = {E2E910FF-6635-4D9D-A7BE-39037849DC4E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3157D387-AA18-46F2-B109-7994C3E12BE1}
+	EndGlobalSection
+EndGlobal
