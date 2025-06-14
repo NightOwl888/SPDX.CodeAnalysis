@@ -18,8 +18,8 @@ namespace SPDX.CodeAnalysis
 
         public override bool Equals(object obj)
         {
-            if (obj is string str)
-                return key.Equals(str, StringComparison.Ordinal);
+            if (obj is StringKey other)
+                return key.Equals(other.key, StringComparison.Ordinal);
 
             return false;
         }
