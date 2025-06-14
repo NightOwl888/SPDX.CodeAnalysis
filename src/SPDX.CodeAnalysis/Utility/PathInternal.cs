@@ -266,6 +266,6 @@ namespace SPDX.CodeAnalysis
         internal static ReadOnlySpan<char> GetPathRoot(ReadOnlySpan<char> path) => osPath.GetPathRoot(path);
 
         internal static char DirectorySeparatorChar => osPath.DirectorySeparatorChar;
-        internal static char AltDirectorySeparatorChar => osPath.DirectorySeparatorChar;
+        internal static char AltDirectorySeparatorChar => osPath.AltDirectorySeparatorChar;
     }
 }
