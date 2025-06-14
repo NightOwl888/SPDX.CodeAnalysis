@@ -112,20 +112,21 @@ namespace SPDX.CodeAnalysis
 
                 ReadOnlySpan<char> spdxLicenseIdentifier = licenseIdContainingText.AsSpan(licenseIdValueSpan!.Value.Start, licenseIdValueSpan.Value.Length).Trim();
 
-                if (!provider.TryGetLicenseHeader(directory, spdxLicenseIdentifier, out IReadOnlyList<string> licenseTextLines))
-                {
-                    // TODO: Report this as an unconfigured license header. For now, we have no fallback values.
-                }
+                // TODO: Re-implement this so we have reporting on license header matching
+                //if (!provider.TryGetLicenseHeader(directory, spdxLicenseIdentifier, out IReadOnlyList<string> licenseTextLines))
+                //{
+                //    // TODO: Report this as an unconfigured license header. For now, we have no fallback values.
+                //}
 
-                foreach (var token in root.DescendantTokens())
-                {
-                    if (ProcessLicenseText(licenseTextLines, token.LeadingTrivia))
-                        break;
+                //foreach (var token in root.DescendantTokens())
+                //{
+                //    if (ProcessLicenseText(licenseTextLines, token.LeadingTrivia))
+                //        break;
 
-                    // Stop scanning once we hit the first type declaration
-                    if (token.Parent is TypeDeclarationSyntax)
-                        break;
-                }
+                //    // Stop scanning once we hit the first type declaration
+                //    if (token.Parent is TypeDeclarationSyntax)
+                //        break;
+                //}
             }
 
 

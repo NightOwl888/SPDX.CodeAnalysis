@@ -10,23 +10,20 @@ namespace SPDX.CodeAnalysis
 {
     public static class LicenseHeaderProviderLoader
     {
-        private static ILicenseHeaderProvider _provider = new FileSystemLicenseHeaderProvider();
+        private static ILicenseHeaderProvider _provider = CreateDefaultLicenseHeaderProvider();
 
         public static void SetProvider(ILicenseHeaderProvider provider) =>
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
 
-        public static void ResetOverride() => _provider = new FileSystemLicenseHeaderProvider();
+        public static void ResetOverride() => _provider = CreateDefaultLicenseHeaderProvider();
 
         public static ILicenseHeaderProvider GetProvider() => _provider;
 
 
-        //public static ILicenseHeaderProvider GetProvider(AnalyzerOptions options, SyntaxTree tree, CancellationToken token)
-        //{
-        //    if (_provider is not null)
-        //        return _provider;
-
-        //    var sourcePath = Path.GetDirectoryName(tree.FilePath)!;
-        //    return new FileSystemLicenseHeaderProvider(sourcePath, options);
-        //}
+        private static ILicenseHeaderProvider CreateDefaultLicenseHeaderProvider()
+        {
+            var fileSystem = new FileSystem();
+            return new LicenseHeaderProvider(fileSystem, new ParentDirectorySpdxDiscoveryStrategy(fileSystem));
+        }
     }
 }

@@ -5,6 +5,7 @@ namespace SPDX.CodeAnalysis
 {
     public interface ILicenseHeaderProvider
     {
-        bool TryGetLicenseHeader(string fileDirectory, ReadOnlySpan<char> spdxLicenseIdentifier, out IReadOnlyList<string> result);
+        // topLevelDirectory == "LICENSES.HEADERS"
+        bool TryGetLicenseHeader(string fileDirectory, string topLevelDirectory, ReadOnlySpan<char> spdxLicenseIdentifier, out IReadOnlyList<IReadOnlyList<string>> result);
     }
 }

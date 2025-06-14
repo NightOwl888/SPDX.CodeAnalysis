@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SPDX.CodeAnalysis.Tests
 {
-    public class InMemoryLicenseHeaderProvider : ILicenseHeaderProvider
+    public class InMemoryLicenseHeaderProvider //: ILicenseHeaderProvider // TODO: Re-implement this interface for testing
     {
         private readonly Dictionary<string, LicenseHeaderCache> _cache;
 
@@ -20,7 +20,7 @@ namespace SPDX.CodeAnalysis.Tests
                 foreach (var (spdxId, lines) in entries)
                     map[new StringKey(spdxId)] = LinesToList(lines);
 
-                _cache[dir] = new LicenseHeaderCache(map);
+                //_cache[dir] = new LicenseHeaderCache(map);
             }
         }
 
@@ -38,7 +38,7 @@ namespace SPDX.CodeAnalysis.Tests
         {
             if (_cache.TryGetValue(fileDirectory, out var licenseCache))
             {
-                return licenseCache.TryGetLicenseHeader(spdxLicenseIdentifier, out result);
+                //return licenseCache.TryGetLicenseHeader(spdxLicenseIdentifier, out result);
             }
 
             result = Array.Empty<string>();

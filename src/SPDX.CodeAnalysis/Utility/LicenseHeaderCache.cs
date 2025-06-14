@@ -6,28 +6,29 @@ namespace SPDX.CodeAnalysis
 {
     public sealed class LicenseHeaderCache
     {
-        private readonly Dictionary<StringKey, IReadOnlyList<string>> _map;
+        private readonly Dictionary<StringKey, IReadOnlyList<IReadOnlyList<string>>> _map;
 
-        public LicenseHeaderCache(Dictionary<StringKey, IReadOnlyList<string>> map)
+        public LicenseHeaderCache(Dictionary<StringKey, IReadOnlyList<IReadOnlyList<string>>> map)
         {
             _map = map ?? throw new ArgumentNullException(nameof(map));
         }
 
-        public bool TryGetLicenseHeader(ReadOnlySpan<char> spdxLicenseIdentifier, out IReadOnlyList<string> result)
+        public bool TryGetLicenseHeaders(ReadOnlySpan<char> spdxLicenseIdentifier, out IReadOnlyList<IReadOnlyList<string>> candidateLicenseHeaders)
         {
             int hashCode = StringHelper.GetHashCode(spdxLicenseIdentifier);
+            List<IReadOnlyList<string>> licenseHeaders = new List<IReadOnlyList<string>>();
+
             foreach (var kvp in _map)
             {
-                var key = kvp.Key;
-                if (key.GetHashCode() == hashCode && key.Equals(spdxLicenseIdentifier))
+                if (kvp.Key.GetHashCode() == hashCode && kvp.Key.Equals(spdxLicenseIdentifier))
                 {
-                    result = kvp.Value;
-                    return true;
+                    licenseHeaders.AddRange(kvp.Value);
+                    break;
                 }
             }
 
-            result = Array.Empty<string>();
-            return false;
+            candidateLicenseHeaders = licenseHeaders.AsReadOnly();
+            return licenseHeaders.Count > 0;
         }
     }
 }

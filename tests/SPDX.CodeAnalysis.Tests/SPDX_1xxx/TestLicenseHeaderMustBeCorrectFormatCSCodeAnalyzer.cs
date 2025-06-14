@@ -15,20 +15,22 @@ namespace SPDX.CodeAnalysis.Tests
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            var licenses = new Dictionary<string, string>
-            {
-                [ApacheLicenseHeaderId] = ApacheLicenseHeaderText,
-                [MITLicenseHeaderId] = MITLicenseHeaderText,
-            };
-            var directories = new Dictionary<string, IDictionary<string, string>>
-            {
-                ["LICENSES.HEADERS"] = licenses,
-            };
+            // TODO: Re-implement this interface for testing
 
-            LicenseHeaderProviderLoader.SetProvider(new InMemoryLicenseHeaderProvider(directories));
+            //var licenses = new Dictionary<string, string>
+            //{
+            //    [ApacheLicenseHeaderId] = ApacheLicenseHeaderText,
+            //    [MITLicenseHeaderId] = MITLicenseHeaderText,
+            //};
+            //var directories = new Dictionary<string, IDictionary<string, string>>
+            //{
+            //    ["LICENSES.HEADERS"] = licenses,
+            //};
+
+            //LicenseHeaderProviderLoader.SetProvider(new InMemoryLicenseHeaderProvider(directories));
         }
 
-        
+
 
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
         {
