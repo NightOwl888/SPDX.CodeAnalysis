@@ -13,14 +13,14 @@ namespace SPDX.CodeAnalysis
             _map = map ?? throw new ArgumentNullException(nameof(map));
         }
 
-        public bool TryGetLicenseHeaders(ReadOnlySpan<char> spdxLicenseIdentifier, out IReadOnlyList<IReadOnlyList<string>> candidateLicenseHeaders)
+        public bool TryGetLicenseHeaders(ReadOnlySpan<char> spdxLicenseIdentifier, ReadOnlySpan<char> licenseLocation, out IReadOnlyList<IReadOnlyList<string>> candidateLicenseHeaders)
         {
-            int hashCode = StringHelper.GetHashCode(spdxLicenseIdentifier);
+            int hashCode = StringKey.GetHashCode(spdxLicenseIdentifier, licenseLocation);
             List<IReadOnlyList<string>> licenseHeaders = new List<IReadOnlyList<string>>();
 
             foreach (var kvp in _map)
             {
-                if (kvp.Key.GetHashCode() == hashCode && kvp.Key.Equals(spdxLicenseIdentifier))
+                if (kvp.Key.GetHashCode() == hashCode && kvp.Key.Equals(spdxLicenseIdentifier, licenseLocation))
                 {
                     licenseHeaders.AddRange(kvp.Value);
                     break;

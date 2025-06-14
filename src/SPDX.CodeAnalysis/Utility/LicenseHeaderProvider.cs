@@ -29,7 +29,7 @@ namespace SPDX.CodeAnalysis
                 throw new ArgumentNullException(nameof(fileDirectory));
 
             // Use discovery strategy
-            var licenseLocation = _discoveryStrategy.FindLicenseLocation(fileDirectory, topLevelDirectory, spdxLicenseIdentifier);
+            string? licenseLocation = _discoveryStrategy.FindLicenseLocation(fileDirectory, topLevelDirectory, spdxLicenseIdentifier);
             if (licenseLocation == null)
             {
                 result = Empty;
@@ -39,7 +39,7 @@ namespace SPDX.CodeAnalysis
             // Cache based on exact location (file or folder)
             var cache = GetOrAddCache(licenseLocation, spdxLicenseIdentifier);
 
-            return cache.TryGetLicenseHeaders(spdxLicenseIdentifier, out result);
+            return cache.TryGetLicenseHeaders(spdxLicenseIdentifier, licenseLocation.AsSpan(), out result);
         }
 
         private LicenseHeaderCache GetOrAddCache(string licenseLocation, ReadOnlySpan<char> spdxLicenseIdentifier)
@@ -58,7 +58,7 @@ namespace SPDX.CodeAnalysis
         private LicenseHeaderCache CreateLicenseHeaderCache(string licenseLocation, ReadOnlySpan<char> spdxLicenseIdentifier)
         {
             var map = new Dictionary<StringKey, List<IReadOnlyList<string>>>(StringKey.Comparer);
-            var key = new StringKey(spdxLicenseIdentifier.ToString());
+            var key = new StringKey(spdxLicenseIdentifier.ToString(), licenseLocation);
 
             if (_fileSystem.DirectoryExists(licenseLocation))
             {
