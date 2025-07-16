@@ -3,9 +3,10 @@
 
 namespace SPDX.CodeAnalysis.Tests
 {
-    public enum CommentStyle
+    public enum CodeStyleElement
     {
-        SingleLine,
-        MultiLine
+        LicenseIdentifier,
+        FileCopyrightText,
+        LicenseHeaderText,
     }
 }

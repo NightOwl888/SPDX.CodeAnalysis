@@ -3,9 +3,9 @@
 
 namespace SPDX.CodeAnalysis.Tests
 {
-    public enum CommentStyle
+    public enum CodeLanguage
     {
-        SingleLine,
-        MultiLine
+        CSharp,
+        VisualBasic
     }
 }

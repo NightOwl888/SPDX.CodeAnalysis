@@ -1,9 +1,12 @@
-﻿using System;
+﻿// Use of this source code is governed by an MIT-style license that can be
+// found in the LICENSE.txt file or at https://opensource.org/licenses/MIT.
+
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace SPDX.CodeAnalysis.Tests
+namespace SPDX.CodeAnalysis.Tests.CSharp
 {
     public class CSharpFileBuilder
     {

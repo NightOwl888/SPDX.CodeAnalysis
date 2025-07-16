@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace SPDX.CodeAnalysis.Tests
+namespace SPDX.CodeAnalysis
 {
-    public class FsmlFileSystem : IFileSystem
+    public class FsmlFileSystem : IFileSystem // Only used by tests
     {
         private readonly Dictionary<string, List<string>> _filesByDir = new(StringComparer.Ordinal);
         private readonly Dictionary<string, string> _contentByFile = new(StringComparer.Ordinal);
@@ -29,7 +29,7 @@ namespace SPDX.CodeAnalysis.Tests
                 foreach (var fileName in kv.Value.Keys)
                 {
                     //string fullPath = Path.Combine(kv.Key, fileName + ".txt");
-                    string fullPath = PathHelper.NormalizeAndJoin(kv.Key.AsSpan(), fileName + ".txt");
+                    string fullPath = PathHelper.NormalizeAndJoin(kv.Key.AsSpan(), $"{fileName}.txt".AsSpan());
                     _contentByFile[fullPath] = kv.Value[fileName];
                 }
             }
@@ -45,7 +45,7 @@ namespace SPDX.CodeAnalysis.Tests
 
             // only support "*.txt"
             //return fileNames.Select(fn => Path.Combine(path, fn + ".txt"));
-            return fileNames.Select(fn => PathHelper.NormalizeAndJoin(path.AsSpan(), fn + ".txt"));
+            return fileNames.Select(fn => PathHelper.NormalizeAndJoin(path.AsSpan(), $"{fn}.txt".AsSpan()));
         }
 
         public IEnumerable<string> EnumerateDirectories(string path, string pattern)

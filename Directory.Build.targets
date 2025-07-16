@@ -13,6 +13,15 @@
     <DebugType Condition=" '$(PortableDebugTypeOnly)' == 'true' ">portable</DebugType>
   </PropertyGroup>
 
+  <Target Name="AddInternalsVisibleTo" BeforeTargets="BeforeCompile" Label="Adds InternalsVisibleTo Attribute and PublicKey (if supplied)">
+    <ItemGroup Condition="'@(InternalsVisibleTo->Count())' &gt; 0 ">
+      <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+        <_Parameter1>%(InternalsVisibleTo.Identity)</_Parameter1>
+        <_Parameter1 Condition=" '$(SignAssembly)' == 'true' And '$(PublicKey)' != '' ">%(InternalsVisibleTo.Identity), PublicKey=$(PublicKey)</_Parameter1>
+      </AssemblyAttribute>
+    </ItemGroup>
+  </Target>
+
   <Target Name="PrintTargetFrameworks" Label="Prints the value for the $(TargetFrameworks) property or 'none' if no frameworks apply. Pass TestProjectsOnly=true to get results only if this is a test project.">
     <PropertyGroup>
       <DoOutputTargetFrameworks Condition=" '$(TestProjectsOnly)' != 'true' Or ('$(TestProjectsOnly)' == 'true' And '$(IsTestProject)' == 'true')">true</DoOutputTargetFrameworks>

@@ -12,7 +12,7 @@ namespace SPDX.CodeAnalysis.Tests
                 public const string SPDX_LicenseIdentifier = "Apache-2.0";
                 public const string SPDX_FileCopyrightText = "Copyright 2025-2028 John Smith";
 
-                public const string LicenseHeader = @"Licensed under the Apache License, Version 2.0 (the ""License"");
+                public const string Header = @"Licensed under the Apache License, Version 2.0 (the ""License"");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
@@ -30,7 +30,7 @@ limitations under the License.";
                 public const string SPDX_LicenseIdentifier = "MIT";
                 public const string SPDX_FileCopyrightText = "Copyright 2025-2028 John Smith";
 
-                public const string LicenseHeader = @"Use of this source code is governed by an MIT-style license that can be
+                public const string Header = @"Use of this source code is governed by an MIT-style license that can be
 found in the LICENSE.txt file or at https://opensource.org/licenses/MIT.";
             }
         }

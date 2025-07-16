@@ -1,0 +1,38 @@
+﻿// Use of this source code is governed by an MIT-style license that can be
+// found in the LICENSE.txt file or at https://opensource.org/licenses/MIT.
+
+using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Testing;
+
+namespace SPDX.CodeAnalysis.Tests
+{
+    public class LicenseHeaderMustBeCorrectFormatTestDriver : FsmlAnalyzerTest<Verifier>
+    {
+        private readonly LicenseAnalyzerOptions licenseAnalyzerOptions;
+
+        public LicenseHeaderMustBeCorrectFormatTestDriver(string fsmlXml, CodeLanguage language, bool suppressLocation = false)
+            : base(fsmlXml, language)
+        {
+            this.licenseAnalyzerOptions = new LicenseAnalyzerOptions { SuppressLocation = suppressLocation };
+
+            // Disable the check for #pragma diagnositicId for the current analyzer.
+            // This check fails if an analyzer outputs messages by default.
+            this.TestBehaviors |= TestBehaviors.SkipSuppressionCheck;
+        }
+
+        protected override DiagnosticAnalyzer CreateCSharpAnalyzer()
+        {
+            // Use dependency injection to mock the file system for testing.
+            IFileSystem fileSystem = CreateFileSystem();
+            return new LicenseHeaderMustBeCorrectFormat(
+                new LicenseHeaderProvider(fileSystem, new ParentDirectorySpdxDiscoveryStrategy(fileSystem)),
+                licenseAnalyzerOptions);
+        }
+
+        protected override DiagnosticAnalyzer CreateVisualBasicAnalyzer()
+        {
+            return new EmptyDiagnosticAnalyzer(); // TODO: For now, we don't support VB
+        }
+
+    }
+}

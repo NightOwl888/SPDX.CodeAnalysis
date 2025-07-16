@@ -1,9 +1,8 @@
-﻿using NUnit.Framework;
-using System;
+﻿// Use of this source code is governed by an MIT-style license that can be
+// found in the LICENSE.txt file or at https://opensource.org/licenses/MIT.
+
+using NUnit.Framework;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SPDX.CodeAnalysis.Tests
 {

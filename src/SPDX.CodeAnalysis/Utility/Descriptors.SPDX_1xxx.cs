@@ -1,4 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
+﻿// Use of this source code is governed by an MIT-style license that can be
+// found in the LICENSE.txt file or at https://opensource.org/licenses/MIT.
+
+using Microsoft.CodeAnalysis;
 using static Microsoft.CodeAnalysis.DiagnosticSeverity;
 using static SPDX.CodeAnalysis.Category;
 
@@ -20,14 +23,14 @@ namespace SPDX.CodeAnalysis
                 Warning
             );
 
-        public static DiagnosticDescriptor SPDX_1002_LicenseCopyrightTextMustExist { get; } =
+        public static DiagnosticDescriptor SPDX_1002_FileCopyrightTextMustExist { get; } =
             Diagnostic(
                 "SPDX_1002",
                 Licensing,
                 Warning
             );
 
-        public static DiagnosticDescriptor SPDX_1003_LicenseCopyrightTextMustHaveValue { get; } =
+        public static DiagnosticDescriptor SPDX_1003_FileCopyrightTextMustHaveValue { get; } =
             Diagnostic(
                 "SPDX_1003",
                 Licensing,

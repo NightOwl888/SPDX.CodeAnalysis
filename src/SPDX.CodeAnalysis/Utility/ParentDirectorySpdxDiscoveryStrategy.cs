@@ -18,9 +18,9 @@ namespace SPDX.CodeAnalysis
 
         public string? FindLicenseLocation(string startingDirectory, string topLevelDirName, ReadOnlySpan<char> spdxLicenseIdentifier)
         {
-            //string fullPath = Path.GetFullPath(startingDirectory);
-            //ReadOnlySpan<char> dir = fullPath.AsSpan();
-            ReadOnlySpan<char> dir = startingDirectory.AsSpan();
+            string fullPath = Path.GetFullPath(startingDirectory);
+            ReadOnlySpan<char> dir = fullPath.AsSpan();
+            //ReadOnlySpan<char> dir = startingDirectory.AsSpan();
             while (!PathInternal.IsEffectivelyEmpty(dir))
             {
                 //string basePath = Path.Combine(dir, topLevelDirName);

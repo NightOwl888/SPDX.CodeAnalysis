@@ -1,8 +1,10 @@
-﻿using System;
+﻿// Use of this source code is governed by an MIT-style license that can be
+// found in the LICENSE.txt file or at https://opensource.org/licenses/MIT.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Xml.Linq;
 
 namespace SPDX.CodeAnalysis
@@ -27,7 +29,7 @@ namespace SPDX.CodeAnalysis
             var result = new Dictionary<string, IDictionary<string, string>>(StringComparer.Ordinal);
 
             var rootDirectory = doc.Root?.Elements().FirstOrDefault() ?? throw new InvalidOperationException("Root directory missing");
-            ParseDirectory(rootDirectory, "", result);
+            ParseDirectory(rootDirectory, ".", result);
             return result;
         }
 
@@ -35,7 +37,9 @@ namespace SPDX.CodeAnalysis
         {
             string dirName = dirElement.Attribute("name")?.Value ?? throw new InvalidOperationException("Directory missing name");
             //string fullPath = Path.Combine(currentPath.Replace('/', Path.DirectorySeparatorChar), dirName);
-            string fullPath = PathHelper.NormalizeAndJoin(currentPath.AsSpan(), dirName.AsSpan());
+            string rootedDirectory = Path.GetFullPath(currentPath);
+            string fullPath = PathHelper.NormalizeAndJoin(rootedDirectory.AsSpan(), dirName.AsSpan());
+            //string fullPath = Path.GetFullPath(PathHelper.NormalizeAndJoin(currentPath.AsSpan(), dirName.AsSpan()));
             var files = new Dictionary<string, string>(StringComparer.Ordinal);
 
             foreach (var file in dirElement.Elements("file"))

@@ -3,9 +3,10 @@
 
 namespace SPDX.CodeAnalysis.Tests
 {
-    public enum CommentStyle
+    // TODO: Remove
+    public interface IFileBuilder
     {
-        SingleLine,
-        MultiLine
+        void WriteComment(FilePosition position, string content, CommentStyle style);
+        string ToString();
     }
 }

@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// Use of this source code is governed by an MIT-style license that can be
+// found in the LICENSE.txt file or at https://opensource.org/licenses/MIT.
+
+using System;
 using System.IO;
-using System.Linq;
-using System.Net.Http.Headers;
 using System.Text;
-using System.Threading.Tasks;
 using static SPDX.CodeAnalysis.MemoryExtensions;
 
 namespace SPDX.CodeAnalysis.Tests
