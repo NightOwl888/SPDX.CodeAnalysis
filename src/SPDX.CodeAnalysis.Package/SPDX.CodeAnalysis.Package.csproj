@@ -19,6 +19,8 @@
     <SpdxCodeAnalysisCSAssemblyFile>$(RepositoryRoot)src\SPDX.CodeAnalysis.CSharp\bin\$(Configuration)\$(TargetFramework)\SPDX.CodeAnalysis.CSharp.dll</SpdxCodeAnalysisCSAssemblyFile>
     <SpdxCodeAnalysisVBAssemblyFile>$(RepositoryRoot)src\SPDX.CodeAnalysis.VisualBasic\bin\$(Configuration)\$(TargetFramework)\SPDX.CodeAnalysis.VisualBasic.dll</SpdxCodeAnalysisVBAssemblyFile>
 
+    <SpdxCommonAssemblyFile>$(RepositoryRoot)src\SPDX.Common\bin\$(Configuration)\$(TargetFramework)\SPDX.Common.dll</SpdxCommonAssemblyFile>
+
     <SpdxCodeAnalysisCommonAssemblyFile>$(RepositoryRoot)src\SPDX.CodeAnalysis.Common\bin\$(Configuration)\$(TargetFramework)\SPDX.CodeAnalysis.dll</SpdxCodeAnalysisCommonAssemblyFile>
   </PropertyGroup>
 
@@ -30,6 +32,9 @@
 
     <None Include="$(SpdxCodeAnalysisCommonAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <!--<None Include="$(SpdxCodeAnalysisCommonAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/vb" Visible="false" />-->
+
+    <None Include="$(SpdxCommonAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <!--<None Include="$(SpdxCommonAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/vb" Visible="false" />-->
   </ItemGroup>
 
 </Project>

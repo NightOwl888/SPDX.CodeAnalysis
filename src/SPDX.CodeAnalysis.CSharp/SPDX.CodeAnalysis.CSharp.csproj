@@ -4,7 +4,6 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <IsRoslynComponent>true</IsRoslynComponent>
@@ -31,6 +30,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SPDX.CodeAnalysis.Common\SPDX.CodeAnalysis.Common.csproj" />
+    <ProjectReference Include="..\SPDX.Common\SPDX.Common.csproj" />
   </ItemGroup>
 
 </Project>

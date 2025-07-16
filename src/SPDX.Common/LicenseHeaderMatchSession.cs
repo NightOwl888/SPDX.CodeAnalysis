@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SPDX.CodeAnalysis
 {
-    internal ref struct LicenseHeaderMatchSession
+    public ref struct LicenseHeaderMatchSession
     {
         private readonly IReadOnlyList<string> _expectedLines;
         private readonly int _lineCount;

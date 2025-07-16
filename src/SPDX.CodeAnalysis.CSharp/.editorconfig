@@ -1,0 +1,3 @@
+# Enable Roslyn code analyzer rules to be sure we don't add anything illegal in this library
+[*.cs]
+dotnet_analyzer_diagnostic.category-AnalyzerCorrectness.severity = warning

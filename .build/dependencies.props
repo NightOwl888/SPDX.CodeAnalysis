@@ -12,5 +12,7 @@
     <MicrosoftNETTestSdkPackageReferenceVersion>17.13.0</MicrosoftNETTestSdkPackageReferenceVersion>
     <NUnitPackageReferenceVersion>4.3.2</NUnitPackageReferenceVersion>
     <NUnit3TestAdapterPackageReferenceVersion>5.0.0</NUnit3TestAdapterPackageReferenceVersion>
+    <SystemBuffersPackageReferenceVersion>4.5.1</SystemBuffersPackageReferenceVersion>
+    <SystemMemoryPackageReferenceVersion>4.5.5</SystemMemoryPackageReferenceVersion>
   </PropertyGroup>
 </Project>

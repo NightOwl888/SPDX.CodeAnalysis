@@ -36,6 +36,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.CSharp", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.Common", "src\SPDX.CodeAnalysis.Common\SPDX.CodeAnalysis.Common.csproj", "{36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.Common", "src\SPDX.Common\SPDX.Common.csproj", "{CD22E965-03E8-4857-A55B-DCCE16DE138F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +60,10 @@ Global
 		{36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD22E965-03E8-4857-A55B-DCCE16DE138F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD22E965-03E8-4857-A55B-DCCE16DE138F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD22E965-03E8-4857-A55B-DCCE16DE138F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD22E965-03E8-4857-A55B-DCCE16DE138F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,6 +73,7 @@ Global
 		{DF5B02A4-9B3E-4E0B-921E-2360C9BA5EE1} = {E2E910FF-6635-4D9D-A7BE-39037849DC4E}
 		{D57D26CF-C0E2-43DD-87BE-9B67F39E9019} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
 		{36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
+		{CD22E965-03E8-4857-A55B-DCCE16DE138F} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3157D387-AA18-46F2-B109-7994C3E12BE1}
