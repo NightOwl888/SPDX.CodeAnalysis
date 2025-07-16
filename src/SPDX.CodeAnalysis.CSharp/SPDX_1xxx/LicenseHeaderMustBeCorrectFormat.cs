@@ -16,7 +16,7 @@ using System.Text;
 using System.Xml.Linq;
 using System.Collections.Immutable;
 
-namespace SPDX.CodeAnalysis
+namespace SPDX.CodeAnalysis.CSharp
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class LicenseHeaderMustBeCorrectFormat : DiagnosticAnalyzer

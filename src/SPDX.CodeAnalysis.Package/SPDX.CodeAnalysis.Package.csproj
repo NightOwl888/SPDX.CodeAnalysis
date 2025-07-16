@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Note TargetFramework or TargetFrameworks must match the output projects for the directories to be build correctly -->
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <NoBuild>true</NoBuild>
+    <IncludeSymbols>false</IncludeSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Label="NuGet Package Settings">
+    <PackageId>SPDX.CodeAnalysis</PackageId>
+    <Description>SPDX license header enforcement analyzers for OSS projects.</Description>
+    <!--<PackageTags>$(PackageTags)</PackageTags>-->
+  </PropertyGroup>
+
+  <PropertyGroup Label="NuGet Package File Paths">
+    <SpdxCodeAnalysisCSAssemblyFile>$(RepositoryRoot)src\SPDX.CodeAnalysis.CSharp\bin\$(Configuration)\$(TargetFramework)\SPDX.CodeAnalysis.CSharp.dll</SpdxCodeAnalysisCSAssemblyFile>
+    <SpdxCodeAnalysisVBAssemblyFile>$(RepositoryRoot)src\SPDX.CodeAnalysis.VisualBasic\bin\$(Configuration)\$(TargetFramework)\SPDX.CodeAnalysis.VisualBasic.dll</SpdxCodeAnalysisVBAssemblyFile>
+  </PropertyGroup>
+
+  <ItemGroup Label="NuGet Package Files">
+    <!-- TODO: Add a readme for this package specifically. The plan is to make the tools to generate license files part of this solution, so we will need separate readme files. -->
+    <!--<None Include="readme.md" Pack="true" PackagePath="\readme.md" />-->
+    <None Include="$(SpdxCodeAnalysisCSAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <!--<None Include="$(SpdxCodeAnalysisVBAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/vb" Visible="false" />-->
+  </ItemGroup>
+
+</Project>

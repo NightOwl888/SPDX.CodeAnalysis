@@ -3,6 +3,7 @@
 
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
+using SPDX.CodeAnalysis.CSharp;
 
 namespace SPDX.CodeAnalysis.Tests
 {

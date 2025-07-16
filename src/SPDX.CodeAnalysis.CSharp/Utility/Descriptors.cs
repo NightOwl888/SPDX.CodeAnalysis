@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using SPDX.CodeAnalysis.CSharp;
 using System.Collections.Concurrent;
 
 namespace SPDX.CodeAnalysis
