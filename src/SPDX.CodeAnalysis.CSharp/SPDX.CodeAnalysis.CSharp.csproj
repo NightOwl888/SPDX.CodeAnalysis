@@ -9,10 +9,6 @@
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <IsRoslynComponent>true</IsRoslynComponent>
     <!--<TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
-
-    <!-- This is needed so that the cross-platform C# language server can find the generated Resources.Designer.cs file -->
-    <!-- see: https://github.com/dotnet/msbuild/issues/8086 -->
-    <CoreCompileDependsOn>PrepareResources;$(CompileDependsOn)</CoreCompileDependsOn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,24 +19,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="$(MicrosoftCodeAnalysisCSharpPackageReferenceVersion)" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!--
-      This approach allows the Resources.designer.cs file to be generated into obj,
-      instead of checked into source control. It also fixes an issue with JetBrains Rider
-      where it doesn't generate comments on the generated properties.
-      See: https://github.com/dotnet/msbuild/issues/8086
-      and https://youtrack.jetbrains.com/issue/RIDER-74074/PublicResXFileCodeGenerator-does-not-generate-comments-and-the-order-of-properties-changes
-    -->
-    <EmbeddedResource Update="Resources.resx">
-      <Generator>MSBuild:Compile</Generator>
-      <StronglyTypedFileName>$(IntermediateOutputPath)Resources.designer.cs</StronglyTypedFileName>
-      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
-      <StronglyTypedNamespace>SPDX.CodeAnalysis.CSharp</StronglyTypedNamespace>
-      <StronglyTypedClassName>Resources</StronglyTypedClassName>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-
   <!-- See: https://github.com/dotnet/roslyn-analyzers/issues/5663#issuecomment-948304565 -->
   <ItemGroup>
     <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
@@ -49,6 +27,10 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="SPDX.CodeAnalysis.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SPDX.CodeAnalysis.Common\SPDX.CodeAnalysis.Common.csproj" />
   </ItemGroup>
 
 </Project>

@@ -18,6 +18,8 @@
   <PropertyGroup Label="NuGet Package File Paths">
     <SpdxCodeAnalysisCSAssemblyFile>$(RepositoryRoot)src\SPDX.CodeAnalysis.CSharp\bin\$(Configuration)\$(TargetFramework)\SPDX.CodeAnalysis.CSharp.dll</SpdxCodeAnalysisCSAssemblyFile>
     <SpdxCodeAnalysisVBAssemblyFile>$(RepositoryRoot)src\SPDX.CodeAnalysis.VisualBasic\bin\$(Configuration)\$(TargetFramework)\SPDX.CodeAnalysis.VisualBasic.dll</SpdxCodeAnalysisVBAssemblyFile>
+
+    <SpdxCodeAnalysisCommonAssemblyFile>$(RepositoryRoot)src\SPDX.CodeAnalysis.Common\bin\$(Configuration)\$(TargetFramework)\SPDX.CodeAnalysis.dll</SpdxCodeAnalysisCommonAssemblyFile>
   </PropertyGroup>
 
   <ItemGroup Label="NuGet Package Files">
@@ -25,6 +27,9 @@
     <!--<None Include="readme.md" Pack="true" PackagePath="\readme.md" />-->
     <None Include="$(SpdxCodeAnalysisCSAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <!--<None Include="$(SpdxCodeAnalysisVBAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/vb" Visible="false" />-->
+
+    <None Include="$(SpdxCodeAnalysisCommonAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <!--<None Include="$(SpdxCodeAnalysisCommonAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/vb" Visible="false" />-->
   </ItemGroup>
 
 </Project>

@@ -34,6 +34,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.CSharp", "src\SPDX.CodeAnalysis.CSharp\SPDX.CodeAnalysis.CSharp.csproj", "{D57D26CF-C0E2-43DD-87BE-9B67F39E9019}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.Common", "src\SPDX.CodeAnalysis.Common\SPDX.CodeAnalysis.Common.csproj", "{36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +54,10 @@ Global
 		{D57D26CF-C0E2-43DD-87BE-9B67F39E9019}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D57D26CF-C0E2-43DD-87BE-9B67F39E9019}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D57D26CF-C0E2-43DD-87BE-9B67F39E9019}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +66,7 @@ Global
 		{5DE39870-229A-472A-ABFC-BC4DB90967D3} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
 		{DF5B02A4-9B3E-4E0B-921E-2360C9BA5EE1} = {E2E910FF-6635-4D9D-A7BE-39037849DC4E}
 		{D57D26CF-C0E2-43DD-87BE-9B67F39E9019} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
+		{36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3157D387-AA18-46F2-B109-7994C3E12BE1}

@@ -5,6 +5,7 @@
     <NerdBankGitVersioningPackageReferenceVersion>[3.5.73-alpha]</NerdBankGitVersioningPackageReferenceVersion>
     <MicrosoftCodeAnalysisAnalyzersPackageReferenceVersion>3.11.0</MicrosoftCodeAnalysisAnalyzersPackageReferenceVersion>
     <MicrosoftCodeAnalysisAnalyzerTestingPackageReferenceVersion>1.1.2</MicrosoftCodeAnalysisAnalyzerTestingPackageReferenceVersion>
+    <MicrosoftCodeAnalysisCommonPackageReferenceVersion>4.12.0</MicrosoftCodeAnalysisCommonPackageReferenceVersion>
     <MicrosoftCodeAnalysisCSharpPackageReferenceVersion>4.12.0</MicrosoftCodeAnalysisCSharpPackageReferenceVersion>
     <MicrosoftCodeAnalysisCSharpWorkspacesPackageReferenceVersion>4.13.0</MicrosoftCodeAnalysisCSharpWorkspacesPackageReferenceVersion>
     <MicrosoftCodeAnalysisVisualBasicWorkspacesPackageReferenceVersion>4.13.0</MicrosoftCodeAnalysisVisualBasicWorkspacesPackageReferenceVersion>
