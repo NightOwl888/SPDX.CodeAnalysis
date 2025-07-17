@@ -10,7 +10,7 @@ namespace SPDX.CodeAnalysis
     {
         // Outer key = LICENSES.HEADERS directory full path
         // Inner key = "MIT" from "MIT.txt", etc.
-        private readonly Dictionary<string, LicenseHeaderCache> _cache = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, LicenseHeaderCacheOld> _cache = new(StringComparer.Ordinal);
         private readonly object _lock = new object();
         private readonly IFileSystem _fileSystem;
         private readonly ILicenseDiscoveryStrategy _discoveryStrategy;
@@ -42,20 +42,20 @@ namespace SPDX.CodeAnalysis
             return cache.TryGetLicenseHeaders(spdxLicenseIdentifier, out result);
         }
 
-        private LicenseHeaderCache GetOrAddCache(string licenseLocation, ReadOnlySpan<char> spdxLicenseIdentifier)
+        private LicenseHeaderCacheOld GetOrAddCache(string licenseLocation, ReadOnlySpan<char> spdxLicenseIdentifier)
         {
             lock (_lock)
             {
-                if (_cache.TryGetValue(licenseLocation, out LicenseHeaderCache existing))
+                if (_cache.TryGetValue(licenseLocation, out LicenseHeaderCacheOld existing))
                     return existing;
 
-                LicenseHeaderCache newCache = CreateLicenseHeaderCache(licenseLocation, spdxLicenseIdentifier);
+                LicenseHeaderCacheOld newCache = CreateLicenseHeaderCache(licenseLocation, spdxLicenseIdentifier);
                 _cache[licenseLocation] = newCache;
                 return newCache;
             }
         }
 
-        private LicenseHeaderCache CreateLicenseHeaderCache(string licenseLocation, ReadOnlySpan<char> spdxLicenseIdentifier)
+        private LicenseHeaderCacheOld CreateLicenseHeaderCache(string licenseLocation, ReadOnlySpan<char> spdxLicenseIdentifier)
         {
             var map = new Dictionary<StringKey, List<IReadOnlyList<string>>>(StringKey.Comparer);
             var key = new StringKey(spdxLicenseIdentifier.ToString());
@@ -75,7 +75,7 @@ namespace SPDX.CodeAnalysis
             {
                 readOnly[kvp.Key] = kvp.Value; // Upcast: List<T> → IReadOnlyList<T>
             }
-            return new LicenseHeaderCache(readOnly);
+            return new LicenseHeaderCacheOld(readOnly);
         }
 
         private void AddToMap(Dictionary<StringKey, List<IReadOnlyList<string>>> map, StringKey key, string path)
