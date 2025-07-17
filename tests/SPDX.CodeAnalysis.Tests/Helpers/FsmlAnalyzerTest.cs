@@ -31,17 +31,25 @@ namespace SPDX.CodeAnalysis.Tests
         where TVerifier : IVerifier, new()
     {
         private readonly string fsmlXml;
+        private readonly IFileSystem fileSystem;
+        private readonly ILicenseHeaderConfigurationReader licenseHeaderConfiguration;
+        private readonly string topLevelDirectoryName;
         private string testCode;
         private string testCodeFilePath;
         private bool sourcesAdded;
+        private bool additionalFilesAdded;
 
-        protected FsmlAnalyzerTest(string fsmlXml, CodeLanguage language)
+        protected FsmlAnalyzerTest(string fsmlXml, CodeLanguage language, string topLevelDirectoryName)
             : base(language)
         {
             this.fsmlXml = fsmlXml ?? throw new ArgumentNullException(nameof(fsmlXml));
+            this.topLevelDirectoryName = topLevelDirectoryName ?? throw new ArgumentNullException(nameof(topLevelDirectoryName));
+            this.fileSystem = new FsmlFileSystem(fsmlXml);
+            this.licenseHeaderConfiguration = new LicenseHeaderConfigurationReader(fileSystem);
         }
 
-        protected virtual IFileSystem CreateFileSystem() => new FsmlFileSystem(fsmlXml);
+        // TODO: Remove this
+        protected virtual IFileSystem CreateFileSystem() => fileSystem;
 
 
         /// <summary>
@@ -65,9 +73,11 @@ namespace SPDX.CodeAnalysis.Tests
 
         protected override Task RunImplAsync(CancellationToken cancellationToken)
         {
+            bool hasTestCodeFilePath = !string.IsNullOrEmpty(testCodeFilePath);
+
             if (!sourcesAdded && testCode is not null)
             {
-                if (!string.IsNullOrEmpty(testCodeFilePath))
+                if (hasTestCodeFilePath)
                 {
                     TestState.Sources.Add((Path.GetFullPath(testCodeFilePath), SourceText.From(testCode)));
                 }
@@ -78,6 +88,15 @@ namespace SPDX.CodeAnalysis.Tests
                 sourcesAdded = true;
             }
             // else assume that the user configured it directly using TestState.Sources (which may mean that they configured more than one source file)
+
+            if (!additionalFilesAdded && hasTestCodeFilePath)
+            {
+                foreach ((string filePath, string content) in licenseHeaderConfiguration.GetLicenseHeaderFiles(testCodeFilePath, topLevelDirectoryName))
+                {
+                    TestState.AdditionalFiles.Add((filePath, content));
+                }
+                additionalFilesAdded = true;
+            }
 
             return base.RunImplAsync(cancellationToken);
         }

@@ -11,8 +11,8 @@ namespace SPDX.CodeAnalysis.Tests
     {
         private readonly LicenseAnalyzerOptions licenseAnalyzerOptions;
 
-        public LicenseHeaderMustBeCorrectFormatTestDriver(string fsmlXml, CodeLanguage language, bool suppressLocation = false)
-            : base(fsmlXml, language)
+        public LicenseHeaderMustBeCorrectFormatTestDriver(string fsmlXml, CodeLanguage language, bool suppressLocation = false, string topLevelDirectoryName = "LICENSES.HEADERS")
+            : base(fsmlXml, language, topLevelDirectoryName)
         {
             this.licenseAnalyzerOptions = new LicenseAnalyzerOptions { SuppressLocation = suppressLocation };
 
