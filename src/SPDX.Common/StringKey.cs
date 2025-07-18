@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace SPDX.CodeAnalysis
 {
+    [DebuggerDisplay("{key}")]
     public sealed class StringKey
     {
         private readonly string key;
