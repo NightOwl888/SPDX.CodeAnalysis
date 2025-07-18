@@ -59,7 +59,7 @@ namespace SPDX.CodeAnalysis
                 }
             }
             ReadOnlySpan<char> candidate = enumerator.Current.Segment;
-            int dotIndex = candidate.IndexOf('.');
+            int dotIndex = candidate.LastIndexOf('.');
             if (dotIndex >= 0)
             {
                 return candidate.Slice(0, dotIndex).ToString();
