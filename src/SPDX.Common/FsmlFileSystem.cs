@@ -28,8 +28,7 @@ namespace SPDX.CodeAnalysis
                 _filesByDir[kv.Key] = kv.Value.Keys.ToList();
                 foreach (var fileName in kv.Value.Keys)
                 {
-                    //string fullPath = Path.Combine(kv.Key, fileName + ".txt");
-                    string fullPath = PathHelper.NormalizeAndJoin(kv.Key.AsSpan(), $"{fileName}.txt".AsSpan());
+                    string fullPath = PathHelper.NormalizeAndJoin(kv.Key.AsSpan(), fileName.AsSpan());
                     _contentByFile[fullPath] = kv.Value[fileName];
                 }
             }
@@ -43,9 +42,7 @@ namespace SPDX.CodeAnalysis
             if (!_filesByDir.TryGetValue(path, out var fileNames))
                 return Array.Empty<string>();
 
-            // only support "*.txt"
-            //return fileNames.Select(fn => Path.Combine(path, fn + ".txt"));
-            return fileNames.Select(fn => PathHelper.NormalizeAndJoin(path.AsSpan(), $"{fn}.txt".AsSpan()));
+            return fileNames.Select(fn => PathHelper.NormalizeAndJoin(path.AsSpan(), fn.AsSpan()));
         }
 
         public IEnumerable<string> EnumerateDirectories(string path, string pattern)
