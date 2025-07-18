@@ -38,24 +38,11 @@ namespace SPDX.CodeAnalysis.CSharp
         }
 
         // Dependency injection
-        //private readonly ILicenseHeaderProvider provider;
         private readonly LicenseHeaderCache cache;
         private readonly LicenseAnalyzerOptions options;
 
-        //public LicenseHeaderMustBeCorrectFormat()
-        //    : this(LicenseHeaderProviderLoader.GetProvider(), null)
-        //{
-        //}
-
-        //// Dependency injection constructor (for testing)
-        //internal LicenseHeaderMustBeCorrectFormat(ILicenseHeaderProvider provider, LicenseAnalyzerOptions? options)
-        //{
-        //    this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
-        //    this.options = options ?? new LicenseAnalyzerOptions();
-        //}
-
         public LicenseHeaderMustBeCorrectFormat()
-    :       this(LicenseHeaderCacheHolder.StaticCache, null)
+            : this(LicenseHeaderCacheHolder.StaticCache, null)
         {
         }
 
@@ -112,23 +99,11 @@ namespace SPDX.CodeAnalysis.CSharp
             bool hasLicenseIdValue = true;
             bool hasCopyrightValue = true;
             
-
-            //bool insideNamespace = false;
-
-
             foreach (var token in root.DescendantTokens())
             {
-                //// Track whether we're inside a namespace block (optional)
-                //if (!insideNamespace && token.Parent is BaseNamespaceDeclarationSyntax)
-                //    insideNamespace = true;
-
                 // Process leading trivia for each token
                 if (ProcessSpdxTag(token.LeadingTrivia))
                     break;
-
-                //// Process trailing trivia for each token
-                //if (ProcessTriviaList(token.TrailingTrivia))
-                //    break;
 
                 // Stop scanning once we hit the first type declaration
                 if (token.Parent is TypeDeclarationSyntax)
@@ -195,13 +170,6 @@ namespace SPDX.CodeAnalysis.CSharp
                     // so we can report a diagnostic.
                 }
 
-
-                //if (!provider.TryGetLicenseHeader(codeFileDirectory, licenseHeaderDirectory, spdxLicenseIdentifier, out IReadOnlyList<IReadOnlyList<string>> result))
-                //{
-                //    hasLicenseText = false;
-                //}
-
-                //hasLicenseText = true;
 
                 // TODO: Re-implement this so we have reporting on license header matching
                 //if (!provider.TryGetLicenseHeader(directory, spdxLicenseIdentifier, out IReadOnlyList<string> licenseTextLines))
@@ -276,7 +244,6 @@ namespace SPDX.CodeAnalysis.CSharp
                     else if (trivia.IsKind(SyntaxKind.MultiLineCommentTrivia))
                     {
                         string text = trivia.ToString(); // safe to reference span from here
-                        //ReadOnlySpan<char> comment = text.AsSpan();
 
                         int lineOffset = 0;
                         foreach (var line in text.SplitLines())
@@ -391,66 +358,6 @@ namespace SPDX.CodeAnalysis.CSharp
             {
                 ReportHasNoLicenseText(context);
             }
-        }
-
-        
-
-        private bool MatchesConfiguredLicenseText(SyntaxTreeAnalysisContext context, ReadOnlySpan<char> text)
-        {
-            //var config = context.Options.AnalyzerConfigOptionsProvider.GetOptions(context.Tree);
-            //config.TryGetValue("dotnet_diagnostic.MyRules0001.use_multiple_namespaces_in_a_file", out var configValue);
-
-
-            // TODO: Make this configurable with fallback to the correct license
-            var configuredLicenseLines = new string[]
-            {
-                "Licensed under the Apache License, Version 2.0",
-                "http://www.apache.org/licenses/LICENSE-2.0"
-            };
-
-            foreach (string expected in  configuredLicenseLines)
-            {
-                if (text.Contains(expected.AsSpan(), StringComparison.Ordinal))
-                    return true;
-            }
-
-            return false;
-        }
-
-        //private string? GetProjectDirectory(AnalyzerOptions options)
-        //{
-        //    foreach (var file in options.AdditionalFiles)
-        //    {
-        //        if (options.AnalyzerConfigOptionsProvider.GetOptions(file)
-        //            .TryGetValue("build_property.MSBuildProjectDirectory", out var projectDir))
-        //        {
-        //            return projectDir;
-        //        }
-        //    }
-        //    return null;
-        //}
-
-        //private static string? FindLicenseHeadersDirectory(string startDirectory)
-        //{
-        //    var dir = new DirectoryInfo(startDirectory);
-
-        //    while (dir != null)
-        //    {
-        //        var candidate = Path.Combine(dir.FullName, "LICENSES.HEADERS");
-        //        if (Directory.Exists(candidate))
-        //            return candidate;
-
-        //        dir = dir.Parent;
-        //    }
-
-        //    return null; // not found
-        //}
-
-
-
-        private static void ValidateLicenseIdentifierValue(SyntaxTreeAnalysisContext context, ReadOnlySpan<char> span)
-        {
-
         }
 
         private void ReportDiagnostic(SyntaxTreeAnalysisContext context, DiagnosticDescriptor descriptor, TextSpan span)
