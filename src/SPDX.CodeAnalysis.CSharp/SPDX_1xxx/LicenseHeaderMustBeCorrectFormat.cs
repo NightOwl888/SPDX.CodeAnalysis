@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 namespace SPDX.CodeAnalysis.CSharp
@@ -115,17 +116,9 @@ namespace SPDX.CodeAnalysis.CSharp
             // the current directory.
             if (hasLicenseId && hasLicenseIdValue)
             {
-                //ILicenseHeaderProvider provider = LicenseHeaderProviderLoader.GetProvider();
-
-                //string licenseHeaderDirectory = "LICENSES.HEADERS"; // TODO: Get from configuration setting, default to this value
-                if (!licenseIdValueSpan.HasValue)
-                {
-                    // TODO: We should report this somehow, but this is a bug with our analyzer, not something the user did.
-                }
+                Debug.Assert(licenseIdValueSpan.HasValue, "The parser failed to set a value for licenseIdValueSpan");
 
                 ReadOnlySpan<char> spdxLicenseIdentifier = licenseIdContainingText.AsSpan(licenseIdValueSpan!.Value.Start, licenseIdValueSpan.Value.Length).Trim();
-
-                //string codeFileDirectory = Path.GetDirectoryName(codeFilePath);
 
                 // First pass: Optimize the search for the "happy path" where the SPDX-License-Identifier and codeFilePath match the license header text(s)
                 IReadOnlyList<LicenseHeaderCacheText> matchingLicenseHeaderTexts = cache.GetMatchingLicenseHeaders(spdxLicenseIdentifier, codeFilePath);
