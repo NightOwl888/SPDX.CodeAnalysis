@@ -23,11 +23,8 @@ namespace SPDX.CodeAnalysis.Tests
 
         protected override DiagnosticAnalyzer CreateCSharpAnalyzer()
         {
-            // Use dependency injection to mock the file system for testing.
-            IFileSystem fileSystem = CreateFileSystem();
-            return new LicenseHeaderMustBeCorrectFormat(
-                new LicenseHeaderProvider(fileSystem, new ParentDirectorySpdxDiscoveryStrategy(fileSystem)),
-                licenseAnalyzerOptions);
+            // Inject dependencies into the analyzer for testing
+            return new LicenseHeaderMustBeCorrectFormat(new LicenseHeaderCache(), licenseAnalyzerOptions);
         }
 
         protected override DiagnosticAnalyzer CreateVisualBasicAnalyzer()

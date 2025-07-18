@@ -23,6 +23,7 @@ namespace SPDX.CodeAnalysis.CSharp
     {
         private const string LicenseIdentifierToken = "SPDX-License-Identifier:";
         private const string LicenseCopyrightToken = "SPDX-FileCopyrightText:";
+        private const string TopLevelDirectoryName = "LICENSES.HEADERS"; // TODO: Make configurable?
         private static readonly ImmutableArray<DiagnosticDescriptor> supportedDiagnostics = ImmutableArray.Create<DiagnosticDescriptor>(
             Descriptors.SPDX_1000_LicenseIdentifierMustExist,
             Descriptors.SPDX_1001_LicenseIdentifierMustHaveValue,
@@ -34,19 +35,39 @@ namespace SPDX.CodeAnalysis.CSharp
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => supportedDiagnostics;
 
+        private static class LicenseHeaderCacheHolder
+        {
+            private static readonly LicenseHeaderCache staticCache = new LicenseHeaderCache();
+
+            public static LicenseHeaderCache StaticCache => staticCache;
+        }
+
         // Dependency injection
-        private readonly ILicenseHeaderProvider provider;
+        //private readonly ILicenseHeaderProvider provider;
+        private readonly LicenseHeaderCache cache;
         private readonly LicenseAnalyzerOptions options;
 
+        //public LicenseHeaderMustBeCorrectFormat()
+        //    : this(LicenseHeaderProviderLoader.GetProvider(), null)
+        //{
+        //}
+
+        //// Dependency injection constructor (for testing)
+        //internal LicenseHeaderMustBeCorrectFormat(ILicenseHeaderProvider provider, LicenseAnalyzerOptions? options)
+        //{
+        //    this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
+        //    this.options = options ?? new LicenseAnalyzerOptions();
+        //}
+
         public LicenseHeaderMustBeCorrectFormat()
-            : this(LicenseHeaderProviderLoader.GetProvider(), null)
+    :       this(LicenseHeaderCacheHolder.StaticCache, null)
         {
         }
 
         // Dependency injection constructor (for testing)
-        internal LicenseHeaderMustBeCorrectFormat(ILicenseHeaderProvider provider, LicenseAnalyzerOptions? options)
+        internal LicenseHeaderMustBeCorrectFormat(LicenseHeaderCache cache, LicenseAnalyzerOptions? options)
         {
-            this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
+            this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
             this.options = options ?? new LicenseAnalyzerOptions();
         }
 
@@ -63,7 +84,11 @@ namespace SPDX.CodeAnalysis.CSharp
             //var firstToken = root.GetFirstToken(includeZeroWidth: true);
 
             //var triviaList = firstToken.LeadingTrivia;
-            string? codeFilePath = context.Tree.FilePath;
+            string codeFilePath = context.Tree.FilePath;
+
+            // Load the configuration from AdditionalFiles
+            var loader = new AdditionalFilesLicenseHeaderCacheLoader(context.Options.AdditionalFiles);
+            cache.EnsureInitialized(loader, codeFilePath, TopLevelDirectoryName);
 
 
             string? copyrightContainingText = null; // Used to keep the text in scope while slicing it.
@@ -122,7 +147,7 @@ namespace SPDX.CodeAnalysis.CSharp
             {
                 //ILicenseHeaderProvider provider = LicenseHeaderProviderLoader.GetProvider();
 
-                string licenseHeaderDirectory = "LICENSES.HEADERS"; // TODO: Get from configuration setting, default to this value
+                //string licenseHeaderDirectory = "LICENSES.HEADERS"; // TODO: Get from configuration setting, default to this value
                 if (!licenseIdValueSpan.HasValue)
                 {
                     // TODO: We should report this somehow, but this is a bug with our analyzer, not something the user did.
@@ -130,14 +155,53 @@ namespace SPDX.CodeAnalysis.CSharp
 
                 ReadOnlySpan<char> spdxLicenseIdentifier = licenseIdContainingText.AsSpan(licenseIdValueSpan!.Value.Start, licenseIdValueSpan.Value.Length).Trim();
 
-                string codeFileDirectory = Path.GetDirectoryName(codeFilePath);
+                //string codeFileDirectory = Path.GetDirectoryName(codeFilePath);
 
-                if (!provider.TryGetLicenseHeader(codeFileDirectory, licenseHeaderDirectory, spdxLicenseIdentifier, out IReadOnlyList<IReadOnlyList<string>> result))
+                // First pass: Optimize the search for the "happy path" where the SPDX-License-Identifier and codeFilePath match the license header text(s)
+                IReadOnlyList<LicenseHeaderCacheText> matchingLicenseHeaderTexts = cache.GetMatchingLicenseHeaders(spdxLicenseIdentifier, codeFilePath);
+
+                if (matchingLicenseHeaderTexts.Count > 0)
                 {
-                    hasLicenseText = false;
+                    // Fast path: In the typical case there will be only one license header text to match against.
+                    if (matchingLicenseHeaderTexts.Count == 1)
+                    {
+                        IReadOnlyList<string> lines = matchingLicenseHeaderTexts[0].Lines;
+
+                        foreach (var token in root.DescendantTokens())
+                        {
+                            if (ProcessLicenseText(lines, token.LeadingTrivia))
+                                break;
+
+                            // Stop scanning once we hit the first type declaration
+                            if (token.Parent is TypeDeclarationSyntax)
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        // TODO: We need our session to track matches for each matchingLicenseHeaderTexts
+                        // and determine if any of them matched (and set hasLicnseText to true). If not, we proceed to the second pass.
+                    }
                 }
 
-                hasLicenseText = true;
+                if (!hasLicenseText)
+                {
+                    // Second pass: We know we need to report a diagnostic now, but we are being more thorough with the matching.
+                    // We run a second pass while recording position information so we can report the diagnostics.
+                    IReadOnlyList<LicenseHeaderCacheText> allLicenseHeaderTexts = cache.GetAllLicenseHeaders();
+
+                    // TODO: We need our session to track matches for each allLicenseHeaderTexts
+                    // and determine if any of them matched. This time, we need to enable position tracking
+                    // so we can report a diagnostic.
+                }
+
+
+                //if (!provider.TryGetLicenseHeader(codeFileDirectory, licenseHeaderDirectory, spdxLicenseIdentifier, out IReadOnlyList<IReadOnlyList<string>> result))
+                //{
+                //    hasLicenseText = false;
+                //}
+
+                //hasLicenseText = true;
 
                 // TODO: Re-implement this so we have reporting on license header matching
                 //if (!provider.TryGetLicenseHeader(directory, spdxLicenseIdentifier, out IReadOnlyList<string> licenseTextLines))
