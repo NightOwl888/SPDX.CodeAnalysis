@@ -91,9 +91,9 @@ namespace SPDX.CodeAnalysis.Tests
 
             if (!additionalFilesAdded && hasTestCodeFilePath)
             {
-                foreach ((string filePath, string content) in licenseHeaderConfiguration.GetLicenseHeaderFiles(testCodeFilePath, topLevelDirectoryName))
+                foreach (LicenseHeaderFile file in licenseHeaderConfiguration.GetLicenseHeaderFiles(testCodeFilePath, topLevelDirectoryName))
                 {
-                    TestState.AdditionalFiles.Add((filePath, content));
+                    TestState.AdditionalFiles.Add((file.FullFilePath, file.Content));
                 }
                 additionalFilesAdded = true;
             }
