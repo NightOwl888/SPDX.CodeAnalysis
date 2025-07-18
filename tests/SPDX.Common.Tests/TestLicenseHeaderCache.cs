@@ -79,13 +79,13 @@ Special2 line3]]></file>
             {
                 yield return new TestCaseData(
                     FileSystemXml.With2OverriddenLevels,
-                    "Apache-2",
+                    "Apache-2.0",
                     "project/src/specialized/baz.cs",
                     TopLevelDirectoryName,
                     new[]
                     {
                     new LicenseHeaderCacheText(
-                        "Apache-2",
+                        "Apache-2.0",
                         "project/LICENSES.HEADERS/Apache-2.0.txt",
                         "project",
                         new[]
