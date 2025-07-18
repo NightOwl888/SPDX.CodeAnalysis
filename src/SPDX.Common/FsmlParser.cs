@@ -46,7 +46,7 @@ namespace SPDX.CodeAnalysis
             {
                 string name = file.Attribute("name")?.Value ?? throw new InvalidOperationException("File missing name");
                 string content = file.Value;
-                files[Path.GetFileNameWithoutExtension(name)] = content;
+                files[name] = content;
             }
 
             result[fullPath] = files;
