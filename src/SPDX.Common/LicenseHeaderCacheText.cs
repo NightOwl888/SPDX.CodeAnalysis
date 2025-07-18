@@ -12,9 +12,9 @@ namespace SPDX
     /// </summary>
     public sealed class LicenseHeaderCacheText
     {
-        public LicenseHeaderCacheText(string spdxIdentifier, string fullFilePath, string matchDirectoryPath, IReadOnlyList<string> lines)
+        public LicenseHeaderCacheText(string spdxLicenseIdentifier, string fullFilePath, string matchDirectoryPath, IReadOnlyList<string> lines)
         {
-            SpdxLicenseIdentifier = spdxIdentifier ?? throw new ArgumentNullException(nameof(spdxIdentifier));
+            SpdxLicenseIdentifier = spdxLicenseIdentifier ?? throw new ArgumentNullException(nameof(spdxLicenseIdentifier));
             FullFilePath = fullFilePath ?? throw new ArgumentNullException(nameof(fullFilePath));
             MatchDirectoryPath = matchDirectoryPath ?? throw new ArgumentNullException(nameof(matchDirectoryPath));
             Lines = lines ?? throw new ArgumentNullException(nameof(lines));

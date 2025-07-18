@@ -39,7 +39,7 @@ namespace SPDX.CodeAnalysis
             var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase); // to avoid case-sensitive duplicates
             queue.Enqueue(root);
 
-            string matchPath = GetMatchPath(topLevelDirectoryName);
+            string matchPath = LicenseHeaderConfigurationHelper.GetMatchPath(topLevelDirectoryName);
 
             while (queue.Count > 0)
             {
@@ -52,8 +52,8 @@ namespace SPDX.CodeAnalysis
                 foreach (string file in fileSystem.EnumerateFiles(current, "*.txt")
                     .Where(f => f.Contains(matchPath)))
                 {
-                    string spdxIdentifier = GetSpdxIdentifier(file, topLevelDirectoryName);
-                    string matchDirectoryPath = GetMatchDirectoryPath(file, topLevelDirectoryName);
+                    string spdxIdentifier = LicenseHeaderConfigurationHelper.GetSpdxLicenseIdentifier(file, topLevelDirectoryName);
+                    string matchDirectoryPath = LicenseHeaderConfigurationHelper.GetMatchDirectoryPath(file, topLevelDirectoryName);
                     yield return new LicenseHeaderFile(spdxIdentifier, file, matchDirectoryPath, fileSystem.OpenText(file).ReadToEnd());
                 }
 
@@ -63,48 +63,6 @@ namespace SPDX.CodeAnalysis
                     queue.Enqueue(sub);
                 }
             }
-        }
-
-        /// <summary>
-        /// Gets the configuration directory for the passed in configuration file.
-        /// This is the directory that source files will match against to determine
-        /// whether the license text configuration applies to the code file.
-        /// </summary>
-        /// <param name="licenseTextFilePath">The license header text path. This must contain a segment with <paramref name="topLevelDirectoryName"/> in it.</param>
-        /// <param name="topLevelDirectoryName">The configuration directory name that the <paramref name="licenseTextFilePath"/> applies to.</param>
-        /// <returns>The configuration directory path that the  <paramref name="licenseTextFilePath"/> applies to.</returns>
-        private string GetMatchDirectoryPath(string licenseTextFilePath, string topLevelDirectoryName)
-        {
-            string matchPath = GetMatchPath(topLevelDirectoryName);
-            int index = licenseTextFilePath.IndexOf(matchPath);
-            Debug.Assert(index >= 0, "topLevelDirectoryName must be in every valid licenseTextFilePath.");
-            return licenseTextFilePath.Substring(0, index);
-        }
-
-        private string GetMatchPath(string topLevelDirectoryName)
-            => Path.DirectorySeparatorChar + topLevelDirectoryName;
-
-
-        private string GetSpdxIdentifier(string licenseTextFilePath, string topLevelDirectoryName)
-        {
-            PathSplitEnumerator enumerator = licenseTextFilePath.SplitPath();
-            ReadOnlySpan<char> topLevelDirectoryNameSpan = topLevelDirectoryName.AsSpan();
-            while (enumerator.MoveNext())
-            {
-                if (enumerator.Current.Segment.SequenceEqual(topLevelDirectoryNameSpan))
-                {
-                    // Advance one more time to get the SPDX identifier
-                    enumerator.MoveNext();
-                    break;
-                }
-            }
-            ReadOnlySpan<char> candidate = enumerator.Current.Segment;
-            int dotIndex = candidate.IndexOf('.');
-            if (dotIndex >= 0)
-            {
-                return candidate.Slice(0, dotIndex).ToString();
-            }
-            return candidate.ToString();
         }
 
         private string FindLicenseHeaderRootDirectory(string codeFilePath, ReadOnlySpan<char> topLevelDirectoryName)
