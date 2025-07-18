@@ -11,6 +11,22 @@ namespace SPDX.CodeAnalysis.Tests.CSharp
 {
     public static class FileSystemXmlDefaults
     {
+        public const string NoConfiguration = @"<filesystem>
+  <directory name=""project"">
+    <directory name=""src"">
+      <directory name=""specialized"">
+        <directory name=""stuff"">
+          <file name=""foo.cs""/>
+        </directory>
+        <file name=""baz.cs""/>
+      </directory>
+      <directory name=""normal"">
+        <file name=""bar.cs""/>
+      </directory>
+    </directory>
+  </directory>
+</filesystem>";
+
         public const string Basic = @"<filesystem>
   <directory name=""project"">
     <directory name=""LICENSES.HEADERS"">

@@ -26,7 +26,8 @@ namespace SPDX.CodeAnalysis.CSharp
             Descriptors.SPDX_1002_FileCopyrightTextMustExist,
             Descriptors.SPDX_1003_FileCopyrightTextMustHaveValue,
             Descriptors.SPDX_1004_LicenseCopyrightTextMustPrecedeLicenseIdentifier,
-            Descriptors.SPDX_1005_LicenseTextMustExist
+            Descriptors.SPDX_1005_LicenseTextMustExist,
+            Descriptors.SPDX_1006_NoLicenseHeaderTextConfiguration
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => supportedDiagnostics;
@@ -58,7 +59,29 @@ namespace SPDX.CodeAnalysis.CSharp
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
+            context.RegisterCompilationStartAction(OnCompilationStart);
+        }
+
+        private void OnCompilationStart(CompilationStartAnalysisContext context)
+        {
+            // Load the configuration from AdditionalFiles
+            var loader = new AdditionalFilesLicenseHeaderCacheLoader(context.Options.AdditionalFiles);
+            // codeFilePath is not used by this loader
+            cache.EnsureInitialized(loader, codeFilePath: string.Empty, TopLevelDirectoryName);
+
+            // Register actions that analyze syntax trees
             context.RegisterSyntaxTreeAction(AnalyzeSyntaxTree);
+
+            // Report missing config if applicable
+            context.RegisterCompilationEndAction(OnCompilationEnd);
+        }
+
+        private void OnCompilationEnd(CompilationAnalysisContext context)
+        {
+            if (cache.IsEmpty)
+            {
+                ReportHasNoLicenseHeaderTextConfiguration(context);
+            }
         }
 
         private void AnalyzeSyntaxTree(SyntaxTreeAnalysisContext context)
@@ -68,10 +91,6 @@ namespace SPDX.CodeAnalysis.CSharp
 
             //var triviaList = firstToken.LeadingTrivia;
             string codeFilePath = context.Tree.FilePath;
-
-            // Load the configuration from AdditionalFiles
-            var loader = new AdditionalFilesLicenseHeaderCacheLoader(context.Options.AdditionalFiles);
-            cache.EnsureInitialized(loader, codeFilePath, TopLevelDirectoryName);
 
 
             string? copyrightContainingText = null; // Used to keep the text in scope while slicing it.
@@ -377,5 +396,8 @@ namespace SPDX.CodeAnalysis.CSharp
 
         private void ReportHasNoLicenseText(SyntaxTreeAnalysisContext context)
             => ReportDiagnostic(context, Descriptors.SPDX_1005_LicenseTextMustExist, new TextSpan(0, 0));
+
+        private void ReportHasNoLicenseHeaderTextConfiguration(CompilationAnalysisContext context)
+            => context.ReportDiagnostic(Diagnostic.Create(Descriptors.SPDX_1006_NoLicenseHeaderTextConfiguration, Location.None));
     }
 }

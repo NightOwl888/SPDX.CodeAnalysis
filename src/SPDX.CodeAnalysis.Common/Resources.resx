@@ -167,9 +167,17 @@
   </data>
   <data name="SPDX_1005_AnalyzerMessageFormat" xml:space="preserve">
     <value>Header comment including license text is required</value>
-    <comment>ddd</comment>
   </data>
   <data name="SPDX_1005_AnalyzerTitle" xml:space="preserve">
     <value>License text block is required header comment on all C# code files</value>
+  </data>
+  <data name="SPDX_1006_AnalyzerDescription" xml:space="preserve">
+    <value>ddd</value>
+  </data>
+  <data name="SPDX_1006_AnalyzerMessageFormat" xml:space="preserve">
+    <value>ddd</value>
+  </data>
+  <data name="SPDX_1006_AnalyzerTitle" xml:space="preserve">
+    <value>ddd</value>
   </data>
 </root>

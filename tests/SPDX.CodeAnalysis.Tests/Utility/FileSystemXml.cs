@@ -5,6 +5,7 @@ namespace SPDX.CodeAnalysis.Tests
 {
     public abstract class FileSystemXml
     {
+        public abstract string NoConfiguration { get; }
         public abstract string Basic { get; }
         public abstract string With1OverriddenLevel { get; }
         public abstract string With2OverriddenLevels { get; }

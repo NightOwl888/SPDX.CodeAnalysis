@@ -1,6 +1,7 @@
 ﻿// Use of this source code is governed by an MIT-style license that can be
 // found in the LICENSE.txt file or at https://opensource.org/licenses/MIT.
 
+using Microsoft.CodeAnalysis.Testing;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using SPDX.CodeAnalysis.Tests.CSharp;
@@ -55,9 +56,31 @@ namespace SPDX.CodeAnalysis.Tests
         //        suppressLocation: true);
         //}
 
+        [Test]
+        public async Task SPDX_1006_NoLicenseHeaderTextConfiguration()
+        {
+            string testCodeFilePath = "project/src/baz.cs";
+            string testCode = CSharpFileBuilder.Create(NamespaceStyle.BlockScoped)
+                    .WithCommentBeforeUsings("SPDX-License-Identifier: Apache-2.0")
+                    .WithCommentBeforeUsings("SPDX-FileCopyrightText: Copyright 2025-2028 John Smith")
+                    .WithCommentBeforeUsings(Constants.License.Apache2.Header)
+                    .ToString();
 
-
-
+            await RunTestAsync(
+                FileSystemXml.NoConfiguration,
+                testCode,
+                testCodeFilePath,
+                enabledDiagnostics: new[]
+                {
+                    Descriptors.SPDX_1006_NoLicenseHeaderTextConfiguration.Id
+                },
+                expectedDiagnostics: new[] {
+                    DiagnosticResult
+                        .CompilerWarning(Descriptors.SPDX_1006_NoLicenseHeaderTextConfiguration.Id)
+                        .WithMessage(FormatMessage(Descriptors.SPDX_1006_NoLicenseHeaderTextConfiguration.MessageFormat))
+                }
+            );
+        }
 
         [Test]
         public async Task EmptyFile()
@@ -70,15 +93,15 @@ namespace SPDX.CodeAnalysis.Tests
                 testCode: "",
                 testCodeFilePath,
                 expectedDiagnostics: new[] {
-                    Microsoft.CodeAnalysis.Testing.DiagnosticResult
+                    DiagnosticResult
                         .CompilerWarning(Descriptors.SPDX_1000_LicenseIdentifierMustExist.Id)
                         .WithSpan(expectedTestCodeFilePath, 1, 1, 1, 1)
                         .WithMessage(FormatMessage(Descriptors.SPDX_1000_LicenseIdentifierMustExist.MessageFormat, LicenseIdentifierTag)),
-                    Microsoft.CodeAnalysis.Testing.DiagnosticResult
+                    DiagnosticResult
                         .CompilerWarning(Descriptors.SPDX_1002_FileCopyrightTextMustExist.Id)
                         .WithSpan(expectedTestCodeFilePath, 1, 1, 1, 1)
                         .WithMessage(FormatMessage(Descriptors.SPDX_1002_FileCopyrightTextMustExist.MessageFormat, FileCopyrightTextTag)),
-                    Microsoft.CodeAnalysis.Testing.DiagnosticResult
+                    DiagnosticResult
                         .CompilerWarning(Descriptors.SPDX_1005_LicenseTextMustExist.Id)
                         .WithSpan(expectedTestCodeFilePath, 1, 1, 1, 1)
                         .WithMessage(FormatMessage(Descriptors.SPDX_1005_LicenseTextMustExist.MessageFormat))
@@ -130,15 +153,15 @@ public class MyClass
 
             test.ExpectedDiagnostics.AddRange(new[]
             {
-                Microsoft.CodeAnalysis.Testing.DiagnosticResult
+                DiagnosticResult
                     .CompilerWarning(Descriptors.SPDX_1000_LicenseIdentifierMustExist.Id)
                     .WithSpan(expectedTestCodeFilePath, 1, 1, 1, 1)
                     .WithMessage(FormatMessage(Descriptors.SPDX_1000_LicenseIdentifierMustExist.MessageFormat, LicenseIdentifierTag)),
-                Microsoft.CodeAnalysis.Testing.DiagnosticResult
+                DiagnosticResult
                     .CompilerWarning(Descriptors.SPDX_1002_FileCopyrightTextMustExist.Id)
                     .WithSpan(expectedTestCodeFilePath, 1, 1, 1, 1)
                     .WithMessage(FormatMessage(Descriptors.SPDX_1002_FileCopyrightTextMustExist.MessageFormat, FileCopyrightTextTag)),
-                Microsoft.CodeAnalysis.Testing.DiagnosticResult
+                DiagnosticResult
                     .CompilerWarning(Descriptors.SPDX_1005_LicenseTextMustExist.Id)
                     .WithSpan(expectedTestCodeFilePath, 1, 1, 1, 1)
                     .WithMessage(FormatMessage(Descriptors.SPDX_1005_LicenseTextMustExist.MessageFormat)),
