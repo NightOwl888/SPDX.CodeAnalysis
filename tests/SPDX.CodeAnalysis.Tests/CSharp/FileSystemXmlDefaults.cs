@@ -96,7 +96,7 @@ Special2 line3]]></file>
               </directory>
               <file name=""special.cs""/>
             </directory>
-          </directory
+          </directory>
           <file name=""foo.cs""/>
         </directory>
         <file name=""baz.cs""/>
