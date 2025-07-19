@@ -73,12 +73,11 @@ namespace SPDX.CodeAnalysis
         /// <summary>
         /// Attempts to locate the tag and its value within a single line of trivia text.
         /// </summary>
-        /// <param name="trivia">The trivia the line comes from (not currently used).</param>
         /// <param name="containingText">The full text containing the trivia.</param>
         /// <param name="line">The current line being scanned.</param>
         /// <param name="lineOffset">The offset of the start of the line within the full trivia text.</param>
         /// <returns>True if the tag was found on this line.</returns>
-        public bool TryFindTag(SyntaxTrivia trivia, string containingText, ReadOnlySpan<char> line, int lineOffset = 0)
+        public bool TryFindTag(string containingText, ReadOnlySpan<char> line, int lineOffset = 0)
         {
             int offset = line.IndexOf(tag.AsSpan(), StringComparison.Ordinal);
             if (offset > -1)
