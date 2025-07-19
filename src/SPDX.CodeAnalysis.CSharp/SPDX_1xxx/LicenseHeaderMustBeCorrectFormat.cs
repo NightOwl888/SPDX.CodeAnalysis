@@ -32,26 +32,17 @@ namespace SPDX.CodeAnalysis.CSharp
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => supportedDiagnostics;
 
-        private static class LicenseHeaderCacheHolder
-        {
-            private static readonly LicenseHeaderCache staticCache = new LicenseHeaderCache();
-
-            public static LicenseHeaderCache StaticCache => staticCache;
-        }
-
         // Dependency injection
-        private readonly LicenseHeaderCache cache;
         private readonly LicenseAnalyzerOptions options;
 
         public LicenseHeaderMustBeCorrectFormat()
-            : this(LicenseHeaderCacheHolder.StaticCache, null)
+            : this(options: null)
         {
         }
 
         // Dependency injection constructor (for testing)
-        internal LicenseHeaderMustBeCorrectFormat(LicenseHeaderCache cache, LicenseAnalyzerOptions? options)
+        internal LicenseHeaderMustBeCorrectFormat(LicenseAnalyzerOptions? options)
         {
-            this.cache = cache ?? throw new ArgumentNullException(nameof(cache));
             this.options = options ?? new LicenseAnalyzerOptions();
         }
 
@@ -66,17 +57,21 @@ namespace SPDX.CodeAnalysis.CSharp
         {
             // Load the configuration from AdditionalFiles
             var loader = new AdditionalFilesLicenseHeaderCacheLoader(context.Options.AdditionalFiles);
+            // Create a per-compilation cache instance.
+            // This lifetime ensures the cache is reloaded if any of the AdditionalFiles changes.
+            var cache = new LicenseHeaderCache();
+            
             // codeFilePath is not used by this loader
             cache.EnsureInitialized(loader, codeFilePath: string.Empty, TopLevelDirectoryName);
 
             // Register actions that analyze syntax trees
-            context.RegisterSyntaxTreeAction(AnalyzeSyntaxTree);
+            context.RegisterSyntaxTreeAction((ctx) => AnalyzeSyntaxTree(ctx, cache));
 
             // Report missing config if applicable
-            context.RegisterCompilationEndAction(OnCompilationEnd);
+            context.RegisterCompilationEndAction((ctx) => OnCompilationEnd(ctx, cache));
         }
 
-        private void OnCompilationEnd(CompilationAnalysisContext context)
+        private void OnCompilationEnd(CompilationAnalysisContext context, LicenseHeaderCache cache)
         {
             if (cache.IsEmpty)
             {
@@ -84,7 +79,7 @@ namespace SPDX.CodeAnalysis.CSharp
             }
         }
 
-        private void AnalyzeSyntaxTree(SyntaxTreeAnalysisContext context)
+        private void AnalyzeSyntaxTree(SyntaxTreeAnalysisContext context, LicenseHeaderCache cache)
         {
             var root = context.Tree.GetRoot(context.CancellationToken);
             //var firstToken = root.GetFirstToken(includeZeroWidth: true);
