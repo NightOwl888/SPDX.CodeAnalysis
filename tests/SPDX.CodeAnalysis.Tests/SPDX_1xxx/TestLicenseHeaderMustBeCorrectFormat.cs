@@ -33,56 +33,7 @@ namespace SPDX.CodeAnalysis.Tests
 
         public abstract FileSystemXml FileSystemXml { get; }
 
-        
 
-        // TODO: Remove this
-        public class SPDX_1000_LicenseIdentifierMustExist_Definition : DiagnosticTestDefinition
-        {
-            public override string DiagnosticId => Descriptors.SPDX_1000_LicenseIdentifierMustExist.Id;
-
-            public override IEnumerable<DiagnosticTestCase> GetTestCases(CodeStyleCombination style)
-            {
-                yield return new DiagnosticTestCase
-                {
-                    DiagnosticId = this.DiagnosticId,
-                    Style = style,
-                    LicenseComponents = LicenseComponent.None,
-                    ExpectDiagnostic = true,
-                    Severity = Descriptors.SPDX_1000_LicenseIdentifierMustExist.DefaultSeverity
-                };
-            }
-        }
-
-        // TODO: Remove this
-        public class SPDX_1001_LicenseIdentifierMustHaveValue_Definition : DiagnosticTestDefinition
-        {
-            public override string DiagnosticId => Descriptors.SPDX_1001_LicenseIdentifierMustHaveValue.Id;
-
-            public override IEnumerable<DiagnosticTestCase> GetTestCases(CodeStyleCombination style)
-            {
-                yield return new DiagnosticTestCase
-                {
-                    DiagnosticId = this.DiagnosticId,
-                    Style = style,
-                    LicenseComponents = LicenseComponent.LicenseIdentifier,
-                    LicenseIdentifierText = "SPDX-License-Identifier:",
-                    ExpectDiagnostic = true,
-                    Severity = Descriptors.SPDX_1001_LicenseIdentifierMustHaveValue.DefaultSeverity
-                };
-            }
-        }
-
-        // TODO: Remove this
-        public static DiagnosticResult ToExpected(DiagnosticTestCase testCase)
-        {
-            return testCase.Severity switch
-            {
-                DiagnosticSeverity.Error => DiagnosticResult.CompilerError(testCase.DiagnosticId),
-                DiagnosticSeverity.Warning => DiagnosticResult.CompilerWarning(testCase.DiagnosticId),
-                DiagnosticSeverity.Info => DiagnosticResult.CompilerWarning(testCase.DiagnosticId).WithSeverity(DiagnosticSeverity.Info), //DiagnosticResult.CompilerInfo(testCase.DiagnosticId),
-                _ => throw new NotSupportedException($"Severity {testCase.Severity} is not supported.")
-            };
-        }
 
         public static string NormalizePath(string path) => Path.GetFullPath(path);
 
