@@ -18,7 +18,7 @@ namespace SPDX.CodeAnalysis.CSharp
     public class LicenseHeaderMustBeCorrectFormat : DiagnosticAnalyzer
     {
         private const string LicenseIdentifierToken = "SPDX-License-Identifier:";
-        private const string LicenseCopyrightToken = "SPDX-FileCopyrightText:";
+        private const string FileCopyrightTextToken = "SPDX-FileCopyrightText:";
         private const string TopLevelDirectoryName = "LICENSES.HEADERS"; // TODO: Make configurable?
         private static readonly ImmutableArray<DiagnosticDescriptor> supportedDiagnostics = ImmutableArray.Create<DiagnosticDescriptor>(
             Descriptors.SPDX_1000_LicenseIdentifierMustExist,
@@ -87,37 +87,16 @@ namespace SPDX.CodeAnalysis.CSharp
             //var triviaList = firstToken.LeadingTrivia;
             string codeFilePath = context.Tree.FilePath;
 
-
-            string? copyrightContainingText = null; // Used to keep the text in scope while slicing it.
-            string? licenseIdContainingText = null; // Used to keep the text in scope while slicing it.
-
-            TextSpan? copyrightValueLocation = null;
-            TextSpan? licenseIdValueLocation = null;
-
-            // Used to store the start/length of the current line (relative to the beginnning of the containing text rather than relative to the file start)
-            TextSpan? copyrightValueSpan = null;
-            TextSpan? licenseIdValueSpan = null;
-
-
-            //ReadOnlySpan<char> copyrightValueSpan = default;
-            //ReadOnlySpan<char> licenseIdValueSpan = default;
-            //ReadOnlySpan<char> licenseTextSpan = default;
-
-            //int? copyrightIndex = null;
-            //int? licenseIdIndex = null;
-
-            bool hasLicenseId = false;
-            bool hasCopyright = false;
             bool hasLicenseText = false;
             bool hasLicenseTextPartial = false;
 
-            bool hasLicenseIdValue = true;
-            bool hasCopyrightValue = true;
-            
+            var spdxLicenseIdentifierSession = new TagValueSession(LicenseIdentifierToken);
+            var spdxFileCopyrightTextSession = new TagValueSession(FileCopyrightTextToken);
+
             foreach (var token in root.DescendantTokens())
             {
                 // Process leading trivia for each token
-                if (ProcessSpdxTag(token.LeadingTrivia))
+                if (ProcessSpdxTag(token.LeadingTrivia, ref spdxLicenseIdentifierSession, ref spdxFileCopyrightTextSession))
                     break;
 
                 // Stop scanning once we hit the first type declaration
@@ -128,11 +107,9 @@ namespace SPDX.CodeAnalysis.CSharp
             // Second pass - If we found the SPDX tags, then look for the correct license header text.
             // This is configured as a file in a LICENSES.HEADERS directory which may be levels above
             // the current directory.
-            if (hasLicenseId && hasLicenseIdValue)
+            if (spdxLicenseIdentifierSession.HasTag && spdxLicenseIdentifierSession.HasValue)
             {
-                Debug.Assert(licenseIdValueSpan.HasValue, "The parser failed to set a value for licenseIdValueSpan");
-
-                ReadOnlySpan<char> spdxLicenseIdentifier = licenseIdContainingText.AsSpan(licenseIdValueSpan!.Value.Start, licenseIdValueSpan.Value.Length).Trim();
+                ReadOnlySpan<char> spdxLicenseIdentifier = spdxLicenseIdentifierSession.Value.Trim();
 
                 // First pass: Optimize the search for the "happy path" where the SPDX-License-Identifier and codeFilePath match the license header text(s)
                 IReadOnlyList<LicenseHeaderCacheText> matchingLicenseHeaderTexts = cache.GetMatchingLicenseHeaders(spdxLicenseIdentifier, codeFilePath);
@@ -193,83 +170,6 @@ namespace SPDX.CodeAnalysis.CSharp
                 //    if (token.Parent is TypeDeclarationSyntax)
                 //        break;
                 //}
-            }
-
-
-            void ProcessSpdxTagLine(SyntaxTrivia trivia, string text, ReadOnlySpan<char> line, int lineOffset = 0)
-            {
-                ReadOnlySpan<char> licenseIdentifier = LicenseIdentifierToken.AsSpan();
-                ReadOnlySpan<char> licenseCopyrightText = LicenseCopyrightToken.AsSpan();
-
-                int offset = line.IndexOf(licenseIdentifier, StringComparison.Ordinal);
-                if (offset > -1)
-                {
-                    hasLicenseId = true;
-                    int tokenLength = licenseIdentifier.Length;
-                    int valueOffsetInLine = offset + tokenLength;
-
-                    // Absolute offset from the start of the full trivia string
-                    int valueOffsetInText = lineOffset + valueOffsetInLine;
-
-                    int length = Math.Max(line.Length - valueOffsetInLine, 0);
-
-                    licenseIdValueLocation = new TextSpan(trivia.SpanStart + valueOffsetInText, length);
-                    licenseIdContainingText = text; // Used to keep the text in scope while slicing it.
-                    licenseIdValueSpan = new TextSpan(valueOffsetInText, length);
-
-                    hasLicenseIdValue = !licenseIdContainingText.AsSpan(valueOffsetInText, length).Trim().IsEmpty;
-                }
-                offset = line.IndexOf(licenseCopyrightText, StringComparison.Ordinal);
-                if (offset > -1)
-                {
-                    hasCopyright = true;
-                    int tokenLength = licenseCopyrightText.Length;
-                    int valueOffsetInLine = offset + tokenLength;
-
-                    // Absolute offset from the start of the full trivia string
-                    int valueOffsetInText = lineOffset + valueOffsetInLine;
-
-                    int length = Math.Max(line.Length - valueOffsetInLine, 0);
-
-                    copyrightValueLocation = new TextSpan(trivia.SpanStart + valueOffsetInText, length);
-                    copyrightContainingText = text; // Used to keep the text in scope while slicing it.
-                    copyrightValueSpan = new TextSpan(valueOffsetInText, length);
-
-                    hasCopyrightValue = !copyrightContainingText.AsSpan(valueOffsetInText, length).Trim().IsEmpty;
-                }
-            }
-
-            bool ProcessSpdxTag(SyntaxTriviaList triviaList)
-            {
-                foreach (var trivia in triviaList)
-                {
-                    if (trivia.IsKind(SyntaxKind.SingleLineCommentTrivia))
-                    {
-                        string text = trivia.ToString(); // safe to reference span from here
-                        ProcessSpdxTagLine(trivia, text, text.AsSpan());
-                    }
-                    else if (trivia.IsKind(SyntaxKind.MultiLineCommentTrivia))
-                    {
-                        string text = trivia.ToString(); // safe to reference span from here
-
-                        int lineOffset = 0;
-                        foreach (var line in text.SplitLines())
-                        {
-                            ProcessSpdxTagLine(trivia, text, line, lineOffset);
-
-                            // Stop scanning if found
-                            if (hasLicenseId && hasCopyright)
-                                return true;
-
-                            lineOffset += line.Line.Length + line.Separator.Length;
-                        }
-                    }
-
-                    // Stop scanning if found
-                    if (hasLicenseId && hasCopyright)
-                        return true;
-                }
-                return false;
             }
 
             //bool ProcessLicenseTextLine(IReadOnlyList<string> licenseTextLines, ref int licenseTextLinesIndex, SyntaxTrivia trivia, string text, ReadOnlySpan<char> line, int separatorOffset = 0)
@@ -343,28 +243,71 @@ namespace SPDX.CodeAnalysis.CSharp
                 return false;
             }
 
-            if (!hasLicenseId)
+            if (!spdxLicenseIdentifierSession.HasTag)
             {
                 ReportHasNoLicenseIdentifier(context);
             }
-            else if (!hasLicenseIdValue)
+            else if (!spdxLicenseIdentifierSession.HasValue)
             {
-                ReportHasNoLicenseIdentifierValue(context, licenseIdValueSpan!.Value);
+                ReportHasNoLicenseIdentifierValue(context,
+                    new TextSpan(spdxLicenseIdentifierSession.ValueOffsetInText, spdxLicenseIdentifierSession.ValueLength));
             }
 
-            if (!hasCopyright)
+            if (!spdxFileCopyrightTextSession.HasTag)
             {
                 ReportHasNoFileCopyrightText(context);
             }
-            else if (!hasCopyrightValue)
+            else if (!spdxFileCopyrightTextSession.HasValue)
             {
-                ReportHasNoFileCopyrightTextValue(context, copyrightValueSpan!.Value);
+                ReportHasNoFileCopyrightTextValue(context,
+                    new TextSpan(spdxFileCopyrightTextSession.ValueOffsetInText, spdxFileCopyrightTextSession.ValueLength));
             }
 
             if (!hasLicenseText)
             {
                 ReportHasNoLicenseText(context);
             }
+        }
+
+        private static bool ProcessSpdxTag(SyntaxTriviaList triviaList,
+            ref TagValueSession spdxLicenseIdentifierSession,
+            ref TagValueSession spdxFileCopyrightTextSession)
+        {
+            bool hasLicenseIdentifier = false, hasFileCopyrightText = false;
+         
+            foreach (var trivia in triviaList)
+            {
+                if (trivia.IsKind(SyntaxKind.SingleLineCommentTrivia))
+                {
+                    string textString = trivia.ToString(); // safe to reference span from here
+                    ReadOnlySpan<char> text = textString.AsSpan();
+
+                    hasLicenseIdentifier = spdxLicenseIdentifierSession.TryFindTag(trivia, textString, text);
+                    hasFileCopyrightText = spdxFileCopyrightTextSession.TryFindTag(trivia, textString, text);
+                }
+                else if (trivia.IsKind(SyntaxKind.MultiLineCommentTrivia))
+                {
+                    string textString = trivia.ToString(); // safe to reference span from here
+
+                    int lineOffset = 0;
+                    foreach (var line in textString.SplitLines())
+                    {
+                        hasLicenseIdentifier = spdxLicenseIdentifierSession.TryFindTag(trivia, textString, line, lineOffset);
+                        hasFileCopyrightText = spdxFileCopyrightTextSession.TryFindTag(trivia, textString, line, lineOffset);
+
+                        // Stop scanning if found
+                        if (hasLicenseIdentifier && hasFileCopyrightText)
+                            return true;
+
+                        lineOffset += line.Line.Length + line.Separator.Length;
+                    }
+                }
+
+                // Stop scanning if found
+                if (hasLicenseIdentifier && hasFileCopyrightText)
+                    return true;
+            }
+            return false;
         }
 
         private void ReportDiagnostic(SyntaxTreeAnalysisContext context, DiagnosticDescriptor descriptor, TextSpan span)
