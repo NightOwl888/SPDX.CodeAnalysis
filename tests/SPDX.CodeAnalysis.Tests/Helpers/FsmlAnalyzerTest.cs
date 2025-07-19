@@ -48,10 +48,6 @@ namespace SPDX.CodeAnalysis.Tests
             this.licenseHeaderConfiguration = new LicenseHeaderConfigurationReader(fileSystem);
         }
 
-        // TODO: Remove this
-        protected virtual IFileSystem CreateFileSystem() => fileSystem;
-
-
         /// <summary>
         /// Gets or sets the input source file for analyzer or code fix testing.
         /// </summary>
