@@ -81,6 +81,8 @@ namespace SPDX.CodeAnalysis.Tests
                 test.ExpectedDiagnostics.AddRange(expectedDiagnostics);
             }
 
+            //Console.Write(testCode); // Enable for debugging
+
             await test.RunAsync();
         }
 

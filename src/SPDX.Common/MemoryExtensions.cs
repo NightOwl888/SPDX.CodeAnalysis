@@ -35,6 +35,19 @@ namespace SPDX.CodeAnalysis
             // PathSplitEnumerator is a struct so there is no allocation here
             return new PathSplitEnumerator(str.AsSpan());
         }
+
+        /// <summary>
+        /// Indicates whether the specified span contains only white-space characters.
+        /// </summary>
+        public static bool IsWhiteSpace(this ReadOnlySpan<char> span)
+        {
+            for (int i = 0; i < span.Length; i++)
+            {
+                if (!char.IsWhiteSpace(span[i]))
+                    return false;
+            }
+            return true;
+        }
     }
 
     // Must be a ref struct as it contains a ReadOnlySpan<char>

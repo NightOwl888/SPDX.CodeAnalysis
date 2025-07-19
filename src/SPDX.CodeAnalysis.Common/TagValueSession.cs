@@ -20,6 +20,9 @@ namespace SPDX.CodeAnalysis
         private int tagOffsetInText;
         private int tagLength;
 
+        private int delimiterOffsetInText;
+        private int delimiterLength;
+
         private int valueOffsetInText;
         private int valueLength;
 
@@ -43,21 +46,26 @@ namespace SPDX.CodeAnalysis
         public bool HasTag => hasTag;
         public bool HasValue => hasValue;
 
-        public ReadOnlySpan<char> Value =>
-            containingText is null ? default : containingText.AsSpan(valueOffsetInText, valueLength);
-
         public ReadOnlySpan<char> Tag =>
             containingText is null ? default : containingText.AsSpan(tagOffsetInText, tagLength);
+
+        public ReadOnlySpan<char> Delimiter =>
+            containingText is null ? default : containingText.AsSpan(delimiterOffsetInText, delimiterLength);
+
+        public ReadOnlySpan<char> Value =>
+            containingText is null ? default : containingText.AsSpan(valueOffsetInText, valueLength);
 
         public ReadOnlySpan<char> FullMatch =>
             containingText is null ? default : containingText.AsSpan(fullOffsetInText, fullLength);
 
+        public int TagOffsetInText => tagOffsetInText;
+        public int TagLength => tagLength;
 
         public int ValueOffsetInText => valueOffsetInText;
         public int ValueLength => valueLength;
 
-        public int TagOffsetInText => tagOffsetInText;
-        public int TagLength => tagLength;
+        public int DelimiterOffsetInText => delimiterOffsetInText;
+        public int DelimiterLength => delimiterLength;
 
         public int FullOffsetInText => fullOffsetInText;
         public int FullLength => fullLength;
@@ -76,25 +84,42 @@ namespace SPDX.CodeAnalysis
             if (offset > -1)
             {
                 this.containingText = containingText;
-
                 hasTag = true;
+
                 // Absolute offset from the start of the full trivia string
                 tagOffsetInText = lineOffset + offset;
 
-                int valueOffsetInLine = offset + tagLength;
+                // Delimiter: should be ": " (colon and space) immediately after tag
+                int delimiterStartInLine = offset + tagLength;
+                ReadOnlySpan<char> lineAfterTag = line.Slice(delimiterStartInLine);
+                delimiterLength = 0;
+                delimiterOffsetInText = lineOffset + delimiterStartInLine;
+
+                // Absolute offset from the start of the full trivia string
+                if (lineAfterTag.StartsWith(": ".AsSpan(), StringComparison.Ordinal))
+                {
+                    delimiterLength = 2;
+                }
+                else if (lineAfterTag.StartsWith(":".AsSpan(), StringComparison.Ordinal))
+                {
+                    delimiterLength = 1;
+                }
+
+                // Value starts after the delimiter
+                int valueOffsetInLine = delimiterStartInLine + delimiterLength;
 
                 // Absolute offset from the start of the full trivia string
                 valueOffsetInText = lineOffset + valueOffsetInLine;
                 valueLength = Math.Max(line.Length - valueOffsetInLine, 0);
 
                 // Absolute offset from the start of the full trivia string
+                // Full match includes from tag start to end of line
                 fullOffsetInText = tagOffsetInText;
                 fullLength = Math.Max(line.Length - offset, 0); // from tag start to line end
 
-                // Simple check for value. Doesn't take into consideration trailing comments or other formatting.
+                // No trimming — we want to verify if it's literally empty
                 // Use REUSE or another SPDX validation tool to get more accurate validation.
-                var span = containingText.AsSpan(valueOffsetInText, valueLength).Trim();
-                hasValue = !span.IsEmpty;
+                hasValue = valueLength > 0 && !containingText.AsSpan(valueOffsetInText, valueLength).IsWhiteSpace();
 
                 return true; // We assume the tag won't span more than one line - this is a limitation of the design
             }

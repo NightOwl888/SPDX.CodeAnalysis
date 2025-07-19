@@ -17,8 +17,8 @@ namespace SPDX.CodeAnalysis.CSharp
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class LicenseHeaderMustBeCorrectFormat : DiagnosticAnalyzer
     {
-        private const string LicenseIdentifierToken = "SPDX-License-Identifier:";
-        private const string FileCopyrightTextToken = "SPDX-FileCopyrightText:";
+        private const string LicenseIdentifierTag = "SPDX-License-Identifier";
+        private const string FileCopyrightTextTag = "SPDX-FileCopyrightText";
         private const string TopLevelDirectoryName = "LICENSES.HEADERS"; // TODO: Make configurable?
         private static readonly ImmutableArray<DiagnosticDescriptor> supportedDiagnostics = ImmutableArray.Create<DiagnosticDescriptor>(
             Descriptors.SPDX_1000_LicenseIdentifierMustExist,
@@ -90,8 +90,8 @@ namespace SPDX.CodeAnalysis.CSharp
             bool hasLicenseText = false;
             bool hasLicenseTextPartial = false;
 
-            var spdxLicenseIdentifierSession = new TagValueSession(LicenseIdentifierToken);
-            var spdxFileCopyrightTextSession = new TagValueSession(FileCopyrightTextToken);
+            var spdxLicenseIdentifierSession = new TagValueSession(LicenseIdentifierTag);
+            var spdxFileCopyrightTextSession = new TagValueSession(FileCopyrightTextTag);
 
             foreach (var token in root.DescendantTokens())
             {
@@ -109,7 +109,7 @@ namespace SPDX.CodeAnalysis.CSharp
             // the current directory.
             if (spdxLicenseIdentifierSession.HasTag && spdxLicenseIdentifierSession.HasValue)
             {
-                ReadOnlySpan<char> spdxLicenseIdentifier = spdxLicenseIdentifierSession.Value.Trim();
+                ReadOnlySpan<char> spdxLicenseIdentifier = spdxLicenseIdentifierSession.Value.TrimEnd();
 
                 // First pass: Optimize the search for the "happy path" where the SPDX-License-Identifier and codeFilePath match the license header text(s)
                 IReadOnlyList<LicenseHeaderCacheText> matchingLicenseHeaderTexts = cache.GetMatchingLicenseHeaders(spdxLicenseIdentifier, codeFilePath);
