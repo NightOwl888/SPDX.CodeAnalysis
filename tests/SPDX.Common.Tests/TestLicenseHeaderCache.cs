@@ -108,7 +108,7 @@ Special2 line3]]></file>
                             "under the License.",
                         }),
                     }
-                ).SetName("TwoOverriddenLevels_FirstLevel_Apache2");
+                ).SetName("TestGetMatchingLicenseHeaders_TwoOverriddenLevels_FirstLevel_Apache2");
 
                 yield return new TestCaseData(
                     FileSystemXml.With2OverriddenLevels,
@@ -127,7 +127,7 @@ Special2 line3]]></file>
                             "MIT line2",
                         }),
                     }
-                ).SetName("TwoOverriddenLevels_FirstLevel_MIT");
+                ).SetName("TestGetMatchingLicenseHeaders_TwoOverriddenLevels_FirstLevel_MIT");
 
                 yield return new TestCaseData(
                     FileSystemXml.With2OverriddenLevels,
@@ -146,7 +146,7 @@ Special2 line3]]></file>
                             "MIT line2",
                         }),
                     }
-                ).SetName("TwoOverriddenLevels_FirstLevel_MIT_DeepNestedSource");
+                ).SetName("TestGetMatchingLicenseHeaders_TwoOverriddenLevels_FirstLevel_MIT_DeepNestedSource");
 
                 yield return new TestCaseData(
                     FileSystemXml.With2OverriddenLevels,
@@ -174,7 +174,7 @@ Special2 line3]]></file>
                             "MS line2",
                         })
                     }
-                ).SetName("TwoOverriddenLevels_SecondLevel_MIT");
+                ).SetName("TestGetMatchingLicenseHeaders_TwoOverriddenLevels_SecondLevel_MIT");
 
                 yield return new TestCaseData(
                     FileSystemXml.With2OverriddenLevels,
@@ -202,7 +202,7 @@ Special2 line3]]></file>
                             "MS line2",
                         })
                     }
-                ).SetName("TwoOverriddenLevels_SecondLevel_MIT_DeepNestedSource");
+                ).SetName("TestGetMatchingLicenseHeaders_TwoOverriddenLevels_SecondLevel_MIT_DeepNestedSource");
 
                 yield return new TestCaseData(
                     FileSystemXml.With2OverriddenLevels,
@@ -234,7 +234,7 @@ Special2 line3]]></file>
                         })
                     ,
                     }
-                ).SetName("TwoOverriddenLevels_ThirdLevel_MIT");
+                ).SetName("TestGetMatchingLicenseHeaders_TwoOverriddenLevels_ThirdLevel_MIT");
 
                 yield return new TestCaseData(
                     FileSystemXml.With2OverriddenLevels,
@@ -266,7 +266,7 @@ Special2 line3]]></file>
                         })
                     ,
                     }
-                ).SetName("TwoOverriddenLevels_ThirdLevel_MIT_DeepNestedSource");
+                ).SetName("TestGetMatchingLicenseHeaders_TwoOverriddenLevels_ThirdLevel_MIT_DeepNestedSource");
             }
         }
 
@@ -302,6 +302,84 @@ Special2 line3]]></file>
                     }
                 }
             });
+        }
+
+        [Test]
+        public void TestTryMatch_MatchingLicenseIdentifier_MatchingCodeFilePath_ReturnsSuccess()
+        {
+            // Arrange
+            string fileSystemXml = FileSystemXml.With2OverriddenLevels;
+            string codeFilePath = NormalizePath("project/src/specialized/stuff/foo.cs");
+            string topLevelDirectoryName = TopLevelDirectoryName;
+            LicenseHeaderCache target = InitializeCache(fileSystemXml, codeFilePath, topLevelDirectoryName);
+
+            // Arrange Inputs
+            string matchDirectoryPath = NormalizePath("project/src/specialized/stuff");
+            ReadOnlySpan<char> spdxId = "MIT".AsSpan();
+
+            // Act
+            Assert.That(target.TryMatch(matchDirectoryPath, spdxId, codeFilePath, out LicenseHeaderCache.MatchResult result), Is.EqualTo(true));
+
+            Assert.That(result, Is.EqualTo(LicenseHeaderCache.MatchResult.Success));
+        }
+
+        [Test]
+        public void TestTryMatch_NonMatchingLicenseIdentifier_MatchingCodeFilePath_ReturnsNonMatchingSpdxIdentifier()
+        {
+            // Arrange
+            string fileSystemXml = FileSystemXml.With2OverriddenLevels;
+            string codeFilePath = NormalizePath("project/src/specialized/stuff/foo.cs");
+            string topLevelDirectoryName = TopLevelDirectoryName;
+            LicenseHeaderCache target = InitializeCache(fileSystemXml, codeFilePath, topLevelDirectoryName);
+
+            // Arrange Inputs
+            string matchDirectoryPath = NormalizePath("project/src/specialized/stuff");
+            ReadOnlySpan<char> spdxId = "FOO".AsSpan();
+
+            // Act/Assert
+            Assert.That(target.TryMatch(matchDirectoryPath, spdxId, codeFilePath, out LicenseHeaderCache.MatchResult result), Is.EqualTo(false));
+
+            Assert.That(result, Is.EqualTo(LicenseHeaderCache.MatchResult.NonMatchingSpdxIdentifier));
+        }
+
+        [Test]
+        public void TestTryMatch_NonMatchingLicenseIdentifier_NonMatchingCodeFilePath_ReturnsNonMatchingSpdxIdentifier()
+        {
+            // Arrange
+            string fileSystemXml = FileSystemXml.With2OverriddenLevels;
+            string codeFilePath = NormalizePath("project/src/specialized/foo.cs"); // Directory is not nested within project/src/specialized/stuff
+            string topLevelDirectoryName = TopLevelDirectoryName;
+            LicenseHeaderCache target = InitializeCache(fileSystemXml, codeFilePath, topLevelDirectoryName);
+
+            // Arrange Inputs
+            string matchDirectoryPath = NormalizePath("project/src/specialized/stuff");
+            ReadOnlySpan<char> spdxId = "FOO".AsSpan();
+
+            // Act/Assert
+            Assert.That(target.TryMatch(matchDirectoryPath, spdxId, codeFilePath, out LicenseHeaderCache.MatchResult result), Is.EqualTo(false));
+
+            // In this case, there is no way to check for a matching code file path, so we only get this result.
+            // This is fine, since we expect these to be fixed one at a time which will reveal other issues later.
+            Assert.That(result, Is.EqualTo(LicenseHeaderCache.MatchResult.NonMatchingSpdxIdentifier));
+        }
+
+        [Test]
+        public void TestTryMatch_MatchingLicenseIdentifier_NonMatchingCodeFilePath_ReturnsNonMatchingCodeFilePath()
+        {
+            // Arrange
+            string fileSystemXml = FileSystemXml.With2OverriddenLevels;
+            string codeFilePath = NormalizePath("project/src/specialized/foo.cs"); // Directory is not nested within project/src/specialized/stuff
+            string topLevelDirectoryName = TopLevelDirectoryName;
+            LicenseHeaderCache target = InitializeCache(fileSystemXml, codeFilePath, topLevelDirectoryName);
+
+            // Arrange Inputs
+            string matchDirectoryPath = NormalizePath("project/src/specialized/stuff");
+            ReadOnlySpan<char> spdxId = "MIT".AsSpan();
+
+            // Act/Assert
+            Assert.That(target.TryMatch(matchDirectoryPath, spdxId, codeFilePath, out LicenseHeaderCache.MatchResult result), Is.EqualTo(false));
+
+            Assert.That(result, Is.EqualTo(LicenseHeaderCache.MatchResult.NonMatchingCodeFilePath));
         }
 
         private static void DumpToConsole(IReadOnlyList<LicenseHeaderCacheText> actual)

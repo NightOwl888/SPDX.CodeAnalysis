@@ -17,13 +17,57 @@ namespace SPDX.CodeAnalysis
 
         public IReadOnlyList<LicenseHeaderCacheText> GetMatchingLicenseHeaders(ReadOnlySpan<char> spdxLicenseIdentifier, string codeFilePath)
         {
+            if (codeFilePath is null)
+                throw new ArgumentNullException(nameof(codeFilePath));
+
             if (!TryGetValue(spdxLicenseIdentifier, out FallbackTreeNode root))
                 return Empty;
 
-            return root.FindBestMatch(codeFilePath);
+            return root.FindBestMatch(codeFilePath)?.Headers ?? Empty;
         }
 
         public IReadOnlyList<LicenseHeaderCacheText> GetAllLicenseHeaders() => _allLicenseHeaders;
+
+        public enum MatchResult
+        {
+            Success,
+            NonMatchingSpdxIdentifier,
+            NonMatchingCodeFilePath,
+        }
+
+        /// <summary>
+        /// Determines whether the supplied configuration license header <paramref name="licenseHeaderMatchDirectoryPath"/> is a match for both the
+        /// <paramref name="codeFileSpdxLicenseIdentifier"/> and <paramref name="codeFilePath"/>.
+        /// </summary>
+        /// <param name="licenseHeaderMatchDirectoryPath">The directory path that represents the configuration root of a license header text file.</param>
+        /// <param name="codeFileSpdxLicenseIdentifier">The SPDX-License-Identifier tag value parsed from the code file.</param>
+        /// <param name="codeFilePath">The absolute path to the code file.</param>
+        /// <param name="result">A value indicating success or the type of match failure that occurred.</param>
+        /// <returns><c>true</c> if the match was successful, otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public bool TryMatch(string licenseHeaderMatchDirectoryPath, ReadOnlySpan<char> codeFileSpdxLicenseIdentifier, string codeFilePath, out MatchResult result)
+        {
+            if (licenseHeaderMatchDirectoryPath is null)
+                throw new ArgumentNullException(nameof(licenseHeaderMatchDirectoryPath));
+            if (codeFilePath is null)
+                throw new ArgumentNullException(nameof(codeFilePath));
+
+            if (!TryGetValue(codeFileSpdxLicenseIdentifier, out FallbackTreeNode root))
+            {
+                result = MatchResult.NonMatchingSpdxIdentifier;
+                return false;
+            }
+
+            FallbackTreeNode? best = root.FindBestMatch(codeFilePath);
+            if (best is null || !best.MatchDirectoryPath.Equals(licenseHeaderMatchDirectoryPath, StringComparison.Ordinal))
+            {
+                result = MatchResult.NonMatchingCodeFilePath;
+                return false;
+            }
+
+            result = MatchResult.Success;
+            return true;
+        }
 
         private sealed class FallbackTreeNode
         {
@@ -35,6 +79,8 @@ namespace SPDX.CodeAnalysis
             {
                 MatchDirectoryPath = matchDirectoryPath;
             }
+
+            public IReadOnlyList<LicenseHeaderCacheText> Headers => _headers;
 
             public void Add(LicenseHeaderCacheText header)
             {
@@ -64,7 +110,7 @@ namespace SPDX.CodeAnalysis
                 }
             }
 
-            public IReadOnlyList<LicenseHeaderCacheText> FindBestMatch(string codeFilePath)
+            public FallbackTreeNode? FindBestMatch(string codeFilePath)
             {
                 FallbackTreeNode? best = null;
                 string normalizedCodeFilePath = Path.GetFullPath(codeFilePath);
@@ -87,11 +133,11 @@ namespace SPDX.CodeAnalysis
 
                 Search(this);
 
-                return best?._headers ?? Empty;
+                return best;
             }
         }
 
-        private static IReadOnlyList<LicenseHeaderCacheText> Empty = Array.Empty<LicenseHeaderCacheText>().ToList();
+        private static readonly IReadOnlyList<LicenseHeaderCacheText> Empty = Array.Empty<LicenseHeaderCacheText>();
 
         public bool IsEmpty => _allLicenseHeaders.Count == 0;
 
