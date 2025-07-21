@@ -66,7 +66,7 @@ namespace SPDX.CodeAnalysis
         /// <param name="triviaLine">The line of text (e.g., from a trivia comment).</param>
         /// <param name="absoluteOffset">The character offset of the start of this line within the full trivia block.</param>
         /// <returns><c>true</c> if the session is still active (we haven't matched all lines yet); otherwise, <c>false</c>.</returns>
-        public bool MatchNextLine(SyntaxTrivia trivia, ReadOnlySpan<char> triviaLine, int absoluteOffset = 0)
+        public bool MatchNextLine(SyntaxTrivia trivia, ReadOnlySpan<char> triviaLine, int absoluteOffset)
         {
             if (matchedLineCount >= expectedLines.Count || shouldStopMatching)
                 return false;

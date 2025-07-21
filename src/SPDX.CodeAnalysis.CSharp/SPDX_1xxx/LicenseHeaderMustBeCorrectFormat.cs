@@ -173,6 +173,31 @@ namespace SPDX.CodeAnalysis.CSharp
                     // We run a second pass while recording position information so we can report the diagnostics.
                     IReadOnlyList<LicenseHeaderCacheText> allLicenseHeaderTexts = cache.GetAllLicenseHeaders();
 
+                    int sessionCount = allLicenseHeaderTexts.Count;
+                    LicenseHeaderMatchSession[] matchSessions = new LicenseHeaderMatchSession[sessionCount];
+                    for (int i = 0; i < sessionCount; i++)
+                    {
+                        matchSessions[i] = new LicenseHeaderMatchSession(allLicenseHeaderTexts[i], WhitespaceTriviaKind, SingleLineCommentTriviaKind, MultiLineCommentTriviaKind);
+                    }
+
+                    foreach (var token in root.DescendantTokens())
+                    {
+                        if (!ProcessLicenseText(matchSessions, token.LeadingTrivia))
+                            break;
+
+                        // Stop scanning once we hit the first type declaration
+                        if (token.Parent is TypeDeclarationSyntax)
+                            break;
+                    }
+
+                    bool hasAnyFullMatch = false;
+                    bool hasAnyPartialMatch = false;
+                    for (int i = 0; i < sessionCount; i++)
+                    {
+                        hasAnyFullMatch |= matchSessions[i].IsFullMatch;
+                        hasAnyPartialMatch |= matchSessions[i].IsPartialMatch;
+                    }
+
                     // TODO: We need our session to track matches for each allLicenseHeaderTexts
                     // and determine if any of them matched. This time, we need to enable position tracking
                     // so we can report a diagnostic.
@@ -239,7 +264,7 @@ namespace SPDX.CodeAnalysis.CSharp
             return true; // Continue processing
         }
 
-        private static bool ProcessLicenseTextLine(LicenseHeaderMatchSession[] matchSessions, SyntaxTrivia trivia, ReadOnlySpan<char> line, int absoluteOffset = 0)
+        private static bool ProcessLicenseTextLine(LicenseHeaderMatchSession[] matchSessions, SyntaxTrivia trivia, ReadOnlySpan<char> line, int absoluteOffset)
         {
             bool anyActive = false;
             for (int i = 0; i < matchSessions.Length; i++)
