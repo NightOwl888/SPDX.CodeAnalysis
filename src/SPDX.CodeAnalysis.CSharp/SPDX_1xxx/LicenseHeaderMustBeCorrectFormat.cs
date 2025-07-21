@@ -29,6 +29,7 @@ namespace SPDX.CodeAnalysis.CSharp
             Descriptors.SPDX_1003_FileCopyrightTextMustHaveValue,
             Descriptors.SPDX_1004_LicenseCopyrightTextMustPrecedeLicenseIdentifier,
             Descriptors.SPDX_1005_LicenseTextMustExist,
+            Descriptors.SPDX_1006_LicenseTextMatchingConfigurationMustMatchAllLines,
             Descriptors.SPDX_2000_NoLicenseHeaderTextConfiguration
         );
 
@@ -109,7 +110,8 @@ namespace SPDX.CodeAnalysis.CSharp
             // the current directory.
             if (spdxLicenseIdentifierSession.HasTag && spdxLicenseIdentifierSession.HasValue)
             {
-                bool hasMatchingLicenseText = false;
+                bool hasAnyFullMatch = false;
+                bool hasAnyPartialMatch = false;
 
                 ReadOnlySpan<char> spdxLicenseIdentifier = spdxLicenseIdentifierSession.Value.TrimEnd();
 
@@ -162,12 +164,26 @@ namespace SPDX.CodeAnalysis.CSharp
 
                     for (int i = 0; i < sessionCount; i++)
                     {
-                        hasMatchingLicenseText |= matchSessions[i].IsFullMatch;
+                        hasAnyFullMatch |= matchSessions[i].IsFullMatch;
+                        hasAnyPartialMatch |= matchSessions[i].IsPartialMatch;
+                    }
+
+                    if (!hasAnyFullMatch && hasAnyPartialMatch)
+                    {
+                        for (int i = 0; i < sessionCount; i++)
+                        {
+                            if (matchSessions[i].IsPartialMatch)
+                            {
+                                // TODO: We need to report the first char that mismatched to the end of the license block.
+                                // Code fix must be able to replace unmatched text and match comment style (single line or multiline).
+                                ReportLicenseTextMatchingConfigurationMustMatchAllLines(context, matchSessions[i].FullMatchSpan!.Value);
+                            }
+                        }
                     }
 
                 }
 
-                if (!hasMatchingLicenseText)
+                if (!hasAnyFullMatch && !hasAnyPartialMatch)
                 {
                     // Second pass: We know we need to report a diagnostic now, but we are being more thorough with the matching.
                     // We run a second pass while recording position information so we can report the diagnostics.
@@ -190,8 +206,7 @@ namespace SPDX.CodeAnalysis.CSharp
                             break;
                     }
 
-                    bool hasAnyFullMatch = false;
-                    bool hasAnyPartialMatch = false;
+                    
                     for (int i = 0; i < sessionCount; i++)
                     {
                         hasAnyFullMatch |= matchSessions[i].IsFullMatch;
@@ -349,6 +364,9 @@ namespace SPDX.CodeAnalysis.CSharp
 
         private void ReportHasNoLicenseText(SyntaxTreeAnalysisContext context)
             => ReportDiagnostic(context, Descriptors.SPDX_1005_LicenseTextMustExist, new TextSpan(0, 0));
+
+        private void ReportLicenseTextMatchingConfigurationMustMatchAllLines(SyntaxTreeAnalysisContext context, TextSpan span)
+            => ReportDiagnostic(context, Descriptors.SPDX_1006_LicenseTextMatchingConfigurationMustMatchAllLines, span);
 
         private void ReportHasNoLicenseHeaderTextConfiguration(CompilationAnalysisContext context)
             => context.ReportDiagnostic(Diagnostic.Create(Descriptors.SPDX_2000_NoLicenseHeaderTextConfiguration, Location.None));

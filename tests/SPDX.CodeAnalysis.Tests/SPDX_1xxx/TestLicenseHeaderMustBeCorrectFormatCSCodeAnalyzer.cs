@@ -46,9 +46,50 @@ namespace SPDX.CodeAnalysis.Tests
             );
         }
 
+        [Test]
+        public async Task SPDX_1006_LicenseTextMatchingConfigurationMustMatchAllLines_WithPartialMatch_ProducesDiagnositic()
+        {
+            const string partiallyMatchingApache2Header = @"Licensed under the Apache License, Version 2.0 (the ""License"");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law BOGUS or agreed to in writing, software
+distributed under the License is distributed on an ""AS IS"" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.";
+
+            const string testCodeFilePath = "project/src/baz.cs";
+            string testCode = CSharpFileBuilder.Create(NamespaceStyle.BlockScoped)
+                    .WithCommentBeforeUsings("SPDX-License-Identifier: Apache-2.0")
+                    .WithCommentBeforeUsings("SPDX-FileCopyrightText: Copyright 2025-2028 John Smith")
+                    .WithCommentBeforeUsings("")
+                    .WithCommentBeforeUsings(partiallyMatchingApache2Header)
+                    .ToString();
+
+            Console.Write(testCode); // Enable for debugging
+
+
+            await RunTestAsync(
+                FileSystemXml.With2OverriddenLevels,
+                testCode,
+                testCodeFilePath,
+                enabledDiagnostics: new[]
+                {
+                    Descriptors.SPDX_1006_LicenseTextMatchingConfigurationMustMatchAllLines.Id
+                },
+                expectedDiagnostics: new[] {
+                    DiagnosticResult
+                        .CompilerWarning(Descriptors.SPDX_1006_LicenseTextMatchingConfigurationMustMatchAllLines.Id)
+                        .WithMessage(FormatMessage(Descriptors.SPDX_1006_LicenseTextMatchingConfigurationMustMatchAllLines.MessageFormat))
+                }
+            , suppressLocation: true); // TODO: Validate the location, info.
+        }
 
         [Test]
-        public async Task SPDX_2000_NoLicenseHeaderTextConfiguration()
+        public async Task SPDX_2000_NoLicenseHeaderTextConfiguration_ProducesDiagnostic()
         {
             string testCodeFilePath = "project/src/baz.cs";
             string testCode = CSharpFileBuilder.Create(NamespaceStyle.BlockScoped)

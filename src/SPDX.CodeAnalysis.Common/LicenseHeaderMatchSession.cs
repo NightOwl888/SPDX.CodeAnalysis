@@ -77,8 +77,11 @@ namespace SPDX.CodeAnalysis
             {
                 if (hasStarted)
                 {
+                    // Mark the end even on mismatch after some progress
                     shouldStopMatching = true;
-                    isContiguous = false;
+
+                    // Don't change isContiguous unless a real gap is encountered.
+                    // Let NotifyNonCommentTrivia() control that.
                 }
                 return !MatchSessionEnded;
             }
