@@ -7,5 +7,6 @@ namespace SPDX.CodeAnalysis
     public enum Category
     {
         Licensing,
+        Configuration,
     }
 }

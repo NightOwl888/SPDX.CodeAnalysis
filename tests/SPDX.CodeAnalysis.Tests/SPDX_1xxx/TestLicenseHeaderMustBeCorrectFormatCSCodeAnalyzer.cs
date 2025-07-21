@@ -48,7 +48,7 @@ namespace SPDX.CodeAnalysis.Tests
 
 
         [Test]
-        public async Task SPDX_1006_NoLicenseHeaderTextConfiguration()
+        public async Task SPDX_2000_NoLicenseHeaderTextConfiguration()
         {
             string testCodeFilePath = "project/src/baz.cs";
             string testCode = CSharpFileBuilder.Create(NamespaceStyle.BlockScoped)
@@ -63,12 +63,12 @@ namespace SPDX.CodeAnalysis.Tests
                 testCodeFilePath,
                 enabledDiagnostics: new[]
                 {
-                    Descriptors.SPDX_1006_NoLicenseHeaderTextConfiguration.Id
+                    Descriptors.SPDX_2000_NoLicenseHeaderTextConfiguration.Id
                 },
                 expectedDiagnostics: new[] {
                     DiagnosticResult
-                        .CompilerWarning(Descriptors.SPDX_1006_NoLicenseHeaderTextConfiguration.Id)
-                        .WithMessage(FormatMessage(Descriptors.SPDX_1006_NoLicenseHeaderTextConfiguration.MessageFormat))
+                        .CompilerWarning(Descriptors.SPDX_2000_NoLicenseHeaderTextConfiguration.Id)
+                        .WithMessage(FormatMessage(Descriptors.SPDX_2000_NoLicenseHeaderTextConfiguration.MessageFormat))
                 }
             );
         }

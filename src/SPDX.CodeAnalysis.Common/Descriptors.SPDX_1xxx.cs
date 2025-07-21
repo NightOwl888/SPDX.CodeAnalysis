@@ -50,12 +50,5 @@ namespace SPDX.CodeAnalysis
                 Licensing,
                 Warning
             );
-
-        public static DiagnosticDescriptor SPDX_1006_NoLicenseHeaderTextConfiguration { get; } =
-            Diagnostic(
-                "SPDX_1006",
-                Licensing,
-                Warning
-            );
     }
 }

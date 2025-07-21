@@ -29,7 +29,7 @@ namespace SPDX.CodeAnalysis.CSharp
             Descriptors.SPDX_1003_FileCopyrightTextMustHaveValue,
             Descriptors.SPDX_1004_LicenseCopyrightTextMustPrecedeLicenseIdentifier,
             Descriptors.SPDX_1005_LicenseTextMustExist,
-            Descriptors.SPDX_1006_NoLicenseHeaderTextConfiguration
+            Descriptors.SPDX_2000_NoLicenseHeaderTextConfiguration
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => supportedDiagnostics;
@@ -351,6 +351,6 @@ namespace SPDX.CodeAnalysis.CSharp
             => ReportDiagnostic(context, Descriptors.SPDX_1005_LicenseTextMustExist, new TextSpan(0, 0));
 
         private void ReportHasNoLicenseHeaderTextConfiguration(CompilationAnalysisContext context)
-            => context.ReportDiagnostic(Diagnostic.Create(Descriptors.SPDX_1006_NoLicenseHeaderTextConfiguration, Location.None));
+            => context.ReportDiagnostic(Diagnostic.Create(Descriptors.SPDX_2000_NoLicenseHeaderTextConfiguration, Location.None));
     }
 }
