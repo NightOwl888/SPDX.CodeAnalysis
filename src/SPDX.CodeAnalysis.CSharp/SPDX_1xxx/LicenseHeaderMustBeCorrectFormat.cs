@@ -9,8 +9,6 @@ using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
-using System.Linq;
 
 namespace SPDX.CodeAnalysis.CSharp
 {
@@ -20,6 +18,10 @@ namespace SPDX.CodeAnalysis.CSharp
         private const string LicenseIdentifierTag = "SPDX-License-Identifier";
         private const string FileCopyrightTextTag = "SPDX-FileCopyrightText";
         private const string TopLevelDirectoryName = "LICENSES.HEADERS"; // TODO: Make configurable?
+        private const int SingleLineCommentTriviaKind = (int)SyntaxKind.SingleLineCommentTrivia;
+        private const int MultiLineCommentTriviaKind = (int)SyntaxKind.MultiLineCommentTrivia;
+        private const int WhitespaceTriviaKind = (int)SyntaxKind.WhitespaceTrivia;
+
         private static readonly ImmutableArray<DiagnosticDescriptor> supportedDiagnostics = ImmutableArray.Create<DiagnosticDescriptor>(
             Descriptors.SPDX_1000_LicenseIdentifierMustExist,
             Descriptors.SPDX_1001_LicenseIdentifierMustHaveValue,
@@ -87,9 +89,6 @@ namespace SPDX.CodeAnalysis.CSharp
             //var triviaList = firstToken.LeadingTrivia;
             string codeFilePath = context.Tree.FilePath;
 
-            bool hasLicenseText = false;
-            bool hasLicenseTextPartial = false;
-
             var spdxLicenseIdentifierSession = new TagValueSession(LicenseIdentifierTag);
             var spdxFileCopyrightTextSession = new TagValueSession(FileCopyrightTextTag);
 
@@ -104,11 +103,14 @@ namespace SPDX.CodeAnalysis.CSharp
                     break;
             }
 
+
             // Second pass - If we found the SPDX tags, then look for the correct license header text.
             // This is configured as a file in a LICENSES.HEADERS directory which may be levels above
             // the current directory.
             if (spdxLicenseIdentifierSession.HasTag && spdxLicenseIdentifierSession.HasValue)
             {
+                bool hasMatchingLicenseText = false;
+
                 ReadOnlySpan<char> spdxLicenseIdentifier = spdxLicenseIdentifierSession.Value.TrimEnd();
 
                 // First pass: Optimize the search for the "happy path" where the SPDX-License-Identifier and codeFilePath match the license header text(s)
@@ -116,131 +118,67 @@ namespace SPDX.CodeAnalysis.CSharp
 
                 if (matchingLicenseHeaderTexts.Count > 0)
                 {
-                    // Fast path: In the typical case there will be only one license header text to match against.
-                    if (matchingLicenseHeaderTexts.Count == 1)
-                    {
-                        IReadOnlyList<string> lines = matchingLicenseHeaderTexts[0].Lines;
+                    //// Fast path: In the typical case there will be only one license header text to match against.
+                    //if (matchingLicenseHeaderTexts.Count == 1)
+                    //{
+                    //    //IReadOnlyList<string> lines = matchingLicenseHeaderTexts[0].Lines;
+                    //    LicenseHeaderMatchSession session = new LicenseHeaderMatchSession(matchingLicenseHeaderTexts[0]);
 
-                        foreach (var token in root.DescendantTokens())
-                        {
-                            if (ProcessLicenseText(lines, token.LeadingTrivia))
-                                break;
+                    //    foreach (var token in root.DescendantTokens())
+                    //    {
+                    //        //if (ProcessLicenseText(lines, token.LeadingTrivia))
+                    //        //    break;
 
-                            // Stop scanning once we hit the first type declaration
-                            if (token.Parent is TypeDeclarationSyntax)
-                                break;
-                        }
-                    }
-                    else
+                    //        //if (session.TryMatchNextLine())
+
+                    //        // Stop scanning once we hit the first type declaration
+                    //        if (token.Parent is TypeDeclarationSyntax)
+                    //            break;
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    // TODO: We need our session to track matches for each matchingLicenseHeaderTexts
+                    //    // and determine if any of them matched (and set hasLicnseText to true). If not, we proceed to the second pass.
+
+
+                    //}
+                    int sessionCount = matchingLicenseHeaderTexts.Count;
+                    LicenseHeaderMatchSession[] matchSessions = new LicenseHeaderMatchSession[sessionCount];
+                    for (int i = 0; i < sessionCount; i++)
                     {
-                        // TODO: We need our session to track matches for each matchingLicenseHeaderTexts
-                        // and determine if any of them matched (and set hasLicnseText to true). If not, we proceed to the second pass.
+                        matchSessions[i] = new LicenseHeaderMatchSession(matchingLicenseHeaderTexts[i], WhitespaceTriviaKind, SingleLineCommentTriviaKind, MultiLineCommentTriviaKind);
                     }
+
+                    foreach (var token in root.DescendantTokens())
+                    {
+                        if (!ProcessLicenseText(matchSessions, token.LeadingTrivia))
+                            break;
+
+                        // Stop scanning once we hit the first type declaration
+                        if (token.Parent is TypeDeclarationSyntax)
+                            break;
+                    }
+
+                    for (int i = 0; i < sessionCount; i++)
+                    {
+                        hasMatchingLicenseText |= matchSessions[i].IsFullMatch;
+                    }
+
                 }
 
-                if (!hasLicenseText)
+                if (!hasMatchingLicenseText)
                 {
                     // Second pass: We know we need to report a diagnostic now, but we are being more thorough with the matching.
                     // We run a second pass while recording position information so we can report the diagnostics.
                     IReadOnlyList<LicenseHeaderCacheText> allLicenseHeaderTexts = cache.GetAllLicenseHeaders();
 
-                    if (allLicenseHeaderTexts.Count == 0)
-                    {
-                        // TODO: Report diagnostic because there are no configured license header texts.
-                    }
-
                     // TODO: We need our session to track matches for each allLicenseHeaderTexts
                     // and determine if any of them matched. This time, we need to enable position tracking
                     // so we can report a diagnostic.
+
+                    ReportHasNoLicenseText(context);
                 }
-
-
-                // TODO: Re-implement this so we have reporting on license header matching
-                //if (!provider.TryGetLicenseHeader(directory, spdxLicenseIdentifier, out IReadOnlyList<string> licenseTextLines))
-                //{
-                //    // TODO: Report this as an unconfigured license header. For now, we have no fallback values.
-                //}
-
-                //foreach (var token in root.DescendantTokens())
-                //{
-                //    if (ProcessLicenseText(licenseTextLines, token.LeadingTrivia))
-                //        break;
-
-                //    // Stop scanning once we hit the first type declaration
-                //    if (token.Parent is TypeDeclarationSyntax)
-                //        break;
-                //}
-            }
-
-            //bool ProcessLicenseTextLine(IReadOnlyList<string> licenseTextLines, ref int licenseTextLinesIndex, SyntaxTrivia trivia, string text, ReadOnlySpan<char> line, int separatorOffset = 0)
-            //{
-            //    ReadOnlySpan<char> licenseLine = licenseTextLines[licenseTextLinesIndex].AsSpan();
-
-            //    int offset = line.IndexOf(licenseLine, StringComparison.Ordinal);
-            //    if (offset > -1)
-            //    {
-            //        licenseTextLinesIndex++;
-            //        if (licenseTextLinesIndex == licenseTextLines.Count)
-            //            return true;
-            //    }
-
-            //    return false;
-            //}
-
-            bool ProcessLicenseText(IReadOnlyList<string> licenseTextLines, SyntaxTriviaList triviaList)
-            {
-                var matchSession = new LicenseHeaderMatchSession(licenseTextLines);
-
-                // Keep track of the line to match in licenseTextLines
-                //int licenseTextLinesIndex = 0;
-
-                foreach (var trivia in triviaList)
-                {
-                    if (trivia.IsKind(SyntaxKind.SingleLineCommentTrivia))
-                    {
-                        string text = trivia.ToString(); // safe to reference span from here
-                        if (matchSession.MatchNextLine(text.AsSpan()))
-                            hasLicenseText = true;
-
-                        //ProcessLicenseTextLine(licenseTextLines, ref licenseTextLinesIndex, trivia, text, text.AsSpan());
-                    }
-                    else if (trivia.IsKind(SyntaxKind.MultiLineCommentTrivia))
-                    {
-                        string text = trivia.ToString(); // safe to reference span from here
-
-                        //int separatorOffset = 0;
-                        foreach (var line in text.SplitLines())
-                        {
-                            //ProcessLicenseTextLine(licenseTextLines, ref licenseTextLinesIndex, trivia, text, line, separatorOffset);
-                            if (matchSession.MatchNextLine(line))
-                            {
-                                hasLicenseText = true;
-                                break;
-                            }
-
-
-                            //// Stop scanning if found
-                            //if (hasLicenseText)
-                            //    return true;
-
-                            //separatorOffset += line.Separator.Length;
-                        }
-                    }
-
-                    // Stop scanning if found
-                    if (hasLicenseText)
-                        break;
-                }
-
-                if (matchSession.IsComplete)
-                {
-                    hasLicenseTextPartial = false;
-                }
-                else if (matchSession.HasMatchedAny)
-                {
-                    hasLicenseTextPartial = true;
-                }
-                return false;
             }
 
             if (!spdxLicenseIdentifierSession.HasTag)
@@ -262,11 +200,63 @@ namespace SPDX.CodeAnalysis.CSharp
                 ReportHasNoFileCopyrightTextValue(context,
                     new TextSpan(spdxFileCopyrightTextSession.ValueOffsetInText, spdxFileCopyrightTextSession.ValueLength));
             }
+        }
 
-            if (!hasLicenseText)
+        private static bool ProcessLicenseText(LicenseHeaderMatchSession[] matchSessions, SyntaxTriviaList triviaList)
+        {
+            foreach (var trivia in triviaList)
             {
-                ReportHasNoLicenseText(context);
+                if (trivia.IsKind(SyntaxKind.SingleLineCommentTrivia))
+                {
+                    string text = trivia.ToString(); // safe to reference span from here
+                    ReadOnlySpan<char> line = text.AsSpan();
+                    int absoluteOffset = trivia.Span.Start;
+                    if (!ProcessLicenseTextLine(matchSessions, trivia, line, absoluteOffset))
+                        return false;
+                }
+                else if (trivia.IsKind(SyntaxKind.MultiLineCommentTrivia))
+                {
+                    string text = trivia.ToString(); // safe to reference span from here
+
+                    int lineOffset = 0;
+                    foreach (var line in text.SplitLines())
+                    {
+                        int absoluteOffset = trivia.Span.Start + lineOffset;
+
+                        if (!ProcessLicenseTextLine(matchSessions, trivia, line, absoluteOffset))
+                            return false;
+
+                        lineOffset += line.Line.Length + line.Separator.Length;
+                    }
+                }
+                else
+                {
+                    if (!ProcessLicenseNonCommentTrivia(matchSessions, trivia))
+                        return false;
+                }
             }
+
+            return true; // Continue processing
+        }
+
+        private static bool ProcessLicenseTextLine(LicenseHeaderMatchSession[] matchSessions, SyntaxTrivia trivia, ReadOnlySpan<char> line, int absoluteOffset = 0)
+        {
+            bool anyActive = false;
+            for (int i = 0; i < matchSessions.Length; i++)
+            {
+                anyActive |= matchSessions[i].MatchNextLine(trivia, line, absoluteOffset);
+            }
+            return anyActive;
+        }
+
+        private static bool ProcessLicenseNonCommentTrivia(LicenseHeaderMatchSession[] matchSessions, SyntaxTrivia trivia)
+        {
+            bool anyActive = false;
+            for (int i = 0; i < matchSessions.Length; i++)
+            {
+                anyActive |= matchSessions[i].NotifyNonCommentTrivia(trivia);
+            }
+            return anyActive;
         }
 
         private static bool ProcessSpdxTag(SyntaxTriviaList triviaList,
@@ -279,21 +269,21 @@ namespace SPDX.CodeAnalysis.CSharp
             {
                 if (trivia.IsKind(SyntaxKind.SingleLineCommentTrivia))
                 {
-                    string textString = trivia.ToString(); // safe to reference span from here
-                    ReadOnlySpan<char> text = textString.AsSpan();
+                    string text = trivia.ToString(); // safe to reference span from here
+                    ReadOnlySpan<char> line = text.AsSpan();
 
-                    hasLicenseIdentifier = spdxLicenseIdentifierSession.TryFindTag(textString, text);
-                    hasFileCopyrightText = spdxFileCopyrightTextSession.TryFindTag(textString, text);
+                    hasLicenseIdentifier = spdxLicenseIdentifierSession.TryFindTag(text, line);
+                    hasFileCopyrightText = spdxFileCopyrightTextSession.TryFindTag(text, line);
                 }
                 else if (trivia.IsKind(SyntaxKind.MultiLineCommentTrivia))
                 {
-                    string textString = trivia.ToString(); // safe to reference span from here
+                    string text = trivia.ToString(); // safe to reference span from here
 
                     int lineOffset = 0;
-                    foreach (var line in textString.SplitLines())
+                    foreach (var line in text.SplitLines())
                     {
-                        hasLicenseIdentifier = spdxLicenseIdentifierSession.TryFindTag(textString, line, lineOffset);
-                        hasFileCopyrightText = spdxFileCopyrightTextSession.TryFindTag(textString, line, lineOffset);
+                        hasLicenseIdentifier = spdxLicenseIdentifierSession.TryFindTag(text, line, lineOffset);
+                        hasFileCopyrightText = spdxFileCopyrightTextSession.TryFindTag(text, line, lineOffset);
 
                         // Stop scanning if found
                         if (hasLicenseIdentifier && hasFileCopyrightText)

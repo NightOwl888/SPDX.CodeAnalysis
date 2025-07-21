@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.Testing;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using SPDX.CodeAnalysis.Tests.CSharp;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,6 +19,33 @@ namespace SPDX.CodeAnalysis.Tests
         public override CodeLanguage Language => CodeLanguage.CSharp;
 
         public override FileSystemXml FileSystemXml => fileSystemXml;
+
+        [Test]
+        public async Task SPDX_1005_LicenseTextMustExist_Apache2_SingleMatch_Exists()
+        {
+            string testCodeFilePath = "project/src/baz.cs";
+            string testCode = CSharpFileBuilder.Create(NamespaceStyle.BlockScoped)
+                    .WithCommentBeforeUsings("SPDX-License-Identifier: Apache-2.0")
+                    .WithCommentBeforeUsings("SPDX-FileCopyrightText: Copyright 2025-2028 John Smith")
+                    .WithCommentBeforeUsings("")
+                    .WithCommentBeforeUsings(Constants.License.Apache2.Header)
+                    .ToString();
+
+            //Console.Write(testCode); // Enable for debugging
+
+
+            await RunTestAsync(
+                FileSystemXml.With2OverriddenLevels,
+                testCode,
+                testCodeFilePath,
+                enabledDiagnostics: new[]
+                {
+                    Descriptors.SPDX_1005_LicenseTextMustExist.Id
+                },
+                expectedDiagnostics: NoDiagnosticResults
+            );
+        }
+
 
         [Test]
         public async Task SPDX_1006_NoLicenseHeaderTextConfiguration()
@@ -64,10 +92,6 @@ namespace SPDX.CodeAnalysis.Tests
                         .CompilerWarning(Descriptors.SPDX_1002_FileCopyrightTextMustExist.Id)
                         .WithSpan(expectedTestCodeFilePath, 1, 1, 1, 1)
                         .WithMessage(FormatMessage(Descriptors.SPDX_1002_FileCopyrightTextMustExist.MessageFormat, FileCopyrightTextTag)),
-                    DiagnosticResult
-                        .CompilerWarning(Descriptors.SPDX_1005_LicenseTextMustExist.Id)
-                        .WithSpan(expectedTestCodeFilePath, 1, 1, 1, 1)
-                        .WithMessage(FormatMessage(Descriptors.SPDX_1005_LicenseTextMustExist.MessageFormat))
                 }
             );
         }
@@ -124,10 +148,6 @@ public class MyClass
                     .CompilerWarning(Descriptors.SPDX_1002_FileCopyrightTextMustExist.Id)
                     .WithSpan(expectedTestCodeFilePath, 1, 1, 1, 1)
                     .WithMessage(FormatMessage(Descriptors.SPDX_1002_FileCopyrightTextMustExist.MessageFormat, FileCopyrightTextTag)),
-                DiagnosticResult
-                    .CompilerWarning(Descriptors.SPDX_1005_LicenseTextMustExist.Id)
-                    .WithSpan(expectedTestCodeFilePath, 1, 1, 1, 1)
-                    .WithMessage(FormatMessage(Descriptors.SPDX_1005_LicenseTextMustExist.MessageFormat)),
             });
 
             await test.RunAsync();

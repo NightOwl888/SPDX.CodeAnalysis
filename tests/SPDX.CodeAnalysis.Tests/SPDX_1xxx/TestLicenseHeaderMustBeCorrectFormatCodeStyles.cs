@@ -3,6 +3,7 @@
 
 using Microsoft.CodeAnalysis.Testing;
 using NUnit.Framework;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -122,34 +123,33 @@ namespace SPDX.CodeAnalysis.Tests
                 suppressLocation: true);
         }
 
-        // TODO: Implement correct tests for all license text behaviors
-        //[Test]
-        //public virtual async Task SPDX_1005_LicenseTextMustExist_Exists_ShouldProduceNoDiagnostic()
-        //{
-        //    string diagnosticId = Descriptors.SPDX_1005_LicenseTextMustExist.Id;
+        [Test]
+        public virtual async Task SPDX_1005_LicenseTextMustExist_Exists_ShouldProduceNoDiagnostic()
+        {
+            string diagnosticId = Descriptors.SPDX_1005_LicenseTextMustExist.Id;
 
-        //    await RunTestAsync(
-        //        FileSystemXml.Basic,
-        //        testCode: GenerateTestCode(),
-        //        testCodeFilePath: GenerateCodeFilePath("project/src/specialized/stuff/"),
-        //        enabledDiagnostics: new[] { diagnosticId },
-        //        expectedDiagnostics: NoDiagnosticResults,
-        //        suppressLocation: true);
-        //}
+            await RunTestAsync(
+                FileSystemXml.Basic,
+                testCode: GenerateTestCode(),
+                testCodeFilePath: GenerateCodeFilePath("project/src/specialized/stuff/"),
+                enabledDiagnostics: new[] { diagnosticId },
+                expectedDiagnostics: NoDiagnosticResults,
+                suppressLocation: true);
+        }
 
-        //[Test]
-        //public virtual async Task SPDX_1005_LicenseTextMustExist_DoesNotExist_ShouldProduceDiagnositc()
-        //{
-        //    string diagnosticId = Descriptors.SPDX_1005_LicenseTextMustExist.Id;
+        [Test]
+        public virtual async Task SPDX_1005_LicenseTextMustExist_DoesNotExist_ShouldProduceDiagnositc()
+        {
+            string diagnosticId = Descriptors.SPDX_1005_LicenseTextMustExist.Id;
 
-        //    await RunTestAsync(
-        //        FileSystemXml.Basic,
-        //        testCode: GenerateTestCode(licenseHeaderText: null),
-        //        testCodeFilePath: GenerateCodeFilePath("project/src/specialized/stuff/"),
-        //        enabledDiagnostics: new[] { diagnosticId },
-        //        expectedDiagnostics: new[] { DiagnosticResult.CompilerWarning(diagnosticId) },
-        //        suppressLocation: true);
-        //}
+            await RunTestAsync(
+                FileSystemXml.Basic,
+                testCode: GenerateTestCode(licenseHeaderText: null),
+                testCodeFilePath: GenerateCodeFilePath("project/src/specialized/stuff/"),
+                enabledDiagnostics: new[] { diagnosticId },
+                expectedDiagnostics: new[] { DiagnosticResult.CompilerWarning(diagnosticId) },
+                suppressLocation: true);
+        }
 
 
         public abstract string CodeFileExtension { get; }
