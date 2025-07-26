@@ -21,6 +21,8 @@ namespace SPDX.CodeAnalysis
         private /*readonly*/ IReadOnlyList<string> expectedLines;
 
         private SyntaxTrivia? lastMatchedTrivia;
+        private SyntaxTrivia? lastTriviaChecked;
+        private SyntaxTrivia? firstMismatchedTrivia;
         private int whitespaceTriviaKind;
         private int singleLineCommentKind;
         private int multiLineCommentKind;
@@ -29,6 +31,7 @@ namespace SPDX.CodeAnalysis
         private int lastMatchedLineOffset;
         private int startOffset;
         private int endOffset;
+        private int? mismatchStartOffset;
         private bool hasStarted;
         private bool hasCompleted;
         private bool shouldStopMatching;
@@ -77,12 +80,21 @@ namespace SPDX.CodeAnalysis
             {
                 if (hasStarted)
                 {
+                    // First mismatch during active match
+                    if (firstMismatchedTrivia is null)
+                    {
+                        mismatchStartOffset = absoluteOffset;
+                        firstMismatchedTrivia = trivia;
+                    }
+
                     // Mark the end even on mismatch after some progress
                     shouldStopMatching = true;
 
                     // Don't change isContiguous unless a real gap is encountered.
                     // Let NotifyNonCommentTrivia() control that.
                 }
+
+                lastTriviaChecked = trivia;
                 return !MatchSessionEnded;
             }
 
@@ -101,6 +113,7 @@ namespace SPDX.CodeAnalysis
             lastMatchedLineOffset = absoluteOffset;
             matchedLineCount++;
             lastMatchedTrivia = trivia;
+            lastTriviaChecked = trivia;
 
             if (matchedLineCount == expectedLines.Count)
                 hasCompleted = true;
@@ -221,5 +234,19 @@ namespace SPDX.CodeAnalysis
             (startOffset >= 0 && endOffset > startOffset)
                 ? TextSpan.FromBounds(startOffset, endOffset)
                 : null;
+
+        public TextSpan? PartialMismatchSpan
+        {
+            get
+            {
+                if (!IsPartialMatch || mismatchStartOffset is null || lastTriviaChecked is null)
+                    return null;
+
+                return TextSpan.FromBounds(
+                    mismatchStartOffset.Value,
+                    lastTriviaChecked.Value.FullSpan.End
+                );
+            }
+        }
     }
 }

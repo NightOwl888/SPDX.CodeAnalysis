@@ -58,12 +58,13 @@ namespace SPDX.CodeAnalysis.CSharp
 
         private void OnCompilationStart(CompilationStartAnalysisContext context)
         {
-            // Load the configuration from AdditionalFiles
-            var loader = new AdditionalFilesLicenseHeaderCacheLoader(context.Options.AdditionalFiles);
             // Create a per-compilation cache instance.
             // This lifetime ensures the cache is reloaded if any of the AdditionalFiles changes.
             var cache = new LicenseHeaderCache();
-            
+
+            // Load the configuration from AdditionalFiles
+            var loader = new AdditionalFilesLicenseHeaderCacheLoader(context.Options.AdditionalFiles);
+
             // codeFilePath is not used by this loader
             cache.EnsureInitialized(loader, codeFilePath: string.Empty, TopLevelDirectoryName);
 
@@ -108,7 +109,7 @@ namespace SPDX.CodeAnalysis.CSharp
             // Second pass - If we found the SPDX tags, then look for the correct license header text.
             // This is configured as a file in a LICENSES.HEADERS directory which may be levels above
             // the current directory.
-            if (spdxLicenseIdentifierSession.HasTag && spdxLicenseIdentifierSession.HasValue)
+            if (spdxLicenseIdentifierSession.HasTag && spdxLicenseIdentifierSession.HasValue && !cache.IsEmpty)
             {
                 bool hasAnyFullMatch = false;
                 bool hasAnyPartialMatch = false;
@@ -174,9 +175,8 @@ namespace SPDX.CodeAnalysis.CSharp
                         {
                             if (matchSessions[i].IsPartialMatch)
                             {
-                                // TODO: We need to report the first char that mismatched to the end of the license block.
-                                // Code fix must be able to replace unmatched text and match comment style (single line or multiline).
-                                ReportLicenseTextMatchingConfigurationMustMatchAllLines(context, matchSessions[i].FullMatchSpan!.Value);
+                                // TODO: Code fix must be able to replace unmatched text and match comment style (single line or multiline).
+                                ReportLicenseTextMatchingConfigurationMustMatchAllLines(context, matchSessions[i].PartialMismatchSpan!.Value);
                             }
                         }
                     }
@@ -206,7 +206,7 @@ namespace SPDX.CodeAnalysis.CSharp
                             break;
                     }
 
-                    
+
                     for (int i = 0; i < sessionCount; i++)
                     {
                         hasAnyFullMatch |= matchSessions[i].IsFullMatch;
@@ -304,7 +304,7 @@ namespace SPDX.CodeAnalysis.CSharp
             ref TagValueSession spdxFileCopyrightTextSession)
         {
             bool hasLicenseIdentifier = false, hasFileCopyrightText = false;
-         
+
             foreach (var trivia in triviaList)
             {
                 if (trivia.IsKind(SyntaxKind.SingleLineCommentTrivia))
@@ -342,7 +342,7 @@ namespace SPDX.CodeAnalysis.CSharp
 
         private void ReportDiagnostic(SyntaxTreeAnalysisContext context, DiagnosticDescriptor descriptor, TextSpan span)
         {
-            var location = options.SuppressLocation
+            Location location = options.SuppressLocation
                 ? Location.None
                 : Location.Create(context.Tree, span);
 
