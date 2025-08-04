@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SPDX.CodeAnalysis.CSharp": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

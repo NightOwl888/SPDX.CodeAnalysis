@@ -5,17 +5,23 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <NoBuild>true</NoBuild>
     <IncludeSymbols>false</IncludeSymbols>
+    
+    <!-- We intentionally don't have a ref or lib directory in our NuGet package because this is an analyzer-only package -->
+    <NoWarn>$(NoWarn);NU5127;NU5128</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Label="NuGet Package Settings">
     <PackageId>SPDX.CodeAnalysis</PackageId>
     <Description>SPDX license header enforcement analyzers for OSS projects.</Description>
     <!--<PackageTags>$(PackageTags)</PackageTags>-->
+    <PackageOutputPath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\_artifacts\NuGetPackages'))</PackageOutputPath>
+    <SpdxPackageVersionPropsFile>$(PackageOutputPath)\SPDX.CodeAnalysis.Version.props</SpdxPackageVersionPropsFile>
   </PropertyGroup>
 
   <PropertyGroup Label="NuGet Package File Paths">
+    <SpdxCodeAnalysisBuildTargetsFile>SPDX.CodeAnalysis.Build.targets</SpdxCodeAnalysisBuildTargetsFile>
+    
     <SpdxCodeAnalysisCSAssemblyFile>$(RepositoryRoot)src\SPDX.CodeAnalysis.CSharp\bin\$(Configuration)\$(TargetFramework)\SPDX.CodeAnalysis.CSharp.dll</SpdxCodeAnalysisCSAssemblyFile>
     <SpdxCodeAnalysisVBAssemblyFile>$(RepositoryRoot)src\SPDX.CodeAnalysis.VisualBasic\bin\$(Configuration)\$(TargetFramework)\SPDX.CodeAnalysis.VisualBasic.dll</SpdxCodeAnalysisVBAssemblyFile>
 
@@ -24,17 +30,89 @@
     <SpdxCodeAnalysisCommonAssemblyFile>$(RepositoryRoot)src\SPDX.CodeAnalysis.Common\bin\$(Configuration)\$(TargetFramework)\SPDX.CodeAnalysis.dll</SpdxCodeAnalysisCommonAssemblyFile>
   </PropertyGroup>
 
+  <ItemGroup Label="Localized Resources">
+    <SpdxCodeAnalyisisCommonResources Include="$(RepositoryRoot)src\SPDX.CodeAnalysis.Common\bin\$(Configuration)\$(TargetFramework)\**\*.resources.dll" />
+  </ItemGroup>
+
   <ItemGroup Label="NuGet Package Files">
+    <None Include="$(SpdxCodeAnalysisBuildTargetsFile)" Pack="true" PackagePath="build/SPDX.CodeAnalysis.targets" />
+
     <!-- TODO: Add a readme for this package specifically. The plan is to make the tools to generate license files part of this solution, so we will need separate readme files. -->
     <!--<None Include="readme.md" Pack="true" PackagePath="\readme.md" />-->
     <None Include="$(SpdxCodeAnalysisCSAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <!--<None Include="$(SpdxCodeAnalysisVBAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/vb" Visible="false" />-->
 
     <None Include="$(SpdxCodeAnalysisCommonAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <!--<None Include="$(SpdxCodeAnalysisCommonAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/vb" Visible="false" />-->
+    <None Include="@(SpdxCodeAnalyisisCommonResources)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <!--<None Include="$(SpdxCodeAnalysisCommonAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/vb" Visible="false" />
+    <None Include="@(SpdxCodeAnalyisisCommonResources)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />-->
 
     <None Include="$(SpdxCommonAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <!--<None Include="$(SpdxCommonAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/vb" Visible="false" />-->
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- We only need this to ensure it is built before this project is. We include all dependent projects because
+         it is required by the MSBuild target below. Granted, including only SPDX.CodeAnalysis.CSharp.csproj would work
+         in normal scenarios, but when executing an MSBuild target from a consuming project (SPDX.CodeAnalysis.Sample.csproj),
+         these are required to be built first and in the order that they are listed here. -->
+    <ProjectReference Include="..\SPDX.Common\SPDX.Common.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\SPDX.CodeAnalysis.Common\SPDX.CodeAnalysis.Common.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\SPDX.CodeAnalysis.CSharp\SPDX.CodeAnalysis.CSharp.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <Target Name="EnsureDependenciesBuilt" BeforeTargets="PrepareForBuild"> 
+    <MSBuild
+      Projects="@(ProjectReference)"
+      Targets="Build"
+      Properties="Configuration=$(Configuration)"
+      BuildInParallel="false" />
+  </Target>
+
+  <UsingTask
+    TaskName="GenerateVersionProps"
+    TaskFactory="RoslynCodeTaskFactory"
+    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+
+    <ParameterGroup>
+      <OutputFile ParameterType="System.String" Required="true" />
+      <Version ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+
+    <Task>
+      <Using Namespace="System.Xml" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+      var settings = new XmlWriterSettings { Indent = true };
+      using (var writer = XmlWriter.Create(OutputFile, settings))
+      {
+          writer.WriteStartDocument();
+          writer.WriteStartElement("Project");
+          writer.WriteStartElement("PropertyGroup");
+          writer.WriteElementString("SPDXCodeAnalysisPackageVersion", Version);
+          writer.WriteEndElement(); // PropertyGroup
+          writer.WriteEndElement(); // Project
+          writer.WriteEndDocument();
+      }
+      ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="GeneratePackageVersionProps" DependsOnTargets="GetBuildVersion" AfterTargets="BeforeBuild">
+    <MakeDir Directories="$(PackageOutputPath)" Condition="!Exists('$(PackageOutputPath)')" />
+
+    <GenerateVersionProps
+      OutputFile="$(SpdxPackageVersionPropsFile)"
+      Version="$(PackageVersion)" />
+  </Target>
+
+  <Target Name="CleanNuGetPackagesDirectory" AfterTargets="Clean">
+    <ItemGroup>
+      <SpdxNuGetFilePaths Include="$(PackageOutputPath)\*.nupkg" />
+    </ItemGroup>
+    
+    <Delete Files="@(SpdxNuGetFilePaths);$(SpdxPackageVersionPropsFile)" />
+  </Target>
 
 </Project>

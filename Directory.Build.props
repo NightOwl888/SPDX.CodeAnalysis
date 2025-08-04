@@ -8,6 +8,10 @@
     <Product>$(GitHubProject)</Product>
   </PropertyGroup>
 
+  <PropertyGroup Label="Debug Settings">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
   <PropertyGroup Label="Version Settings">
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>

@@ -2,13 +2,86 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="../SPDX.CodeAnalysis/SPDX.CodeAnalysis.csproj"
-                      OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+  <PropertyGroup>
+    <SpdxArtifactsDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\_artifacts'))</SpdxArtifactsDirectory>
+    <SpdxNuGetPackageOutputPath>$(SpdxArtifactsDirectory)\NuGetPackages</SpdxNuGetPackageOutputPath>
+    <SpdxPackageVersionPropsFilePath>$(SpdxNuGetPackageOutputPath)\SPDX.CodeAnalysis.Version.props</SpdxPackageVersionPropsFilePath>
+    <RestoreSources>
+      $(RestoreSources);
+      $(SpdxNuGetPackageOutputPath);
+      https://api.nuget.org/v3/index.json
+    </RestoreSources>
+    <!-- We install the analyzer package in a local directory so we don't pollute the
+          .nuget cache on the dev machine with temporary builds -->
+    <RestorePackagesPath>obj\LocalNuGetPackages</RestorePackagesPath>
+    <SpdxRestorePackagesPath>$(RestorePackagesPath)\spdx.codeanalysis</SpdxRestorePackagesPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Visual Studio blocks MSBuild from being able to check whether files are up-to-date.
+          So, we disable that here to gain access to that info. -->
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+  </PropertyGroup>
+
+  <Import Project="$(SpdxPackageVersionPropsFilePath)" Condition="Exists('$(SpdxPackageVersionPropsFilePath)')"/>
+
+  <ItemGroup Condition="Exists('$(SpdxPackageVersionPropsFilePath)')">
+    <PackageReference Include="SPDX.CodeAnalysis" Version="$(SPDXCodeAnalysisPackageVersion)" />
   </ItemGroup>
+
+  <Target Name="EnsureNuGetPackageBuilt" BeforeTargets="PrepareForBuild" Condition="'$(DesignTimeBuild)' != 'true'">
+    <!-- Build the project that produces the NuGet package -->
+    <MSBuild
+      Projects="..\SPDX.CodeAnalysis.Package\SPDX.CodeAnalysis.Package.csproj"
+      Targets="Build"
+      Properties="Configuration=$(Configuration)"
+       />
+
+    <!-- Since we may be continually using the last build number (unless a commit occured),
+          we need to clear the project local NuGet cache. -->
+    <ForceDeleteDirectory DirectoryPath="$(SpdxRestorePackagesPath)" />
+
+    <!-- Restore again, now that the .nupkg should exist -->
+    <MSBuild
+      Projects="$(MSBuildProjectFullPath)"
+      Targets="Restore"
+      Properties="Configuration=$(Configuration)" />
+  </Target>
+
+  <Target Name="CleanRestorePackagesPath" AfterTargets="Clean" Condition="'$(DesignTimeBuild)' != 'true'">
+    <ForceDeleteDirectory DirectoryPath="$(SpdxRestorePackagesPath)" />
+  </Target>
+
+  <UsingTask
+    TaskName="ForceDeleteDirectory"
+    TaskFactory="RoslynCodeTaskFactory"
+    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <DirectoryPath ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        try
+        {
+            if (Directory.Exists(DirectoryPath))
+            {
+                Directory.Delete(DirectoryPath, recursive: true);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Swallow all exceptions unless MSBuild wants you to fail
+            Log.LogMessage(MessageImportance.Low, $"Failed to delete directory '{DirectoryPath}': {ex.Message}");
+        }
+      ]]>
+      </Code>
+    </Task>
+  </UsingTask>
 
 </Project>

@@ -7,6 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{02EA68
 	ProjectSection(SolutionItems) = preProject
 		.build\dependencies.props = .build\dependencies.props
 		.build\nuget.props = .build\nuget.props
+		version.json = version.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C2EF017A-5599-40FA-A1C4-E30C8587B058}"
@@ -40,6 +41,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.Common", "src\SPDX.Com
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.Common.Tests", "tests\SPDX.Common.Tests\SPDX.Common.Tests.csproj", "{C1EA98D3-127E-4FD9-A434-49810AF612C9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.Sample", "src\SPDX.CodeAnalysis.Sample\SPDX.CodeAnalysis.Sample.csproj", "{64742B5A-ED00-F463-5432-4E2E68CB49CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.Vsix", "src\SPDX.CodeAnalysis.Vsix\SPDX.CodeAnalysis.Vsix.csproj", "{4F5BF1EB-3758-4093-922E-8C37ED8393FC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26} = {36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26}
+		{CD22E965-03E8-4857-A55B-DCCE16DE138F} = {CD22E965-03E8-4857-A55B-DCCE16DE138F}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -70,6 +79,14 @@ Global
 		{C1EA98D3-127E-4FD9-A434-49810AF612C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1EA98D3-127E-4FD9-A434-49810AF612C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1EA98D3-127E-4FD9-A434-49810AF612C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64742B5A-ED00-F463-5432-4E2E68CB49CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64742B5A-ED00-F463-5432-4E2E68CB49CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64742B5A-ED00-F463-5432-4E2E68CB49CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64742B5A-ED00-F463-5432-4E2E68CB49CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F5BF1EB-3758-4093-922E-8C37ED8393FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F5BF1EB-3758-4093-922E-8C37ED8393FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F5BF1EB-3758-4093-922E-8C37ED8393FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F5BF1EB-3758-4093-922E-8C37ED8393FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -81,6 +98,8 @@ Global
 		{36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
 		{CD22E965-03E8-4857-A55B-DCCE16DE138F} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
 		{C1EA98D3-127E-4FD9-A434-49810AF612C9} = {E2E910FF-6635-4D9D-A7BE-39037849DC4E}
+		{64742B5A-ED00-F463-5432-4E2E68CB49CC} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
+		{4F5BF1EB-3758-4093-922E-8C37ED8393FC} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3157D387-AA18-46F2-B109-7994C3E12BE1}

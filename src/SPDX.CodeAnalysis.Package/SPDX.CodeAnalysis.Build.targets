@@ -1,0 +1,139 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <SPDX_HashFilePath>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\$(IntermediateOutputPath)$(MSBuildProjectName).SpdxLicenseHeaderFilesHash.txt'))</SPDX_HashFilePath>
+    <SPDX_StampCodeFilePath>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\$(IntermediateOutputPath)$(MSBuildProjectName).SpdxLicenseHeadersStamp.g.cs'))</SPDX_StampCodeFilePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SpdxAdditionalFiles Include="LICENSES.HEADERS/*" />
+    <SpdxAdditionalFiles Include="**/LICENSES.HEADERS/*" />
+  </ItemGroup>
+
+  <UsingTask
+    TaskName="SPDX_DiscoverLicenseHeaders"
+    TaskFactory="RoslynCodeTaskFactory"
+    AssemblyFile="$(MSBuildBinPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <ProjectDirectory ParameterType="System.String" Required="true" />
+      <DiscoveredFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Collections.Generic" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+            var discovered = new List<ITaskItem>();
+            var dir = new DirectoryInfo(ProjectDirectory);
+
+            while (dir != null)
+            {
+                var headersPath = Path.Combine(dir.FullName, "LICENSES.HEADERS");
+                if (Directory.Exists(headersPath))
+                {
+                    foreach (var file in Directory.GetFiles(headersPath, "*.txt", SearchOption.AllDirectories))
+                    {
+                        discovered.Add(new TaskItem(file));
+                    }
+                }
+
+                dir = dir.Parent;
+            }
+
+            DiscoveredFiles = discovered.ToArray();
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <!-- Hash task -->
+  <UsingTask TaskName="SPDX_HashFiles"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildBinPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Inputs ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <OutputFile ParameterType="System.String" Required="true" />
+      <HashOutputChanged ParameterType="System.Boolean" Output="true" />
+      <HashString ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Linq" />
+      <Using Namespace="System.Security.Cryptography" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        var hasher = SHA256.Create();
+        foreach (var file in Inputs.OrderBy(f => f.ItemSpec, StringComparer.OrdinalIgnoreCase))
+        {
+            string path = file.GetMetadata("FullPath");
+            if (!File.Exists(path)) continue;
+
+            byte[] content = File.ReadAllBytes(path);
+            hasher.TransformBlock(content, 0, content.Length, null, 0);
+        }
+        hasher.TransformFinalBlock(new byte[0], 0, 0);
+        string newHash = Convert.ToBase64String(hasher.Hash);
+
+        string oldHash = File.Exists(OutputFile) ? File.ReadAllText(OutputFile).Trim() : "";
+        HashOutputChanged = newHash != oldHash;
+        HashString = newHash;
+
+        if (HashOutputChanged)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(OutputFile));
+            File.WriteAllText(OutputFile, newHash);
+        }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <!-- Run early -->
+  <Target Name="SPDX_DiscoverLicenseHeaders_Evaluate"
+          BeforeTargets="CoreCompile">
+
+    <Message Importance="high" Text="Discovering AdditionalFiles..." />
+      
+    <SPDX_DiscoverLicenseHeaders ProjectDirectory="$(MSBuildProjectDirectory)">
+      <Output TaskParameter="DiscoveredFiles" ItemName="_DynamicSpdxAdditionalFiles" />
+    </SPDX_DiscoverLicenseHeaders>
+
+    <ItemGroup>
+      <_AllSpdxAdditionalFiles Include="@(SpdxAdditionalFiles)" />
+      <_AllSpdxAdditionalFiles Include="@(_DynamicSpdxAdditionalFiles)" />
+    </ItemGroup>
+
+    <SPDX_HashFiles Inputs="@(_AllSpdxAdditionalFiles)" OutputFile="$(SPDX_HashFilePath)">
+      <Output TaskParameter="HashOutputChanged" PropertyName="SpdxHeaderHashChanged" />
+      <Output TaskParameter="HashString" PropertyName="SpdxHeaderHashString" />
+    </SPDX_HashFiles>
+    
+    <Message Importance="high" Text="SPDX_HashFiles output: $(SpdxHeaderHashChanged), $(SpdxHeaderHashString)" />
+
+    <!-- Only update synthetic file if the hash changed -->
+    <WriteLinesToFile Condition="'$(SpdxHeaderHashChanged)' == 'true'"
+                      File="$(SPDX_StampCodeFilePath)"
+                      Lines="// $(SpdxHeaderHashString)"
+                      Overwrite="true" />
+
+    <Message Importance="high" Text="Hash written to file $(SPDX_StampCodeFilePath)." Condition="'$(SpdxHeaderHashChanged)' == 'true'" />
+
+    <!-- Always assign additional files (whether changed or not) -->
+    <ItemGroup>
+      <AdditionalFiles Include="@(_AllSpdxAdditionalFiles)" />
+    </ItemGroup>
+
+    <!-- Add the file to the build. This will trigger the build if the file changed. It is guaranteed to exist, now. -->
+    <ItemGroup>
+      <Compile Include="$(SPDX_StampCodeFilePath)" />
+    </ItemGroup>
+
+  </Target>
+
+  <Target Name="SPDX_CleanDiscoveredLicenseHeaderFiles" AfterTargets="Clean">
+    <Delete Files="$(SPDX_HashFilePath);$(SPDX_StampCodeFilePath)" />
+  </Target>
+
+</Project>

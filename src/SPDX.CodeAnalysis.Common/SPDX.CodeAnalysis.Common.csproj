@@ -10,6 +10,8 @@
     <!-- This is needed so that the cross-platform C# language server can find the generated Resources.Designer.cs file -->
     <!-- see: https://github.com/dotnet/msbuild/issues/8086 -->
     <CoreCompileDependsOn>PrepareResources;$(CompileDependsOn)</CoreCompileDependsOn>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <PreferredUILang>en-US</PreferredUILang>
   </PropertyGroup>
 
   <ItemGroup>

@@ -2,13 +2,32 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>SPDX.CodeAnalysis.CSharp</AssemblyName>
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
+
+    <!-- Newer versions of VS and the SDK allow loading as 64 bit, so we need this for compatibility when loading in VS  -->
+    <Prefer32Bit>false</Prefer32Bit>
 
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <IsRoslynComponent>true</IsRoslynComponent>
     <!--<TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
+
+    <!-- Avoid ID conflicts with the package project. -->
+    <PackageId>*$(MSBuildProjectFile)*</PackageId>
+
+    <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
+    <EnableNativeCodeDebugging>true</EnableNativeCodeDebugging>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <!-- Override Nerdbank.GitVersioning's output to bust the VS cache for debugging -->
+    <SkipGitVersioning>true</SkipGitVersioning>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.*</FileVersion>
+  </PropertyGroup>
+
+  <Import Project="WildcardVersionSupport.targets"/>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="$(MicrosoftCodeAnalysisAnalyzersPackageReferenceVersion)">

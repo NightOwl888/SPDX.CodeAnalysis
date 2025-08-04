@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SPDX.CodeAnalysis.Vsix": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
