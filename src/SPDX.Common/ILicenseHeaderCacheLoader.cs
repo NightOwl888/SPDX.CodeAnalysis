@@ -6,6 +6,6 @@ namespace SPDX.CodeAnalysis
 {
     public interface ILicenseHeaderCacheLoader
     {
-        IReadOnlyList<LicenseHeaderCacheText> LoadLicenseHeaders(string codeFilePath, string topLevelDirectoryName);
+        IReadOnlyList<LicenseHeaderCacheText> LoadLicenseHeaders(string topLevelDirectoryName);
     }
 }

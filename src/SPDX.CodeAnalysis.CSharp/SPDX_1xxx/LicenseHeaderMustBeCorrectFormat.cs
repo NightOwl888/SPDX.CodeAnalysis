@@ -58,15 +58,12 @@ namespace SPDX.CodeAnalysis.CSharp
 
         private void OnCompilationStart(CompilationStartAnalysisContext context)
         {
-            // Create a per-compilation cache instance.
-            // This lifetime ensures the cache is reloaded if any of the AdditionalFiles changes.
-            var cache = new LicenseHeaderCache();
-
             // Load the configuration from AdditionalFiles
             var loader = new AdditionalFilesLicenseHeaderCacheLoader(context.Options.AdditionalFiles);
 
-            // codeFilePath is not used by this loader
-            cache.EnsureInitialized(loader, codeFilePath: string.Empty, TopLevelDirectoryName);
+            // Create a per-compilation cache instance.
+            // This lifetime ensures the cache is reloaded if any of the AdditionalFiles changes.
+            var cache = new LicenseHeaderCache(loader.LoadLicenseHeaders(TopLevelDirectoryName));
 
             // Register actions that analyze syntax trees
             context.RegisterSyntaxTreeAction((ctx) => AnalyzeSyntaxTree(ctx, cache));

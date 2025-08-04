@@ -19,6 +19,6 @@ namespace SPDX.CodeAnalysis
         /// <param name="codeFilePath">The starting file path of the search. Must contain a filename (even though it could be fictitious).</param>
         /// <param name="topLevelDirectoryName">The name of the configuration directory to search for.</param>
         /// <returns>An enumeration of pairs of file path and content of all configuration files within the range.</returns>
-        IEnumerable<LicenseHeaderFile> GetLicenseHeaderFiles(string codeFilePath, string topLevelDirectoryName);
+        IEnumerable<LicenseHeaderFile> GetLicenseHeaderFiles(string codeFilePath, string topLevelDirectoryName); // TODO: Change codeFilePath to startingDirectory or similar.
     }
 }

@@ -10,13 +10,15 @@ namespace SPDX.CodeAnalysis
     public class LicenseHeaderCacheLoader : ILicenseHeaderCacheLoader
     {
         private readonly ILicenseHeaderConfigurationReader reader;
+        private readonly string codeFilePath;
 
-        public LicenseHeaderCacheLoader(ILicenseHeaderConfigurationReader reader)
+        public LicenseHeaderCacheLoader(ILicenseHeaderConfigurationReader reader, string codeFilePath)
         {
             this.reader = reader ?? throw new ArgumentNullException(nameof(reader));
+            this.codeFilePath = codeFilePath ?? throw new ArgumentNullException(nameof(codeFilePath));
         }
 
-        public IReadOnlyList<LicenseHeaderCacheText> LoadLicenseHeaders(string codeFilePath, string topLevelDirectoryName)
+        public IReadOnlyList<LicenseHeaderCacheText> LoadLicenseHeaders(string topLevelDirectoryName)
         {
             List<LicenseHeaderCacheText> result = new();
             foreach (LicenseHeaderFile file in reader.GetLicenseHeaderFiles(codeFilePath, topLevelDirectoryName))

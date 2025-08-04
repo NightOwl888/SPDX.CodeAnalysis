@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 
 namespace SPDX.CodeAnalysis
 {
@@ -13,7 +12,14 @@ namespace SPDX.CodeAnalysis
     {
         private readonly Dictionary<StringKey, FallbackTreeNode> _spdxTrees = new();
         private readonly List<LicenseHeaderCacheText> _allLicenseHeaders = new();
-        private object notNullIfInitalized = null!;
+
+        public LicenseHeaderCache(IReadOnlyList<LicenseHeaderCacheText> licenseHeaderTexts)
+        {
+            if (licenseHeaderTexts is null)
+                throw new ArgumentNullException(nameof(licenseHeaderTexts));
+
+            Load(licenseHeaderTexts);
+        }
 
         public IReadOnlyList<LicenseHeaderCacheText> GetMatchingLicenseHeaders(ReadOnlySpan<char> spdxLicenseIdentifier, string codeFilePath)
         {
@@ -140,19 +146,6 @@ namespace SPDX.CodeAnalysis
         private static readonly IReadOnlyList<LicenseHeaderCacheText> Empty = Array.Empty<LicenseHeaderCacheText>();
 
         public bool IsEmpty => _allLicenseHeaders.Count == 0;
-
-        public void EnsureInitialized(ILicenseHeaderCacheLoader loader, string codeFilePath, string topLevelDircectoryName)
-        {
-            if (loader is null)
-                throw new ArgumentNullException(nameof(loader));
-            if (codeFilePath is null)
-                throw new ArgumentNullException(nameof(codeFilePath));
-
-            LazyInitializer.EnsureInitialized(ref notNullIfInitalized, () => {
-                Load(loader.LoadLicenseHeaders(codeFilePath, topLevelDircectoryName));
-                return new object();
-            });
-        }
 
         private void Load(IReadOnlyList<LicenseHeaderCacheText> licenseHeaderTexts)
         {

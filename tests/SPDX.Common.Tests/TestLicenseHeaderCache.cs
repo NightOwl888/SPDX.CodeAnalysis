@@ -419,10 +419,9 @@ Special2 line3]]></file>
         {
             var fileSystem = new FsmlFileSystem(fileSystemXml);
             var reader = new LicenseHeaderConfigurationReader(fileSystem);
-            var loader = new LicenseHeaderCacheLoader(reader);
-            var cache = new LicenseHeaderCache();
+            var loader = new LicenseHeaderCacheLoader(reader, codeFilePath);
+            var cache = new LicenseHeaderCache(loader.LoadLicenseHeaders(topLevelDirectoryName));
 
-            cache.EnsureInitialized(loader, codeFilePath, topLevelDirectoryName);
             return cache;
         }
 

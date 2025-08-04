@@ -24,7 +24,7 @@ namespace SPDX.CodeAnalysis
             this.additionalFiles = additionalFiles;
         }
 
-        public IReadOnlyList<LicenseHeaderCacheText> LoadLicenseHeaders(string codeFilePath, string topLevelDirectoryName)
+        public IReadOnlyList<LicenseHeaderCacheText> LoadLicenseHeaders(string topLevelDirectoryName)
         {
             List<LicenseHeaderCacheText> result = new();
             string matchPath = LicenseHeaderConfigurationHelper.GetMatchPath(topLevelDirectoryName);
