@@ -18,14 +18,12 @@ namespace SPDX.CodeAnalysis
             this.codeFilePath = codeFilePath ?? throw new ArgumentNullException(nameof(codeFilePath));
         }
 
-        public IReadOnlyList<LicenseHeaderCacheText> LoadLicenseHeaders(string topLevelDirectoryName)
+        public IEnumerable<LicenseHeaderCacheText> LoadLicenseHeaders(string topLevelDirectoryName)
         {
-            List<LicenseHeaderCacheText> result = new();
             foreach (LicenseHeaderFile file in reader.GetLicenseHeaderFiles(codeFilePath, topLevelDirectoryName))
             {
-                result.Add(new LicenseHeaderCacheText(file));
+                yield return new LicenseHeaderCacheText(file);
             }
-            return result.AsReadOnly();
         }
     }
 }

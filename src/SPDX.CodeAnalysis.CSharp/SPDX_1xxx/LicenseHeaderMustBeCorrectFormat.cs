@@ -35,17 +35,24 @@ namespace SPDX.CodeAnalysis.CSharp
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => supportedDiagnostics;
 
+        private static class CacheProvider
+        {
+            public static readonly ILicenseHeaderCacheLifetimeManager Instance = new LicenseHeaderCacheLifetimeManager();
+        }
+
         // Dependency injection
+        private readonly ILicenseHeaderCacheLifetimeManager cacheLifetimeManager;
         private readonly LicenseAnalyzerOptions options;
 
         public LicenseHeaderMustBeCorrectFormat()
-            : this(options: null)
+            : this(CacheProvider.Instance, options: null)
         {
         }
 
         // Dependency injection constructor (for testing)
-        internal LicenseHeaderMustBeCorrectFormat(LicenseAnalyzerOptions? options)
+        internal LicenseHeaderMustBeCorrectFormat(ILicenseHeaderCacheLifetimeManager cacheLifetimeManager, LicenseAnalyzerOptions? options)
         {
+            this.cacheLifetimeManager = cacheLifetimeManager ?? throw new ArgumentNullException(nameof(cacheLifetimeManager));
             this.options = options ?? new LicenseAnalyzerOptions();
         }
 
@@ -59,11 +66,7 @@ namespace SPDX.CodeAnalysis.CSharp
         private void OnCompilationStart(CompilationStartAnalysisContext context)
         {
             // Load the configuration from AdditionalFiles
-            var loader = new AdditionalFilesLicenseHeaderCacheLoader(context.Options.AdditionalFiles);
-
-            // Create a per-compilation cache instance.
-            // This lifetime ensures the cache is reloaded if any of the AdditionalFiles changes.
-            var cache = new LicenseHeaderCache(loader.LoadLicenseHeaders(TopLevelDirectoryName));
+            LicenseHeaderCache cache = cacheLifetimeManager.GetCache(context.Options.AdditionalFiles, TopLevelDirectoryName, context.CancellationToken);
 
             // Register actions that analyze syntax trees
             context.RegisterSyntaxTreeAction((ctx) => AnalyzeSyntaxTree(ctx, cache));

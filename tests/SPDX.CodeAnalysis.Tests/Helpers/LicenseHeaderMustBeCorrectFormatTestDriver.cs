@@ -24,7 +24,10 @@ namespace SPDX.CodeAnalysis.Tests
         protected override DiagnosticAnalyzer CreateCSharpAnalyzer()
         {
             // Inject dependencies into the analyzer for testing
-            return new LicenseHeaderMustBeCorrectFormat(licenseAnalyzerOptions);
+
+            // We new up a new cacheManger for each test rather than using the static instance.
+            var cacheManager = new LicenseHeaderCacheLifetimeManager();
+            return new LicenseHeaderMustBeCorrectFormat(cacheManager, licenseAnalyzerOptions);
         }
 
         protected override DiagnosticAnalyzer CreateVisualBasicAnalyzer()

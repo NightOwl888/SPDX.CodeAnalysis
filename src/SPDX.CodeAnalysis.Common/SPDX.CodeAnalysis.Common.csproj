@@ -44,4 +44,8 @@
     <ProjectReference Include="..\SPDX.Common\SPDX.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="SPDX.CodeAnalysis.Common.Tests" />
+  </ItemGroup>
+
 </Project>

@@ -13,7 +13,7 @@ namespace SPDX.CodeAnalysis
         private readonly Dictionary<StringKey, FallbackTreeNode> _spdxTrees = new();
         private readonly List<LicenseHeaderCacheText> _allLicenseHeaders = new();
 
-        public LicenseHeaderCache(IReadOnlyList<LicenseHeaderCacheText> licenseHeaderTexts)
+        public LicenseHeaderCache(IEnumerable<LicenseHeaderCacheText> licenseHeaderTexts)
         {
             if (licenseHeaderTexts is null)
                 throw new ArgumentNullException(nameof(licenseHeaderTexts));
@@ -147,7 +147,7 @@ namespace SPDX.CodeAnalysis
 
         public bool IsEmpty => _allLicenseHeaders.Count == 0;
 
-        private void Load(IReadOnlyList<LicenseHeaderCacheText> licenseHeaderTexts)
+        private void Load(IEnumerable<LicenseHeaderCacheText> licenseHeaderTexts)
         {
             foreach (var text in licenseHeaderTexts)
             {
