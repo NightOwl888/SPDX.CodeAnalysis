@@ -1,5 +1,6 @@
 ﻿// SPDX-License-Identifier: Apache2.0
 // SPDX-FileCopyrightText: Copyright 2025-2028 John Smith
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
