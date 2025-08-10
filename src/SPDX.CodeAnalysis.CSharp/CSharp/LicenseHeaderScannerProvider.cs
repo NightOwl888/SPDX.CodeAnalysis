@@ -3,8 +3,8 @@
 
 namespace SPDX.CodeAnalysis.CSharp
 {
-    public static class TagValueScannerProvider
+    public static class LicenseHeaderScannerProvider
     {
-        public static ITagValueScanner Instance = new TagValueScanner(CSharpLanguageService.Instance);
+        public static ILicenseHeaderScanner Instance = new LicenseHeaderScanner(CSharpLanguageService.Instance);
     }
 }

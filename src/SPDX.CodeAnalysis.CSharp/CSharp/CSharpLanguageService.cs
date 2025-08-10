@@ -4,31 +4,35 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 
 namespace SPDX.CodeAnalysis.CSharp
 {
-    public class CSharpLanguageService : ILanguageService
+    public sealed class CSharpLanguageService : ILanguageService
     {
+        private const int SingleLineCommentTriviaKind = (int)SyntaxKind.SingleLineCommentTrivia;
+        private const int MultiLineCommentTriviaKind = (int)SyntaxKind.MultiLineCommentTrivia;
+        private const int WhitespaceTriviaKind = (int)SyntaxKind.WhitespaceTrivia;
+
+        private CSharpLanguageService()
+        {
+        }
+
+        public static ILanguageService Instance => new CSharpLanguageService();
+
         public bool IsKind(SyntaxTrivia trivia, LanguageAgnosticSyntaxKind kind)
         {
-            return trivia.IsKind(ToSyntaxKind(kind));
+            int rawKind = trivia.RawKind;
+            if (kind == LanguageAgnosticSyntaxKind.SingleLineCommentTrivia)
+                return rawKind == SingleLineCommentTriviaKind;
+            else if (kind == LanguageAgnosticSyntaxKind.MultiLineCommentTrivia)
+                return rawKind == MultiLineCommentTriviaKind;
+            else if (kind == LanguageAgnosticSyntaxKind.WhitespaceTrivia)
+                return rawKind == WhitespaceTriviaKind;
+
+            return false;
         }
 
         public bool IsTypeDeclarationSyntax(SyntaxNode? node)
-        {
-            return node is TypeDeclarationSyntax;
-        }
-
-        private SyntaxKind ToSyntaxKind(LanguageAgnosticSyntaxKind kind)
-        {
-            return kind switch
-            {
-                LanguageAgnosticSyntaxKind.SingleLineCommentTrivia => SyntaxKind.SingleLineCommentTrivia,
-                LanguageAgnosticSyntaxKind.MultiLineCommentTrivia => SyntaxKind.MultiLineCommentTrivia,
-                LanguageAgnosticSyntaxKind.WhitespaceTrivia => SyntaxKind.WhitespaceTrivia,
-                _ => throw new ArgumentOutOfRangeException(nameof(kind)),
-            };
-        }
+            => node is TypeDeclarationSyntax;
     }
 }

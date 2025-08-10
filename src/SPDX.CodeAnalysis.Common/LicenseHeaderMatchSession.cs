@@ -17,15 +17,14 @@ namespace SPDX.CodeAnalysis
     /// </summary>
     public struct LicenseHeaderMatchSession
     {
+        private /*readonly*/ ILanguageService languageService;
+
         private /*readonly*/ string matchDirectoryPath;
         private /*readonly*/ IReadOnlyList<string> expectedLines;
 
         private SyntaxTrivia? lastMatchedTrivia;
         private SyntaxTrivia? lastTriviaChecked;
         private SyntaxTrivia? firstMismatchedTrivia;
-        private int whitespaceTriviaKind;
-        private int singleLineCommentKind;
-        private int multiLineCommentKind;
 
         private int matchedLineCount;
         private int lastMatchedLineOffset;
@@ -40,16 +39,13 @@ namespace SPDX.CodeAnalysis
         /// <summary>
         /// Initializes the session using a license header from configuration.
         /// </summary>
-        public LicenseHeaderMatchSession(LicenseHeaderCacheText header, int whitespaceTriviaKind, int singleLineCommentKind, int multiLineCommentKind = -1)
+        public LicenseHeaderMatchSession(LicenseHeaderCacheText header, ILanguageService languageService)
         {
+            this.languageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
             if (header is null)
                 throw new ArgumentNullException(nameof(header));
             expectedLines = header.Lines;
             matchDirectoryPath = header.MatchDirectoryPath;
-
-            this.whitespaceTriviaKind = whitespaceTriviaKind;
-            this.singleLineCommentKind = singleLineCommentKind;
-            this.multiLineCommentKind = multiLineCommentKind;
 
             matchedLineCount = 0;
             lastMatchedLineOffset = -1;
@@ -130,7 +126,8 @@ namespace SPDX.CodeAnalysis
 
             SyntaxTrivia prev = previous.Value;
 
-            if (prev.RawKind == singleLineCommentKind && current.RawKind == singleLineCommentKind)
+            if (languageService.IsKind(prev, LanguageAgnosticSyntaxKind.SingleLineCommentTrivia) &&
+                languageService.IsKind(current, LanguageAgnosticSyntaxKind.SingleLineCommentTrivia))
             {
                 // We are always loading a SyntaxTree, so we can ignore nullability here
                 var prevLine = prev.SyntaxTree!.GetLineSpan(prev.Span).EndLinePosition.Line;
@@ -138,7 +135,8 @@ namespace SPDX.CodeAnalysis
                 return currLine == prevLine || currLine == prevLine + 1;
             }
 
-            if (prev.RawKind == multiLineCommentKind && current.RawKind == multiLineCommentKind)
+            if (languageService.IsKind(prev, LanguageAgnosticSyntaxKind.MultiLineCommentTrivia) &&
+                languageService.IsKind(current, LanguageAgnosticSyntaxKind.MultiLineCommentTrivia))
             {
                 return prev.Span.End + 1 >= current.Span.Start;
             }
@@ -179,7 +177,7 @@ namespace SPDX.CodeAnalysis
             else if (thisLine == lastLine + 1)
             {
                 // One line apart — check if the trivia is acceptable
-                if (trivia.RawKind == whitespaceTriviaKind)
+                if (languageService.IsKind(trivia, LanguageAgnosticSyntaxKind.WhitespaceTrivia))
                 {
                     // Allow whitespace between indented single-line comments
                     return !MatchSessionEnded;
