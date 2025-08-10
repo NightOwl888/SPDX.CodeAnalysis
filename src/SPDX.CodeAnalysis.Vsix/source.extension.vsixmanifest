@@ -16,9 +16,10 @@
   <Assets>
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="SPDX.CodeAnalysis.CSharp" Path="|SPDX.CodeAnalysis.CSharp|"/>
     <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="SPDX.CodeAnalysis.CSharp" Path="|SPDX.CodeAnalysis.CSharp|"/>
-    <!--<Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="SPDX.CodeAnalysis.CSharp.CodeFixes" Path="|SPDX.CodeAnalysis.CSharp.CodeFixes|"/>
-    <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="SPDX.CodeAnalysis.CSharp.CodeFixes" Path="|SPDX.CodeAnalysis.CSharp.CodeFixes|"/>-->
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="SPDX.CodeAnalysis.CodeFixes.CSharp" Path="|SPDX.CodeAnalysis.CodeFixes.CSharp|"/>
+    <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="SPDX.CodeAnalysis.CodeFixes.CSharp" Path="|SPDX.CodeAnalysis.CodeFixes.CSharp|"/>
 
+    <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="SPDX.CodeAnalysis.CodeFixes.Common" Path="|SPDX.CodeAnalysis.CodeFixes.Common|" />
     <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="SPDX.CodeAnalysis.Common" Path="|SPDX.CodeAnalysis.Common|" />
     <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="SPDX.Common" Path="|SPDX.Common|" />
   </Assets>

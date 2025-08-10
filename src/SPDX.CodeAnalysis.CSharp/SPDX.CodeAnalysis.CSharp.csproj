@@ -27,7 +27,7 @@
     <FileVersion>1.0.*</FileVersion>
   </PropertyGroup>
 
-  <Import Project="WildcardVersionSupport.targets"/>
+  <Import Project="$(RepositoryRoot).build/WildcardVersionSupport.targets"/>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="$(MicrosoftCodeAnalysisAnalyzersPackageReferenceVersion)">

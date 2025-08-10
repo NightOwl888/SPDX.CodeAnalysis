@@ -24,7 +24,11 @@
     
     <SpdxCodeAnalysisCSAssemblyFile>$(RepositoryRoot)src\SPDX.CodeAnalysis.CSharp\bin\$(Configuration)\$(TargetFramework)\SPDX.CodeAnalysis.CSharp.dll</SpdxCodeAnalysisCSAssemblyFile>
     <SpdxCodeAnalysisVBAssemblyFile>$(RepositoryRoot)src\SPDX.CodeAnalysis.VisualBasic\bin\$(Configuration)\$(TargetFramework)\SPDX.CodeAnalysis.VisualBasic.dll</SpdxCodeAnalysisVBAssemblyFile>
+    <SpdxCodeAnalysisCodeFixesCSAssemblyFile>$(RepositoryRoot)src\SPDX.CodeAnalysis.CodeFixes.CSharp\bin\$(Configuration)\$(TargetFramework)\SPDX.CodeAnalysis.CodeFixes.CSharp.dll</SpdxCodeAnalysisCodeFixesCSAssemblyFile>
+    <SpdxCodeAnalysisCodeFixesVBAssemblyFile>$(RepositoryRoot)src\SPDX.CodeAnalysis.CodeFixes.VisualBasic\bin\$(Configuration)\$(TargetFramework)\SPDX.CodeAnalysis.CodeFixes.VisualBasic.dll</SpdxCodeAnalysisCodeFixesVBAssemblyFile>
 
+    <SpdxCodeAnalysisCodeCommonAssemblyFile>$(RepositoryRoot)src\SPDX.CodeAnalysis.CodeFixes.Common\bin\$(Configuration)\$(TargetFramework)\SPDX.CodeAnalysis.CodeFixes.Common.dll</SpdxCodeAnalysisCodeCommonAssemblyFile>
+      
     <SpdxCommonAssemblyFile>$(RepositoryRoot)src\SPDX.Common\bin\$(Configuration)\$(TargetFramework)\SPDX.Common.dll</SpdxCommonAssemblyFile>
 
     <SpdxCodeAnalysisCommonAssemblyFile>$(RepositoryRoot)src\SPDX.CodeAnalysis.Common\bin\$(Configuration)\$(TargetFramework)\SPDX.CodeAnalysis.dll</SpdxCodeAnalysisCommonAssemblyFile>
@@ -42,6 +46,10 @@
     <None Include="$(SpdxCodeAnalysisCSAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <!--<None Include="$(SpdxCodeAnalysisVBAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/vb" Visible="false" />-->
 
+    <None Include="$(SpdxCodeAnalysisCodeFixesCSAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <!--<None Include="$(SpdxCodeAnalysisCodeFixesVBAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/vb" Visible="false" />-->
+
+    <None Include="$(SpdxCodeAnalysisCodeCommonAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(SpdxCodeAnalysisCommonAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="@(SpdxCodeAnalyisisCommonResources)" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <!--<None Include="$(SpdxCodeAnalysisCommonAssemblyFile)" Pack="true" PackagePath="analyzers/dotnet/vb" Visible="false" />
@@ -59,20 +67,15 @@
     <ProjectReference Include="..\SPDX.Common\SPDX.Common.csproj" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\SPDX.CodeAnalysis.Common\SPDX.CodeAnalysis.Common.csproj" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\SPDX.CodeAnalysis.CSharp\SPDX.CodeAnalysis.CSharp.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\SPDX.CodeAnalysis.CodeFixes.Common\SPDX.CodeAnalysis.CodeFixes.Common.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\SPDX.CodeAnalysis.CodeFixes.CSharp\SPDX.CodeAnalysis.CodeFixes.CSharp.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
-  <Target Name="EnsureDependenciesBuilt" BeforeTargets="PrepareForBuild"> 
-    <MSBuild
-      Projects="@(ProjectReference)"
-      Targets="Build"
-      Properties="Configuration=$(Configuration)"
-      BuildInParallel="false" />
+  <Target Name="EnsureDependenciesBuilt" BeforeTargets="PrepareForBuild">
+    <MSBuild Projects="@(ProjectReference)" Targets="Restore;PrepareForBuild;Build" Properties="Configuration=$(Configuration)" BuildInParallel="false" />
   </Target>
 
-  <UsingTask
-    TaskName="GenerateVersionProps"
-    TaskFactory="RoslynCodeTaskFactory"
-    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+  <UsingTask TaskName="GenerateVersionProps" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
 
     <ParameterGroup>
       <OutputFile ParameterType="System.String" Required="true" />
@@ -83,28 +86,37 @@
       <Using Namespace="System.Xml" />
       <Code Type="Fragment" Language="cs">
         <![CDATA[
-      var settings = new XmlWriterSettings { Indent = true };
-      using (var writer = XmlWriter.Create(OutputFile, settings))
-      {
-          writer.WriteStartDocument();
-          writer.WriteStartElement("Project");
-          writer.WriteStartElement("PropertyGroup");
-          writer.WriteElementString("SPDXCodeAnalysisPackageVersion", Version);
-          writer.WriteEndElement(); // PropertyGroup
-          writer.WriteEndElement(); // Project
-          writer.WriteEndDocument();
-      }
-      ]]>
+            var trimmedVersion = Version.Trim();
+            var settings = new XmlWriterSettings { Indent = true };
+            using (var writer = XmlWriter.Create(OutputFile, settings))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("Project");
+                writer.WriteStartElement("PropertyGroup");
+                writer.WriteElementString("SPDXCodeAnalysisPackageVersion", trimmedVersion);
+                writer.WriteEndElement(); // PropertyGroup
+                writer.WriteEndElement(); // Project
+                writer.WriteEndDocument();
+            }
+          ]]>
       </Code>
     </Task>
   </UsingTask>
 
+  <Target Name="AppendDebugTimestampToPackageVersion"
+        AfterTargets="GetBuildVersion">
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+      <!-- Append timestamp every ~2 seconds -->
+      <PackageVersion>
+        $(PackageVersion)-debug-$([System.DateTime]::UtcNow.DayOfYear)-$([System.Math]::Floor($([System.DateTime]::UtcNow.TimeOfDay.TotalSeconds)))
+      </PackageVersion>
+    </PropertyGroup>
+  </Target>
+
   <Target Name="GeneratePackageVersionProps" DependsOnTargets="GetBuildVersion" AfterTargets="BeforeBuild">
     <MakeDir Directories="$(PackageOutputPath)" Condition="!Exists('$(PackageOutputPath)')" />
 
-    <GenerateVersionProps
-      OutputFile="$(SpdxPackageVersionPropsFile)"
-      Version="$(PackageVersion)" />
+    <GenerateVersionProps OutputFile="$(SpdxPackageVersionPropsFile)" Version="$(PackageVersion)" />
   </Target>
 
   <Target Name="CleanNuGetPackagesDirectory" AfterTargets="Clean">

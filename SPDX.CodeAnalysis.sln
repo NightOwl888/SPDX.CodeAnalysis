@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{02EA68
 		.build\dependencies.props = .build\dependencies.props
 		.build\nuget.props = .build\nuget.props
 		version.json = version.json
+		.build\WildcardVersionSupport.targets = .build\WildcardVersionSupport.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C2EF017A-5599-40FA-A1C4-E30C8587B058}"
@@ -16,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C2EF017A-559
 		src\Directory.Build.targets = src\Directory.Build.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.Package", "src\SPDX.CodeAnalysis.Package\SPDX.CodeAnalysis.Package.csproj", "{5DE39870-229A-472A-ABFC-BC4DB90967D3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E2E910FF-6635-4D9D-A7BE-39037849DC4E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A73EE4A7-5330-4CC7-9349-84F425B88B64}"
 	ProjectSection(SolutionItems) = preProject
@@ -29,7 +30,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E2E910FF-6635-4D9D-A7BE-39037849DC4E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.Vsix", "src\SPDX.CodeAnalysis.Vsix\SPDX.CodeAnalysis.Vsix.csproj", "{4F5BF1EB-3758-4093-922E-8C37ED8393FC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26} = {36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26}
+		{CD22E965-03E8-4857-A55B-DCCE16DE138F} = {CD22E965-03E8-4857-A55B-DCCE16DE138F}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.Package", "src\SPDX.CodeAnalysis.Package\SPDX.CodeAnalysis.Package.csproj", "{5DE39870-229A-472A-ABFC-BC4DB90967D3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.Tests", "tests\SPDX.CodeAnalysis.Tests\SPDX.CodeAnalysis.Tests.csproj", "{DF5B02A4-9B3E-4E0B-921E-2360C9BA5EE1}"
 EndProject
@@ -43,13 +50,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.Common.Tests", "tests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.Sample", "src\SPDX.CodeAnalysis.Sample\SPDX.CodeAnalysis.Sample.csproj", "{64742B5A-ED00-F463-5432-4E2E68CB49CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.Vsix", "src\SPDX.CodeAnalysis.Vsix\SPDX.CodeAnalysis.Vsix.csproj", "{4F5BF1EB-3758-4093-922E-8C37ED8393FC}"
-	ProjectSection(ProjectDependencies) = postProject
-		{36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26} = {36DFC6E8-9D22-96CD-10F2-C0A0D8DE0A26}
-		{CD22E965-03E8-4857-A55B-DCCE16DE138F} = {CD22E965-03E8-4857-A55B-DCCE16DE138F}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.Common.Tests", "tests\SPDX.CodeAnalysis.Common.Tests\SPDX.CodeAnalysis.Common.Tests.csproj", "{3E28FBE0-19C8-0AA5-5954-D62AF67FDA69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.CodeFixes.CSharp", "src\SPDX.CodeAnalysis.CodeFixes.CSharp\SPDX.CodeAnalysis.CodeFixes.CSharp.csproj", "{6A0C7A4D-8044-90BE-FF66-B0C8A849DADA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.CodeFixes.Common", "src\SPDX.CodeAnalysis.CodeFixes.Common\SPDX.CodeAnalysis.CodeFixes.Common.csproj", "{915EF32A-E09C-4831-BAD4-085C5327093B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +62,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F5BF1EB-3758-4093-922E-8C37ED8393FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F5BF1EB-3758-4093-922E-8C37ED8393FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F5BF1EB-3758-4093-922E-8C37ED8393FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F5BF1EB-3758-4093-922E-8C37ED8393FC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5DE39870-229A-472A-ABFC-BC4DB90967D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5DE39870-229A-472A-ABFC-BC4DB90967D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5DE39870-229A-472A-ABFC-BC4DB90967D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -85,19 +94,24 @@ Global
 		{64742B5A-ED00-F463-5432-4E2E68CB49CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64742B5A-ED00-F463-5432-4E2E68CB49CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{64742B5A-ED00-F463-5432-4E2E68CB49CC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4F5BF1EB-3758-4093-922E-8C37ED8393FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4F5BF1EB-3758-4093-922E-8C37ED8393FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4F5BF1EB-3758-4093-922E-8C37ED8393FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4F5BF1EB-3758-4093-922E-8C37ED8393FC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3E28FBE0-19C8-0AA5-5954-D62AF67FDA69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3E28FBE0-19C8-0AA5-5954-D62AF67FDA69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E28FBE0-19C8-0AA5-5954-D62AF67FDA69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E28FBE0-19C8-0AA5-5954-D62AF67FDA69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A0C7A4D-8044-90BE-FF66-B0C8A849DADA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A0C7A4D-8044-90BE-FF66-B0C8A849DADA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A0C7A4D-8044-90BE-FF66-B0C8A849DADA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A0C7A4D-8044-90BE-FF66-B0C8A849DADA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{915EF32A-E09C-4831-BAD4-085C5327093B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{915EF32A-E09C-4831-BAD4-085C5327093B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{915EF32A-E09C-4831-BAD4-085C5327093B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{915EF32A-E09C-4831-BAD4-085C5327093B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{4F5BF1EB-3758-4093-922E-8C37ED8393FC} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
 		{5DE39870-229A-472A-ABFC-BC4DB90967D3} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
 		{DF5B02A4-9B3E-4E0B-921E-2360C9BA5EE1} = {E2E910FF-6635-4D9D-A7BE-39037849DC4E}
 		{D57D26CF-C0E2-43DD-87BE-9B67F39E9019} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
@@ -105,8 +119,9 @@ Global
 		{CD22E965-03E8-4857-A55B-DCCE16DE138F} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
 		{C1EA98D3-127E-4FD9-A434-49810AF612C9} = {E2E910FF-6635-4D9D-A7BE-39037849DC4E}
 		{64742B5A-ED00-F463-5432-4E2E68CB49CC} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
-		{4F5BF1EB-3758-4093-922E-8C37ED8393FC} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
 		{3E28FBE0-19C8-0AA5-5954-D62AF67FDA69} = {E2E910FF-6635-4D9D-A7BE-39037849DC4E}
+		{6A0C7A4D-8044-90BE-FF66-B0C8A849DADA} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
+		{915EF32A-E09C-4831-BAD4-085C5327093B} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3157D387-AA18-46F2-B109-7994C3E12BE1}

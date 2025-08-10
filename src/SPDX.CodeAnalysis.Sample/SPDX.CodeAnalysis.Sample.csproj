@@ -33,10 +33,13 @@
   </ItemGroup>
 
   <Target Name="EnsureNuGetPackageBuilt" BeforeTargets="PrepareForBuild" Condition="'$(DesignTimeBuild)' != 'true'">
+
+    <Message Importance="high" Text="Running NuGet Package Build..." />
+
     <!-- Build the project that produces the NuGet package -->
     <MSBuild
       Projects="..\SPDX.CodeAnalysis.Package\SPDX.CodeAnalysis.Package.csproj"
-      Targets="Build"
+      Targets="Restore;PrepareForBuild;Build"
       Properties="Configuration=$(Configuration)"
        />
 

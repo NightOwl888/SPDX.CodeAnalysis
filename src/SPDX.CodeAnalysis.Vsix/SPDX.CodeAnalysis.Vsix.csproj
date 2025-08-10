@@ -38,6 +38,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SPDX.CodeAnalysis.CodeFixes.CSharp\SPDX.CodeAnalysis.CodeFixes.CSharp.csproj" />
+    <ProjectReference Include="..\SPDX.CodeAnalysis.CodeFixes.Common\SPDX.CodeAnalysis.CodeFixes.Common.csproj" />
     <ProjectReference Include="..\SPDX.CodeAnalysis.CSharp\SPDX.CodeAnalysis.CSharp.csproj" />
     <ProjectReference Include="..\SPDX.CodeAnalysis.Common\SPDX.CodeAnalysis.Common.csproj" />
     <ProjectReference Include="..\SPDX.Common\SPDX.Common.csproj" />
