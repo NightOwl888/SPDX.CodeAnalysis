@@ -34,6 +34,9 @@ namespace SPDX.CodeAnalysis
 
         public IReadOnlyList<LicenseHeaderCacheText> GetAllLicenseHeaders() => _allLicenseHeaders;
 
+        public IEnumerable<string> GetAllSpdxLicenseIdentifiers()
+            => _spdxTrees.Keys.Select(k => k.ToString());
+
         public enum MatchResult
         {
             Success,

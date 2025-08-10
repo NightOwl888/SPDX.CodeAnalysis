@@ -23,12 +23,26 @@ namespace SPDX.CodeAnalysis.CodeFixes.CSharp
     public class LicenseIdentifierCodeFixProvider : CodeFixProvider
     {
         private const string LicenseIdentifierTag = "SPDX-License-Identifier";
+        private const string TopLevelDirectoryName = "LICENSES.HEADERS"; // TODO: Make configurable?
 
-        private static readonly ImmutableArray<string> fixableDiagnosticIds = ImmutableArray.Create<string>(
+        private static readonly ImmutableArray<string> fixableDiagnosticIds = ImmutableArray.Create(
             Descriptors.SPDX_1000_LicenseIdentifierMustExist.Id
         );
 
         public override ImmutableArray<string> FixableDiagnosticIds => fixableDiagnosticIds;
+
+        // Dependency injection
+        private readonly ILicenseHeaderCacheLifetimeManager cacheLifetimeManager;
+
+        public LicenseIdentifierCodeFixProvider()
+            : this(LicenseHeaderCacheProvider.Instance)
+        {
+        }
+
+        internal LicenseIdentifierCodeFixProvider(ILicenseHeaderCacheLifetimeManager cacheLifetimeManager)
+        {
+            this.cacheLifetimeManager = cacheLifetimeManager ?? throw new ArgumentNullException(nameof(cacheLifetimeManager));
+        }
 
         public override FixAllProvider GetFixAllProvider() =>
             WellKnownFixAllProviders.BatchFixer;
@@ -42,16 +56,17 @@ namespace SPDX.CodeAnalysis.CodeFixes.CSharp
             if (root is null)
                 return;
 
-            // TODO: Replace with real cache logic
-            var licenseIds = ImmutableArray.Create("Apache-2.0", "MIT");
+            var additionalFiles = document.Project.AnalyzerOptions.AdditionalFiles;
+            var cache = cacheLifetimeManager.GetCache(additionalFiles, TopLevelDirectoryName, cancellationToken);
+            var spdxLicenseIdentifiers = cache.GetAllSpdxLicenseIdentifiers();
 
-            foreach (var licenseId in licenseIds)
+            foreach (var spdxLicenseIdentifier in spdxLicenseIdentifiers)
             {
-                var title = string.Format(CodeFixResources.SPDX_1000_CodeFixTitle, $"{LicenseIdentifierTag}: {licenseId}");
+                var title = string.Format(CodeFixResources.SPDX_1000_CodeFixTitle, $"{LicenseIdentifierTag}: {spdxLicenseIdentifier}");
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: title,
-                        createChangedDocument: c => InsertLicenseCommentAsync(document, root, licenseId, diagnostic.Location, c),
+                        createChangedDocument: c => InsertLicenseCommentAsync(document, root, spdxLicenseIdentifier, diagnostic.Location, c),
                         equivalenceKey: title),
                     diagnostic);
             }

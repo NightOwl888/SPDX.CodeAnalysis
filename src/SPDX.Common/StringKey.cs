@@ -29,6 +29,8 @@ namespace SPDX.CodeAnalysis
         public override int GetHashCode()
             => StringHelper.GetHashCode(key.AsSpan());
 
+        public override string ToString() => key;
+
         public static KeyComparer Comparer { get; } = new KeyComparer();
 
         public sealed class KeyComparer : IEqualityComparer<StringKey>

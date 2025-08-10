@@ -35,17 +35,12 @@ namespace SPDX.CodeAnalysis.CSharp
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => supportedDiagnostics;
 
-        private static class CacheProvider
-        {
-            public static readonly ILicenseHeaderCacheLifetimeManager Instance = new LicenseHeaderCacheLifetimeManager();
-        }
-
         // Dependency injection
         private readonly ILicenseHeaderCacheLifetimeManager cacheLifetimeManager;
         private readonly LicenseAnalyzerOptions options;
 
         public LicenseHeaderMustBeCorrectFormat()
-            : this(CacheProvider.Instance, options: null)
+            : this(LicenseHeaderCacheProvider.Instance, options: null)
         {
         }
 
