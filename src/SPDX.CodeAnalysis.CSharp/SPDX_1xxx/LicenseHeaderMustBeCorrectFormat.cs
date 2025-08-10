@@ -307,8 +307,8 @@ namespace SPDX.CodeAnalysis.CSharp
                     string text = trivia.ToString(); // safe to reference span from here
                     ReadOnlySpan<char> line = text.AsSpan();
 
-                    hasLicenseIdentifier = spdxLicenseIdentifierSession.TryFindTag(text, line);
-                    hasFileCopyrightText = spdxFileCopyrightTextSession.TryFindTag(text, line);
+                    hasLicenseIdentifier |= spdxLicenseIdentifierSession.TryFindTag(text, line);
+                    hasFileCopyrightText |= spdxFileCopyrightTextSession.TryFindTag(text, line);
                 }
                 else if (trivia.IsKind(SyntaxKind.MultiLineCommentTrivia))
                 {
@@ -317,8 +317,8 @@ namespace SPDX.CodeAnalysis.CSharp
                     int lineOffset = 0;
                     foreach (var line in text.SplitLines())
                     {
-                        hasLicenseIdentifier = spdxLicenseIdentifierSession.TryFindTag(text, line, lineOffset);
-                        hasFileCopyrightText = spdxFileCopyrightTextSession.TryFindTag(text, line, lineOffset);
+                        hasLicenseIdentifier |= spdxLicenseIdentifierSession.TryFindTag(text, line, lineOffset);
+                        hasFileCopyrightText |= spdxFileCopyrightTextSession.TryFindTag(text, line, lineOffset);
 
                         // Stop scanning if found
                         if (hasLicenseIdentifier && hasFileCopyrightText)
