@@ -27,7 +27,7 @@ namespace SPDX.CodeAnalysis.Tests
 
             // We new up a new cacheManger for each test rather than using the static instance.
             var cacheManager = new LicenseHeaderCacheLifetimeManager();
-            return new LicenseHeaderMustBeCorrectFormat(cacheManager, licenseAnalyzerOptions);
+            return new LicenseHeaderMustBeCorrectFormat(cacheManager, TagValueScannerProvider.Instance, licenseAnalyzerOptions);
         }
 
         protected override DiagnosticAnalyzer CreateVisualBasicAnalyzer()

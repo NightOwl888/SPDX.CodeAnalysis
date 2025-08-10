@@ -37,17 +37,19 @@ namespace SPDX.CodeAnalysis.CSharp
 
         // Dependency injection
         private readonly ILicenseHeaderCacheLifetimeManager cacheLifetimeManager;
+        private readonly ITagValueScanner tagValueScanner;
         private readonly LicenseAnalyzerOptions options;
 
         public LicenseHeaderMustBeCorrectFormat()
-            : this(LicenseHeaderCacheProvider.Instance, options: null)
+            : this(LicenseHeaderCacheProvider.Instance, TagValueScannerProvider.Instance, options: null)
         {
         }
 
         // Dependency injection constructor (for testing)
-        internal LicenseHeaderMustBeCorrectFormat(ILicenseHeaderCacheLifetimeManager cacheLifetimeManager, LicenseAnalyzerOptions? options)
+        internal LicenseHeaderMustBeCorrectFormat(ILicenseHeaderCacheLifetimeManager cacheLifetimeManager, ITagValueScanner tagValueScanner, LicenseAnalyzerOptions? options)
         {
             this.cacheLifetimeManager = cacheLifetimeManager ?? throw new ArgumentNullException(nameof(cacheLifetimeManager));
+            this.tagValueScanner = tagValueScanner ?? throw new ArgumentNullException(nameof(tagValueScanner));
             this.options = options ?? new LicenseAnalyzerOptions();
         }
 
@@ -89,17 +91,7 @@ namespace SPDX.CodeAnalysis.CSharp
             var spdxLicenseIdentifierSession = new TagValueSession(LicenseIdentifierTag);
             var spdxFileCopyrightTextSession = new TagValueSession(FileCopyrightTextTag);
 
-            foreach (var token in root.DescendantTokens())
-            {
-                // Process leading trivia for each token
-                if (ProcessSpdxTag(token.LeadingTrivia, ref spdxLicenseIdentifierSession, ref spdxFileCopyrightTextSession))
-                    break;
-
-                // Stop scanning once we hit the first type declaration
-                if (token.Parent is TypeDeclarationSyntax)
-                    break;
-            }
-
+            tagValueScanner.ScanForTagAndValue(root, ref spdxLicenseIdentifierSession, ref spdxFileCopyrightTextSession);
 
             // Second pass - If we found the SPDX tags, then look for the correct license header text.
             // This is configured as a file in a LICENSES.HEADERS directory which may be levels above
@@ -292,47 +284,6 @@ namespace SPDX.CodeAnalysis.CSharp
                 anyActive |= matchSessions[i].NotifyNonCommentTrivia(trivia);
             }
             return anyActive;
-        }
-
-        private static bool ProcessSpdxTag(SyntaxTriviaList triviaList,
-            ref TagValueSession spdxLicenseIdentifierSession,
-            ref TagValueSession spdxFileCopyrightTextSession)
-        {
-            bool hasLicenseIdentifier = false, hasFileCopyrightText = false;
-
-            foreach (var trivia in triviaList)
-            {
-                if (trivia.IsKind(SyntaxKind.SingleLineCommentTrivia))
-                {
-                    string text = trivia.ToString(); // safe to reference span from here
-                    ReadOnlySpan<char> line = text.AsSpan();
-
-                    hasLicenseIdentifier |= spdxLicenseIdentifierSession.TryFindTag(text, line);
-                    hasFileCopyrightText |= spdxFileCopyrightTextSession.TryFindTag(text, line);
-                }
-                else if (trivia.IsKind(SyntaxKind.MultiLineCommentTrivia))
-                {
-                    string text = trivia.ToString(); // safe to reference span from here
-
-                    int lineOffset = 0;
-                    foreach (var line in text.SplitLines())
-                    {
-                        hasLicenseIdentifier |= spdxLicenseIdentifierSession.TryFindTag(text, line, lineOffset);
-                        hasFileCopyrightText |= spdxFileCopyrightTextSession.TryFindTag(text, line, lineOffset);
-
-                        // Stop scanning if found
-                        if (hasLicenseIdentifier && hasFileCopyrightText)
-                            return true;
-
-                        lineOffset += line.Line.Length + line.Separator.Length;
-                    }
-                }
-
-                // Stop scanning if found
-                if (hasLicenseIdentifier && hasFileCopyrightText)
-                    return true;
-            }
-            return false;
         }
 
         private void ReportDiagnostic(SyntaxTreeAnalysisContext context, DiagnosticDescriptor descriptor, TextSpan span)
