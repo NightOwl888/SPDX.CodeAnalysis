@@ -60,10 +60,10 @@ namespace SPDX.CodeAnalysis.Tests
         //public async Task RunTestAsync(string fileSystemXml, string testCode, string testCodeFilePath)
         //    => await RunTestAsync(fileSystemXml, testCode, testCodeFilePath, enabledDiagnostics: null, expectedDiagnostics: null);
 
-        public async Task RunTestAsync(string fileSystemXml, string testCode, string testCodeFilePath, IList<DiagnosticResult> expectedDiagnostics, bool suppressLocation = false)
+        public async Task RunTestAsync(string fileSystemXml, string testCode, string testCodeFilePath, IList<DiagnosticResult>? expectedDiagnostics, bool suppressLocation = false)
             => await RunTestAsync(fileSystemXml, testCode, testCodeFilePath, enabledDiagnostics: null, expectedDiagnostics, suppressLocation);
 
-        public async Task RunTestAsync(string fileSystemXml, string testCode, string testCodeFilePath, IList<string> enabledDiagnostics, IList<DiagnosticResult> expectedDiagnostics, bool suppressLocation = false)
+        public async Task RunTestAsync(string fileSystemXml, string testCode, string testCodeFilePath, IList<string>? enabledDiagnostics, IList<DiagnosticResult>? expectedDiagnostics, bool suppressLocation = false)
         {
             var test = new LicenseHeaderMustBeCorrectFormatTestDriver(fileSystemXml, Language, suppressLocation)
             {

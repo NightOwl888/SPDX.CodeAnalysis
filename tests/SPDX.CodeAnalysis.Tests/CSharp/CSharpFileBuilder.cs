@@ -24,8 +24,6 @@ namespace SPDX.CodeAnalysis.Tests.CSharp
         private NamespaceStyle _style;
         private bool _includeType = true;
 
-        private const string Indent = "    ";
-
         private CSharpFileBuilder(NamespaceStyle style)
         {
             _style = style;
@@ -39,9 +37,9 @@ namespace SPDX.CodeAnalysis.Tests.CSharp
             return this;
         }
 
-        public CSharpFileBuilder BeforeUsings(string content) => AddLines(_beforeUsings, content, false);
-        public CSharpFileBuilder BeforeNamespace(string content) => AddLines(_beforeNamespace, content, false);
-        public CSharpFileBuilder BeforeType(string content) => AddLines(_beforeType, content, false);
+        public CSharpFileBuilder BeforeUsings(string? content) => AddLines(_beforeUsings, content, false);
+        public CSharpFileBuilder BeforeNamespace(string? content) => AddLines(_beforeNamespace, content, false);
+        public CSharpFileBuilder BeforeType(string? content) => AddLines(_beforeType, content, false);
 
         public CSharpFileBuilder Write(FilePosition position, string content)
         {
@@ -57,7 +55,7 @@ namespace SPDX.CodeAnalysis.Tests.CSharp
             return this;
         }
 
-        public CSharpFileBuilder WriteComment(FilePosition position, string content, CommentStyle style = CommentStyle.SingleLine)
+        public CSharpFileBuilder WriteComment(FilePosition position, string? content, CommentStyle style = CommentStyle.SingleLine)
         {
             List<TextLine> destination = position switch
             {
@@ -71,16 +69,16 @@ namespace SPDX.CodeAnalysis.Tests.CSharp
             return this;
         }
 
-        public CSharpFileBuilder WithCommentBeforeUsings(string content, CommentStyle style = CommentStyle.SingleLine)
+        public CSharpFileBuilder WithCommentBeforeUsings(string? content, CommentStyle style = CommentStyle.SingleLine)
             => WriteComment(FilePosition.BeforeUsings, content, style);
 
-        public CSharpFileBuilder WithCommentBeforeNamespace(string content, CommentStyle style = CommentStyle.SingleLine)
+        public CSharpFileBuilder WithCommentBeforeNamespace(string? content, CommentStyle style = CommentStyle.SingleLine)
             => WriteComment(FilePosition.BeforeNamespace, content, style);
 
-        public CSharpFileBuilder WithCommentBeforeType(string content, CommentStyle style = CommentStyle.SingleLine)
+        public CSharpFileBuilder WithCommentBeforeType(string? content, CommentStyle style = CommentStyle.SingleLine)
             => WriteComment(FilePosition.BeforeType, content, style);
 
-        private CSharpFileBuilder AddLines(List<TextLine> list, string content, bool isComment, CommentStyle style = CommentStyle.SingleLine)
+        private CSharpFileBuilder AddLines(List<TextLine> list, string? content, bool isComment, CommentStyle style = CommentStyle.SingleLine)
         {
             if (string.IsNullOrEmpty(content))
                 return this;

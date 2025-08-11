@@ -34,8 +34,8 @@ namespace SPDX.CodeAnalysis.Tests
         private readonly IFileSystem fileSystem;
         private readonly ILicenseHeaderConfigurationReader licenseHeaderConfiguration;
         private readonly string topLevelDirectoryName;
-        private string testCode;
-        private string testCodeFilePath;
+        private string? testCode;
+        private string? testCodeFilePath;
         private bool sourcesAdded;
         private bool additionalFilesAdded;
 
@@ -52,7 +52,7 @@ namespace SPDX.CodeAnalysis.Tests
         /// Gets or sets the input source file for analyzer or code fix testing.
         /// </summary>
         /// <seealso cref="TestState"/>
-        public new string TestCode
+        public new string? TestCode
         {
             get => testCode;
             set => testCode = value;
@@ -61,7 +61,7 @@ namespace SPDX.CodeAnalysis.Tests
         /// <summary>
         /// Gets or sets the input source file path for analyzer or code fix testing.
         /// </summary>
-        public string TestCodeFilePath
+        public string? TestCodeFilePath
         {
             get => testCodeFilePath;
             set => testCodeFilePath = value;
@@ -75,7 +75,7 @@ namespace SPDX.CodeAnalysis.Tests
             {
                 if (hasTestCodeFilePath)
                 {
-                    TestState.Sources.Add((Path.GetFullPath(testCodeFilePath), SourceText.From(testCode)));
+                    TestState.Sources.Add((Path.GetFullPath(testCodeFilePath!), SourceText.From(testCode)));
                 }
                 else
                 {
@@ -87,7 +87,7 @@ namespace SPDX.CodeAnalysis.Tests
 
             if (!additionalFilesAdded && hasTestCodeFilePath)
             {
-                foreach (LicenseHeaderFile file in licenseHeaderConfiguration.GetLicenseHeaderFiles(testCodeFilePath, topLevelDirectoryName))
+                foreach (LicenseHeaderFile file in licenseHeaderConfiguration.GetLicenseHeaderFiles(testCodeFilePath!, topLevelDirectoryName))
                 {
                     TestState.AdditionalFiles.Add((file.FullFilePath, file.Content));
                 }
