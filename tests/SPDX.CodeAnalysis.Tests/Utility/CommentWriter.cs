@@ -4,7 +4,6 @@
 using System;
 using System.IO;
 using System.Text;
-using static SPDX.CodeAnalysis.MemoryExtensions;
 
 namespace SPDX.CodeAnalysis.Tests
 {
