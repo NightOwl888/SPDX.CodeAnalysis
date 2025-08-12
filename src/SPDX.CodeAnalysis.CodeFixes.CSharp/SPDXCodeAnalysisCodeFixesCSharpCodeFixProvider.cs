@@ -20,7 +20,7 @@
 //    {
 //        public sealed override ImmutableArray<string> FixableDiagnosticIds
 //        {
-//            get { return ImmutableArray.Create(Descriptors.SPDX1000_LicenseIdentifierMustExist.Id); }
+//            get { return ImmutableArray.Create(Descriptors.SPDX_1000_LicenseIdentifierMustExist.Id); }
 //        }
 
 //        public sealed override FixAllProvider GetFixAllProvider()

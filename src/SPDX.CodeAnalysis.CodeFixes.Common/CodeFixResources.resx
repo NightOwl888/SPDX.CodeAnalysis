@@ -121,7 +121,7 @@
     <value>Make uppercase</value>
     <comment>The title of the code fix.</comment>
   </data>
-  <data name="SPDX1000_CodeFixTitle" xml:space="preserve">
+  <data name="SPDX_1000_CodeFixTitle" xml:space="preserve">
     <value>Insert {0}</value>
   </data>
 </root>

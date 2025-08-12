@@ -9,9 +9,9 @@ namespace SPDX.CodeAnalysis
 {
     public static partial class Descriptors
     {
-        public static DiagnosticDescriptor SPDX2000_NoLicenseHeaderTextConfiguration { get; } =
+        public static DiagnosticDescriptor SPDX_2000_NoLicenseHeaderTextConfiguration { get; } =
             Diagnostic(
-                "SPDX2000",
+                "SPDX_2000",
                 Configuration,
                 Warning
             );

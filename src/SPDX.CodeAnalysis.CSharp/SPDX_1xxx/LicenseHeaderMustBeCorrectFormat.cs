@@ -12,21 +12,6 @@ using System.Diagnostics;
 namespace SPDX.CodeAnalysis.CSharp
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public sealed class SPDXAnalyzer : DiagnosticAnalyzer
-    {
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(Descriptors.SPDX1000_LicenseIdentifierMustExist);
-
-        public override void Initialize(AnalysisContext context)
-        {
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-            context.EnableConcurrentExecution();
-            // Minimal — no actual analysis needed to pass RS2002
-        }
-    }
-
-
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class LicenseHeaderMustBeCorrectFormat : DiagnosticAnalyzer
     {
         private const string LicenseIdentifierTag = "SPDX-License-Identifier";
@@ -34,14 +19,14 @@ namespace SPDX.CodeAnalysis.CSharp
         private const string TopLevelDirectoryName = "LICENSES.HEADERS"; // TODO: Make configurable?
 
         private static readonly ImmutableArray<DiagnosticDescriptor> supportedDiagnostics = ImmutableArray.Create<DiagnosticDescriptor>(
-            Descriptors.SPDX1000_LicenseIdentifierMustExist,
-            Descriptors.SPDX1001_LicenseIdentifierMustHaveValue,
-            Descriptors.SPDX1002_FileCopyrightTextMustExist,
-            Descriptors.SPDX1003_FileCopyrightTextMustHaveValue,
-            Descriptors.SPDX1004_LicenseCopyrightTextMustPrecedeLicenseIdentifier,
-            Descriptors.SPDX1005_LicenseTextMustExist,
-            Descriptors.SPDX1006_LicenseTextMatchingConfigurationMustMatchAllLines,
-            Descriptors.SPDX2000_NoLicenseHeaderTextConfiguration
+            Descriptors.SPDX_1000_LicenseIdentifierMustExist,
+            Descriptors.SPDX_1001_LicenseIdentifierMustHaveValue,
+            Descriptors.SPDX_1002_FileCopyrightTextMustExist,
+            Descriptors.SPDX_1003_FileCopyrightTextMustHaveValue,
+            Descriptors.SPDX_1004_LicenseCopyrightTextMustPrecedeLicenseIdentifier,
+            Descriptors.SPDX_1005_LicenseTextMustExist,
+            Descriptors.SPDX_1006_LicenseTextMatchingConfigurationMustMatchAllLines,
+            Descriptors.SPDX_2000_NoLicenseHeaderTextConfiguration
         );
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => supportedDiagnostics;
@@ -226,24 +211,24 @@ namespace SPDX.CodeAnalysis.CSharp
         }
 
         private void ReportHasNoLicenseIdentifier(SyntaxTreeAnalysisContext context)
-            => ReportDiagnostic(context, Descriptors.SPDX1000_LicenseIdentifierMustExist, new TextSpan(0, 0));
+            => ReportDiagnostic(context, Descriptors.SPDX_1000_LicenseIdentifierMustExist, new TextSpan(0, 0));
 
         private void ReportHasNoLicenseIdentifierValue(SyntaxTreeAnalysisContext context, TextSpan span)
-            => ReportDiagnostic(context, Descriptors.SPDX1001_LicenseIdentifierMustHaveValue, span);
+            => ReportDiagnostic(context, Descriptors.SPDX_1001_LicenseIdentifierMustHaveValue, span);
 
         private void ReportHasNoFileCopyrightText(SyntaxTreeAnalysisContext context)
-            => ReportDiagnostic(context, Descriptors.SPDX1002_FileCopyrightTextMustExist, new TextSpan(0, 0));
+            => ReportDiagnostic(context, Descriptors.SPDX_1002_FileCopyrightTextMustExist, new TextSpan(0, 0));
 
         private void ReportHasNoFileCopyrightTextValue(SyntaxTreeAnalysisContext context, TextSpan span)
-            => ReportDiagnostic(context, Descriptors.SPDX1003_FileCopyrightTextMustHaveValue, span);
+            => ReportDiagnostic(context, Descriptors.SPDX_1003_FileCopyrightTextMustHaveValue, span);
 
         private void ReportHasNoLicenseText(SyntaxTreeAnalysisContext context)
-            => ReportDiagnostic(context, Descriptors.SPDX1005_LicenseTextMustExist, new TextSpan(0, 0));
+            => ReportDiagnostic(context, Descriptors.SPDX_1005_LicenseTextMustExist, new TextSpan(0, 0));
 
         private void ReportLicenseTextMatchingConfigurationMustMatchAllLines(SyntaxTreeAnalysisContext context, TextSpan span)
-            => ReportDiagnostic(context, Descriptors.SPDX1006_LicenseTextMatchingConfigurationMustMatchAllLines, span);
+            => ReportDiagnostic(context, Descriptors.SPDX_1006_LicenseTextMatchingConfigurationMustMatchAllLines, span);
 
         private void ReportHasNoLicenseHeaderTextConfiguration(CompilationAnalysisContext context)
-            => context.ReportDiagnostic(Diagnostic.Create(Descriptors.SPDX2000_NoLicenseHeaderTextConfiguration, Location.None));
+            => context.ReportDiagnostic(Diagnostic.Create(Descriptors.SPDX_2000_NoLicenseHeaderTextConfiguration, Location.None));
     }
 }

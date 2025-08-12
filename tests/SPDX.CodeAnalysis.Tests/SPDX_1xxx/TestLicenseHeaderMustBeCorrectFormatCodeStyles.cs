@@ -12,9 +12,9 @@ namespace SPDX.CodeAnalysis.Tests
     public abstract class TestLicenseHeaderMustBeCorrectFormatCodeStyles : TestLicenseHeaderMustBeCorrectFormat
     {
         [Test]
-        public virtual async Task SPDX1000_LicenseIdentifierMustExist_Exists_ShouldProduceNoDiagnostic()
+        public virtual async Task SPDX_1000_LicenseIdentifierMustExist_Exists_ShouldProduceNoDiagnostic()
         {
-            string diagnosticId = Descriptors.SPDX1000_LicenseIdentifierMustExist.Id;
+            string diagnosticId = Descriptors.SPDX_1000_LicenseIdentifierMustExist.Id;
 
             await RunTestAsync(
                 FileSystemXml.Basic,
@@ -26,9 +26,9 @@ namespace SPDX.CodeAnalysis.Tests
         }
 
         [Test]
-        public virtual async Task SPDX1000_LicenseIdentifierMustExist_DoesNotExist_ShouldProduceDiagnositc()
+        public virtual async Task SPDX_1000_LicenseIdentifierMustExist_DoesNotExist_ShouldProduceDiagnositc()
         {
-            string diagnosticId = Descriptors.SPDX1000_LicenseIdentifierMustExist.Id;
+            string diagnosticId = Descriptors.SPDX_1000_LicenseIdentifierMustExist.Id;
 
             await RunTestAsync(
                 FileSystemXml.Basic,
@@ -40,9 +40,9 @@ namespace SPDX.CodeAnalysis.Tests
         }
 
         [Test]
-        public virtual async Task SPDX1001_LicenseIdentifierMustHaveValue_HasValue_ShouldProduceNoDiagnostic()
+        public virtual async Task SPDX_1001_LicenseIdentifierMustHaveValue_HasValue_ShouldProduceNoDiagnostic()
         {
-            string diagnosticId = Descriptors.SPDX1001_LicenseIdentifierMustHaveValue.Id;
+            string diagnosticId = Descriptors.SPDX_1001_LicenseIdentifierMustHaveValue.Id;
 
             await RunTestAsync(
                 FileSystemXml.Basic,
@@ -54,9 +54,9 @@ namespace SPDX.CodeAnalysis.Tests
         }
 
         [Test]
-        public virtual async Task SPDX1001_LicenseIdentifierMustHaveValue_HasNoValue_ShouldProduceDiagnositc()
+        public virtual async Task SPDX_1001_LicenseIdentifierMustHaveValue_HasNoValue_ShouldProduceDiagnositc()
         {
-            string diagnosticId = Descriptors.SPDX1001_LicenseIdentifierMustHaveValue.Id;
+            string diagnosticId = Descriptors.SPDX_1001_LicenseIdentifierMustHaveValue.Id;
 
             await RunTestAsync(
                 FileSystemXml.Basic,
@@ -68,9 +68,9 @@ namespace SPDX.CodeAnalysis.Tests
         }
 
         [Test]
-        public virtual async Task SPDX1002_FileCopyrightTextMustExist_Exists_ShouldProduceNoDiagnostic()
+        public virtual async Task SPDX_1002_FileCopyrightTextMustExist_Exists_ShouldProduceNoDiagnostic()
         {
-            string diagnosticId = Descriptors.SPDX1002_FileCopyrightTextMustExist.Id;
+            string diagnosticId = Descriptors.SPDX_1002_FileCopyrightTextMustExist.Id;
 
             await RunTestAsync(
                 FileSystemXml.Basic,
@@ -82,9 +82,9 @@ namespace SPDX.CodeAnalysis.Tests
         }
 
         [Test]
-        public virtual async Task SPDX1002_FileCopyrightTextMustExist_DoesNotExist_ShouldProduceDiagnositc()
+        public virtual async Task SPDX_1002_FileCopyrightTextMustExist_DoesNotExist_ShouldProduceDiagnositc()
         {
-            string diagnosticId = Descriptors.SPDX1002_FileCopyrightTextMustExist.Id;
+            string diagnosticId = Descriptors.SPDX_1002_FileCopyrightTextMustExist.Id;
 
             await RunTestAsync(
                 FileSystemXml.Basic,
@@ -96,9 +96,9 @@ namespace SPDX.CodeAnalysis.Tests
         }
 
         [Test]
-        public virtual async Task SPDX1003_FileCopyrightTextMustHaveValue_HasValue_ShouldProduceNoDiagnostic()
+        public virtual async Task SPDX_1003_FileCopyrightTextMustHaveValue_HasValue_ShouldProduceNoDiagnostic()
         {
-            string diagnosticId = Descriptors.SPDX1003_FileCopyrightTextMustHaveValue.Id;
+            string diagnosticId = Descriptors.SPDX_1003_FileCopyrightTextMustHaveValue.Id;
 
             await RunTestAsync(
                 FileSystemXml.Basic,
@@ -110,9 +110,9 @@ namespace SPDX.CodeAnalysis.Tests
         }
 
         [Test]
-        public virtual async Task SPDX1003_FileCopyrightTextMustHaveValue_HasNoValue_ShouldProduceDiagnositc()
+        public virtual async Task SPDX_1003_FileCopyrightTextMustHaveValue_HasNoValue_ShouldProduceDiagnositc()
         {
-            string diagnosticId = Descriptors.SPDX1003_FileCopyrightTextMustHaveValue.Id;
+            string diagnosticId = Descriptors.SPDX_1003_FileCopyrightTextMustHaveValue.Id;
 
             await RunTestAsync(
                 FileSystemXml.Basic,
@@ -124,9 +124,9 @@ namespace SPDX.CodeAnalysis.Tests
         }
 
         [Test]
-        public virtual async Task SPDX1005_LicenseTextMustExist_Exists_ShouldProduceNoDiagnostic()
+        public virtual async Task SPDX_1005_LicenseTextMustExist_Exists_ShouldProduceNoDiagnostic()
         {
-            string diagnosticId = Descriptors.SPDX1005_LicenseTextMustExist.Id;
+            string diagnosticId = Descriptors.SPDX_1005_LicenseTextMustExist.Id;
 
             await RunTestAsync(
                 FileSystemXml.Basic,
@@ -138,9 +138,9 @@ namespace SPDX.CodeAnalysis.Tests
         }
 
         [Test]
-        public virtual async Task SPDX1005_LicenseTextMustExist_DoesNotExist_ShouldProduceDiagnositc()
+        public virtual async Task SPDX_1005_LicenseTextMustExist_DoesNotExist_ShouldProduceDiagnositc()
         {
-            string diagnosticId = Descriptors.SPDX1005_LicenseTextMustExist.Id;
+            string diagnosticId = Descriptors.SPDX_1005_LicenseTextMustExist.Id;
 
             await RunTestAsync(
                 FileSystemXml.Basic,

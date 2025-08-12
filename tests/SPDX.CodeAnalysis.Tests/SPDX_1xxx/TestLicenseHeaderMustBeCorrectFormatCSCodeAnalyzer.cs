@@ -21,7 +21,7 @@ namespace SPDX.CodeAnalysis.Tests
         public override FileSystemXml FileSystemXml => fileSystemXml;
 
         [Test]
-        public async Task SPDX1005_LicenseTextMustExist_Apache2_SingleMatch_Exists()
+        public async Task SPDX_1005_LicenseTextMustExist_Apache2_SingleMatch_Exists()
         {
             string testCodeFilePath = "project/src/baz.cs";
             string testCode = CSharpFileBuilder.Create(NamespaceStyle.BlockScoped)
@@ -40,14 +40,14 @@ namespace SPDX.CodeAnalysis.Tests
                 testCodeFilePath,
                 enabledDiagnostics: new[]
                 {
-                    Descriptors.SPDX1005_LicenseTextMustExist.Id
+                    Descriptors.SPDX_1005_LicenseTextMustExist.Id
                 },
                 expectedDiagnostics: NoDiagnosticResults
             );
         }
 
         [Test]
-        public async Task SPDX1006_LicenseTextMatchingConfigurationMustMatchAllLines_WithPartialMatch_ProducesDiagnositic()
+        public async Task SPDX_1006_LicenseTextMatchingConfigurationMustMatchAllLines_WithPartialMatch_ProducesDiagnositic()
         {
             const string partiallyMatchingApache2Header = @"Licensed under the Apache License, Version 2.0 (the ""License"");
 you may not use this file except in compliance with the License.
@@ -78,18 +78,18 @@ limitations under the License.";
                 testCodeFilePath,
                 enabledDiagnostics: new[]
                 {
-                    Descriptors.SPDX1006_LicenseTextMatchingConfigurationMustMatchAllLines.Id
+                    Descriptors.SPDX_1006_LicenseTextMatchingConfigurationMustMatchAllLines.Id
                 },
                 expectedDiagnostics: new[] {
                     DiagnosticResult
-                        .CompilerWarning(Descriptors.SPDX1006_LicenseTextMatchingConfigurationMustMatchAllLines.Id)
-                        .WithMessage(FormatMessage(Descriptors.SPDX1006_LicenseTextMatchingConfigurationMustMatchAllLines.MessageFormat))
+                        .CompilerWarning(Descriptors.SPDX_1006_LicenseTextMatchingConfigurationMustMatchAllLines.Id)
+                        .WithMessage(FormatMessage(Descriptors.SPDX_1006_LicenseTextMatchingConfigurationMustMatchAllLines.MessageFormat))
                 }
             , suppressLocation: true); // TODO: Validate the location, info.
         }
 
         [Test]
-        public async Task SPDX2000_NoLicenseHeaderTextConfiguration_ProducesDiagnostic()
+        public async Task SPDX_2000_NoLicenseHeaderTextConfiguration_ProducesDiagnostic()
         {
             string testCodeFilePath = "project/src/baz.cs";
             string testCode = CSharpFileBuilder.Create(NamespaceStyle.BlockScoped)
@@ -104,12 +104,12 @@ limitations under the License.";
                 testCodeFilePath,
                 enabledDiagnostics: new[]
                 {
-                    Descriptors.SPDX2000_NoLicenseHeaderTextConfiguration.Id
+                    Descriptors.SPDX_2000_NoLicenseHeaderTextConfiguration.Id
                 },
                 expectedDiagnostics: new[] {
                     DiagnosticResult
-                        .CompilerWarning(Descriptors.SPDX2000_NoLicenseHeaderTextConfiguration.Id)
-                        .WithMessage(FormatMessage(Descriptors.SPDX2000_NoLicenseHeaderTextConfiguration.MessageFormat))
+                        .CompilerWarning(Descriptors.SPDX_2000_NoLicenseHeaderTextConfiguration.Id)
+                        .WithMessage(FormatMessage(Descriptors.SPDX_2000_NoLicenseHeaderTextConfiguration.MessageFormat))
                 }
             );
         }
@@ -126,13 +126,13 @@ limitations under the License.";
                 testCodeFilePath,
                 expectedDiagnostics: new[] {
                     DiagnosticResult
-                        .CompilerWarning(Descriptors.SPDX1000_LicenseIdentifierMustExist.Id)
+                        .CompilerWarning(Descriptors.SPDX_1000_LicenseIdentifierMustExist.Id)
                         .WithSpan(expectedTestCodeFilePath, 1, 1, 1, 1)
-                        .WithMessage(FormatMessage(Descriptors.SPDX1000_LicenseIdentifierMustExist.MessageFormat, LicenseIdentifierTag)),
+                        .WithMessage(FormatMessage(Descriptors.SPDX_1000_LicenseIdentifierMustExist.MessageFormat, LicenseIdentifierTag)),
                     DiagnosticResult
-                        .CompilerWarning(Descriptors.SPDX1002_FileCopyrightTextMustExist.Id)
+                        .CompilerWarning(Descriptors.SPDX_1002_FileCopyrightTextMustExist.Id)
                         .WithSpan(expectedTestCodeFilePath, 1, 1, 1, 1)
-                        .WithMessage(FormatMessage(Descriptors.SPDX1002_FileCopyrightTextMustExist.MessageFormat, FileCopyrightTextTag)),
+                        .WithMessage(FormatMessage(Descriptors.SPDX_1002_FileCopyrightTextMustExist.MessageFormat, FileCopyrightTextTag)),
                 }
             );
         }
@@ -182,13 +182,13 @@ public class MyClass
             test.ExpectedDiagnostics.AddRange(new[]
             {
                 DiagnosticResult
-                    .CompilerWarning(Descriptors.SPDX1000_LicenseIdentifierMustExist.Id)
+                    .CompilerWarning(Descriptors.SPDX_1000_LicenseIdentifierMustExist.Id)
                     .WithSpan(expectedTestCodeFilePath, 1, 1, 1, 1)
-                    .WithMessage(FormatMessage(Descriptors.SPDX1000_LicenseIdentifierMustExist.MessageFormat, LicenseIdentifierTag)),
+                    .WithMessage(FormatMessage(Descriptors.SPDX_1000_LicenseIdentifierMustExist.MessageFormat, LicenseIdentifierTag)),
                 DiagnosticResult
-                    .CompilerWarning(Descriptors.SPDX1002_FileCopyrightTextMustExist.Id)
+                    .CompilerWarning(Descriptors.SPDX_1002_FileCopyrightTextMustExist.Id)
                     .WithSpan(expectedTestCodeFilePath, 1, 1, 1, 1)
-                    .WithMessage(FormatMessage(Descriptors.SPDX1002_FileCopyrightTextMustExist.MessageFormat, FileCopyrightTextTag)),
+                    .WithMessage(FormatMessage(Descriptors.SPDX_1002_FileCopyrightTextMustExist.MessageFormat, FileCopyrightTextTag)),
             });
 
             await test.RunAsync();
