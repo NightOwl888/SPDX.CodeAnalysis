@@ -9,51 +9,51 @@ namespace SPDX.CodeAnalysis
 {
     public static partial class Descriptors
     {
-        public static DiagnosticDescriptor SPDX_1000_LicenseIdentifierMustExist { get; } =
+        public static DiagnosticDescriptor SPDX1000_LicenseIdentifierMustExist { get; } =
             Diagnostic(
-                "SPDX_1000",
+                "SPDX1000",
                 Licensing,
                 Warning
             );
 
-        public static DiagnosticDescriptor SPDX_1001_LicenseIdentifierMustHaveValue { get; } =
+        public static DiagnosticDescriptor SPDX1001_LicenseIdentifierMustHaveValue { get; } =
             Diagnostic(
-                "SPDX_1001",
+                "SPDX1001",
                 Licensing,
                 Warning
             );
 
-        public static DiagnosticDescriptor SPDX_1002_FileCopyrightTextMustExist { get; } =
+        public static DiagnosticDescriptor SPDX1002_FileCopyrightTextMustExist { get; } =
             Diagnostic(
-                "SPDX_1002",
+                "SPDX1002",
                 Licensing,
                 Warning
             );
 
-        public static DiagnosticDescriptor SPDX_1003_FileCopyrightTextMustHaveValue { get; } =
+        public static DiagnosticDescriptor SPDX1003_FileCopyrightTextMustHaveValue { get; } =
             Diagnostic(
-                "SPDX_1003",
+                "SPDX1003",
                 Licensing,
                 Warning
             );
 
-        public static DiagnosticDescriptor SPDX_1004_LicenseCopyrightTextMustPrecedeLicenseIdentifier { get; } =
+        public static DiagnosticDescriptor SPDX1004_LicenseCopyrightTextMustPrecedeLicenseIdentifier { get; } =
             Diagnostic(
-                "SPDX_1004",
+                "SPDX1004",
                 Licensing,
                 Warning
             );
 
-        public static DiagnosticDescriptor SPDX_1005_LicenseTextMustExist { get; } =
+        public static DiagnosticDescriptor SPDX1005_LicenseTextMustExist { get; } =
             Diagnostic(
-                "SPDX_1005",
+                "SPDX1005",
                 Licensing,
                 Warning
             );
 
-        public static DiagnosticDescriptor SPDX_1006_LicenseTextMatchingConfigurationMustMatchAllLines { get; } =
+        public static DiagnosticDescriptor SPDX1006_LicenseTextMatchingConfigurationMustMatchAllLines { get; } =
             Diagnostic(
-                "SPDX_1006",
+                "SPDX1006",
                 Licensing,
                 Warning
             );

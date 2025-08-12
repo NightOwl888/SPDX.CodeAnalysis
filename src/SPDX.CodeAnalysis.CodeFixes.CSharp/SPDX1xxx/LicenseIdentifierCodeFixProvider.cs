@@ -26,7 +26,7 @@ namespace SPDX.CodeAnalysis.CodeFixes.CSharp
         private const string TopLevelDirectoryName = "LICENSES.HEADERS"; // TODO: Make configurable?
 
         private static readonly ImmutableArray<string> fixableDiagnosticIds = ImmutableArray.Create(
-            Descriptors.SPDX_1000_LicenseIdentifierMustExist.Id
+            Descriptors.SPDX1000_LicenseIdentifierMustExist.Id
         );
 
         public override ImmutableArray<string> FixableDiagnosticIds => fixableDiagnosticIds;
@@ -62,7 +62,7 @@ namespace SPDX.CodeAnalysis.CodeFixes.CSharp
 
             foreach (var spdxLicenseIdentifier in spdxLicenseIdentifiers)
             {
-                var title = string.Format(CodeFixResources.SPDX_1000_CodeFixTitle, $"{LicenseIdentifierTag}: {spdxLicenseIdentifier}");
+                var title = string.Format(CodeFixResources.SPDX1000_CodeFixTitle, $"{LicenseIdentifierTag}: {spdxLicenseIdentifier}");
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: title,
@@ -81,6 +81,8 @@ namespace SPDX.CodeAnalysis.CodeFixes.CSharp
             bool zeroLength = length == 0;
 
             var tree = await document.GetSyntaxTreeAsync(cancellationToken);
+            if (tree is null)
+                return document;
 
             var config = document.Project.AnalyzerOptions.AnalyzerConfigOptionsProvider.GetOptions(tree);
 

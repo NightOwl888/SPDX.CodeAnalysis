@@ -117,76 +117,76 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="SPDX_1000_AnalyzerDescription" xml:space="preserve">
+  <data name="SPDX1000_AnalyzerDescription" xml:space="preserve">
     <value>'SPDX-License-Identifier:' is required header comment on all C# code files.</value>
   </data>
-  <data name="SPDX_1000_AnalyzerMessageFormat" xml:space="preserve">
+  <data name="SPDX1000_AnalyzerMessageFormat" xml:space="preserve">
     <value>Header comment including 'SPDX-License-Identifier:' is required</value>
   </data>
-  <data name="SPDX_1000_AnalyzerTitle" xml:space="preserve">
+  <data name="SPDX1000_AnalyzerTitle" xml:space="preserve">
     <value>'SPDX-License-Identifier:' is required header comment on all C# code files</value>
   </data>
-  <data name="SPDX_1001_AnalyzerDescription" xml:space="preserve">
+  <data name="SPDX1001_AnalyzerDescription" xml:space="preserve">
     <value>ddd</value>
   </data>
-  <data name="SPDX_1001_AnalyzerMessageFormat" xml:space="preserve">
+  <data name="SPDX1001_AnalyzerMessageFormat" xml:space="preserve">
     <value>ddd</value>
   </data>
-  <data name="SPDX_1001_AnalyzerTitle" xml:space="preserve">
+  <data name="SPDX1001_AnalyzerTitle" xml:space="preserve">
     <value>ddd</value>
   </data>
-  <data name="SPDX_1002_AnalyzerDescription" xml:space="preserve">
+  <data name="SPDX1002_AnalyzerDescription" xml:space="preserve">
     <value>'SPDX-CopyrightText:' is required header comment on all C# code files.</value>
   </data>
-  <data name="SPDX_1002_AnalyzerMessageFormat" xml:space="preserve">
+  <data name="SPDX1002_AnalyzerMessageFormat" xml:space="preserve">
     <value>Header comment including 'SPDX-CopyrightText:' is required</value>
   </data>
-  <data name="SPDX_1002_AnalyzerTitle" xml:space="preserve">
+  <data name="SPDX1002_AnalyzerTitle" xml:space="preserve">
     <value>'SPDX-CopyrightText:' is required header comment on all C# code files</value>
   </data>
-  <data name="SPDX_1003_AnalyzerDescription" xml:space="preserve">
+  <data name="SPDX1003_AnalyzerDescription" xml:space="preserve">
     <value>ddd</value>
   </data>
-  <data name="SPDX_1003_AnalyzerMessageFormat" xml:space="preserve">
+  <data name="SPDX1003_AnalyzerMessageFormat" xml:space="preserve">
     <value>ddd</value>
   </data>
-  <data name="SPDX_1003_AnalyzerTitle" xml:space="preserve">
+  <data name="SPDX1003_AnalyzerTitle" xml:space="preserve">
     <value>ddd</value>
   </data>
-  <data name="SPDX_1004_AnalyzerDescription" xml:space="preserve">
+  <data name="SPDX1004_AnalyzerDescription" xml:space="preserve">
     <value>ddd</value>
   </data>
-  <data name="SPDX_1004_AnalyzerMessageFormat" xml:space="preserve">
+  <data name="SPDX1004_AnalyzerMessageFormat" xml:space="preserve">
     <value>ddd</value>
   </data>
-  <data name="SPDX_1004_AnalyzerTitle" xml:space="preserve">
+  <data name="SPDX1004_AnalyzerTitle" xml:space="preserve">
     <value>ddd</value>
   </data>
-  <data name="SPDX_1005_AnalyzerDescription" xml:space="preserve">
+  <data name="SPDX1005_AnalyzerDescription" xml:space="preserve">
     <value>License text block is required header comment on all C# code files.</value>
   </data>
-  <data name="SPDX_1005_AnalyzerMessageFormat" xml:space="preserve">
+  <data name="SPDX1005_AnalyzerMessageFormat" xml:space="preserve">
     <value>Header comment including license text is required</value>
   </data>
-  <data name="SPDX_1005_AnalyzerTitle" xml:space="preserve">
+  <data name="SPDX1005_AnalyzerTitle" xml:space="preserve">
     <value>License text block is required header comment on all C# code files</value>
   </data>
-  <data name="SPDX_1006_AnalyzerDescription" xml:space="preserve">
+  <data name="SPDX1006_AnalyzerDescription" xml:space="preserve">
     <value>ddd</value>
   </data>
-  <data name="SPDX_1006_AnalyzerMessageFormat" xml:space="preserve">
+  <data name="SPDX1006_AnalyzerMessageFormat" xml:space="preserve">
     <value>ddd</value>
   </data>
-  <data name="SPDX_1006_AnalyzerTitle" xml:space="preserve">
+  <data name="SPDX1006_AnalyzerTitle" xml:space="preserve">
     <value>ddd</value>
   </data>
-  <data name="SPDX_2000_AnalyzerDescription" xml:space="preserve">
+  <data name="SPDX2000_AnalyzerDescription" xml:space="preserve">
     <value>ddd</value>
   </data>
-  <data name="SPDX_2000_AnalyzerMessageFormat" xml:space="preserve">
+  <data name="SPDX2000_AnalyzerMessageFormat" xml:space="preserve">
     <value>ddd</value>
   </data>
-  <data name="SPDX_2000_AnalyzerTitle" xml:space="preserve">
+  <data name="SPDX2000_AnalyzerTitle" xml:space="preserve">
     <value>ddd</value>
   </data>
 </root>
