@@ -9,15 +9,18 @@
     <SpdxArtifactsDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\_artifacts'))</SpdxArtifactsDirectory>
     <SpdxNuGetPackageOutputPath>$(SpdxArtifactsDirectory)\NuGetPackages</SpdxNuGetPackageOutputPath>
     <SpdxPackageVersionPropsFilePath>$(SpdxNuGetPackageOutputPath)\SPDX.CodeAnalysis.Version.props</SpdxPackageVersionPropsFilePath>
-    <RestoreSources>
-      $(RestoreSources);
-      $(SpdxNuGetPackageOutputPath);
-      https://api.nuget.org/v3/index.json
-    </RestoreSources>
     <!-- We install the analyzer package in a local directory so we don't pollute the
           .nuget cache on the dev machine with temporary builds -->
     <RestorePackagesPath>obj\LocalNuGetPackages</RestorePackagesPath>
     <SpdxRestorePackagesPath>$(RestorePackagesPath)\spdx.codeanalysis</SpdxRestorePackagesPath>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="Exists('$(SpdxNuGetPackageOutputPath)')">
+    <RestoreSources>$(RestoreSources);$(SpdxNuGetPackageOutputPath)</RestoreSources>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <RestoreSources>$(RestoreSources);https://api.nuget.org/v3/index.json</RestoreSources>
   </PropertyGroup>
 
   <PropertyGroup>
