@@ -2,19 +2,21 @@
 // found in the LICENSE.txt file or at https://opensource.org/licenses/MIT.
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 
-namespace SPDX.CodeAnalysis.CSharp
+namespace SPDX.CodeAnalysis.Languages
 {
     public sealed class CSharpLanguageService : ILanguageService
     {
-        private const int SingleLineCommentTriviaKind = (int)SyntaxKind.SingleLineCommentTrivia;
-        private const int MultiLineCommentTriviaKind = (int)SyntaxKind.MultiLineCommentTrivia;
-        private const int WhitespaceTriviaKind = (int)SyntaxKind.WhitespaceTrivia;
+        private const int SingleLineCommentTriviaKind = 8541; // (int)SyntaxKind.SingleLineCommentTrivia;
+        private const int MultiLineCommentTriviaKind = 8542; //(int)SyntaxKind.MultiLineCommentTrivia;
+        private const int WhitespaceTriviaKind = 8540; //(int)SyntaxKind.WhitespaceTrivia;
+
+        private readonly Type typeSyntaxType;
 
         private CSharpLanguageService()
         {
+            typeSyntaxType = Type.GetType("Microsoft.CodeAnalysis.CSharp.Syntax.TypeDeclarationSyntax", throwOnError: false);
         }
 
         public static ILanguageService Instance => new CSharpLanguageService();
@@ -33,6 +35,11 @@ namespace SPDX.CodeAnalysis.CSharp
         }
 
         public bool IsTypeDeclarationSyntax(SyntaxNode? node)
-            => node is TypeDeclarationSyntax;
+        {
+            if (node is null) return false;
+            if (typeSyntaxType is null) return false;
+
+            return typeSyntaxType.IsInstanceOfType(node);
+        }
     }
 }

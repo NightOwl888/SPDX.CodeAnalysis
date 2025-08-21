@@ -3,7 +3,7 @@
 
 using Microsoft.CodeAnalysis;
 
-namespace SPDX.CodeAnalysis
+namespace SPDX.CodeAnalysis.Languages
 {
     public interface ILanguageService
     {

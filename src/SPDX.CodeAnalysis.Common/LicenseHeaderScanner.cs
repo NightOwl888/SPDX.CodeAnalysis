@@ -2,6 +2,7 @@
 // found in the LICENSE.txt file or at https://opensource.org/licenses/MIT.
 
 using Microsoft.CodeAnalysis;
+using SPDX.CodeAnalysis.Languages;
 using System;
 using System.Collections.Generic;
 

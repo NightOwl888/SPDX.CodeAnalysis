@@ -3,6 +3,7 @@
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using SPDX.CodeAnalysis.Languages;
 using System;
 using System.Collections.Generic;
 using System.Reflection.PortableExecutable;

@@ -10,6 +10,7 @@
     <MicrosoftCodeAnalysisCSharpPackageReferenceVersion>4.12.0</MicrosoftCodeAnalysisCSharpPackageReferenceVersion>
     <MicrosoftCodeAnalysisCSharpFeaturesPackageReferenceVersion>4.12.0</MicrosoftCodeAnalysisCSharpFeaturesPackageReferenceVersion>
     <MicrosoftCodeAnalysisCSharpWorkspacesPackageReferenceVersion>4.12.0</MicrosoftCodeAnalysisCSharpWorkspacesPackageReferenceVersion>
+    <MicrosoftCodeAnalysisVisualBasicPackageReferenceVersion>4.12.0</MicrosoftCodeAnalysisVisualBasicPackageReferenceVersion>
     <MicrosoftCodeAnalysisVisualBasicWorkspacesPackageReferenceVersion>4.12.0</MicrosoftCodeAnalysisVisualBasicWorkspacesPackageReferenceVersion>
     <MicrosoftCodeAnalysisWorkspacesCommonPackageReferenceVersion>4.12.0</MicrosoftCodeAnalysisWorkspacesCommonPackageReferenceVersion>
     <MicrosoftNETTestSdkPackageReferenceVersion>17.13.0</MicrosoftNETTestSdkPackageReferenceVersion>
