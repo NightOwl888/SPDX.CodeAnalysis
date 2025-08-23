@@ -46,6 +46,7 @@ namespace SPDX.CodeAnalysis
                 : stackalloc char[CharStackBufferSize];
             try
             {
+                bool path1EndsWithSlash = false;
                 int index = 0;
                 
                 if (rootLength > 0)
@@ -61,16 +62,22 @@ namespace SPDX.CodeAnalysis
                                 c = PathInternal.DirectorySeparatorChar;
 
                             buffer[index++] = c;
+                            if (i == rootLength - 1)
+                                path1EndsWithSlash = c == PathInternal.DirectorySeparatorChar;
                         }
                     }
                     else
                     {
-                        root.CopyTo(buffer.Slice(index));
-                        index += rootLength;
+                        for (int i = index; i < rootLength; i++)
+                        {
+                            char c = root[i];
+                            buffer[index++] = c;
+                            if (i == rootLength - 1)
+                                path1EndsWithSlash = c == PathInternal.DirectorySeparatorChar;
+                        }
                     }
                 }
                 
-                bool path1EndsWithSlash = false;
                 foreach (var dir in path1.Slice(rootLength).SplitPath())
                 {
                     if (dir.Segment.Length > 0)
