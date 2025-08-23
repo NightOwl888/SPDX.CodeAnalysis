@@ -4,7 +4,6 @@
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Text;
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -32,6 +31,7 @@ namespace SPDX.CodeAnalysis.Tests
     {
         private readonly string fsmlXml;
         private readonly IFileSystem fileSystem;
+        private readonly IRootPathNormalizer normalizer;
         private readonly ILicenseHeaderConfigurationReader licenseHeaderConfiguration;
         private readonly string topLevelDirectoryName;
         private string? testCode;
@@ -39,19 +39,20 @@ namespace SPDX.CodeAnalysis.Tests
         private bool sourcesAdded;
         private bool additionalFilesAdded;
 
-        protected FsmlAnalyzerTest(string fsmlXml, CodeLanguage language, string topLevelDirectoryName)
+        protected FsmlAnalyzerTest(string fsmlXml, IRootPathNormalizer normalizer, CodeLanguage language, string topLevelDirectoryName)
             : base(language)
         {
             this.fsmlXml = fsmlXml ?? throw new ArgumentNullException(nameof(fsmlXml));
             this.topLevelDirectoryName = topLevelDirectoryName ?? throw new ArgumentNullException(nameof(topLevelDirectoryName));
-            this.fileSystem = new FsmlFileSystem(fsmlXml);
-            this.licenseHeaderConfiguration = new LicenseHeaderConfigurationReader(fileSystem);
+            this.normalizer = normalizer ?? throw new ArgumentNullException(nameof(normalizer));
+            this.fileSystem = new FsmlFileSystem(fsmlXml, normalizer);
+            this.licenseHeaderConfiguration = new LicenseHeaderConfigurationReader(fileSystem, normalizer);
         }
 
         /// <summary>
         /// Gets or sets the input source file for analyzer or code fix testing.
         /// </summary>
-        /// <seealso cref="TestState"/>
+        /// <seealso cref="AnalyzerTest{TVerifier}.TestState"/>
         public new string? TestCode
         {
             get => testCode;
@@ -75,7 +76,7 @@ namespace SPDX.CodeAnalysis.Tests
             {
                 if (hasTestCodeFilePath)
                 {
-                    TestState.Sources.Add((Path.GetFullPath(testCodeFilePath!), SourceText.From(testCode)));
+                    TestState.Sources.Add((normalizer.Normalize(testCodeFilePath!), SourceText.From(testCode)));
                 }
                 else
                 {
@@ -87,7 +88,7 @@ namespace SPDX.CodeAnalysis.Tests
 
             if (!additionalFilesAdded && hasTestCodeFilePath)
             {
-                foreach (LicenseHeaderFile file in licenseHeaderConfiguration.GetLicenseHeaderFiles(testCodeFilePath!, topLevelDirectoryName))
+                foreach (LicenseHeaderFile file in licenseHeaderConfiguration.GetLicenseHeaderFiles(normalizer.Normalize(testCodeFilePath!), topLevelDirectoryName))
                 {
                     TestState.AdditionalFiles.Add((file.FullFilePath, file.Content));
                 }

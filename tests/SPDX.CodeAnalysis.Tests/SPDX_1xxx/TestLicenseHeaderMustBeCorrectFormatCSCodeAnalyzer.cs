@@ -3,7 +3,6 @@
 
 using Microsoft.CodeAnalysis.Testing;
 using NUnit.Framework;
-using NUnit.Framework.Internal;
 using SPDX.CodeAnalysis.Tests.CSharp;
 using System;
 using System.Linq;
@@ -167,7 +166,7 @@ public class MyClass
 
             string testCodeFilePath = "project/src/baz.cs";
             string expectedTestCodeFilePath = NormalizePath(testCodeFilePath);
-            var test = new LicenseHeaderMustBeCorrectFormatTestDriver(FileSystemXml.With1OverriddenLevel, CodeLanguage.CSharp)
+            var test = new LicenseHeaderMustBeCorrectFormatTestDriver(FileSystemXml.With1OverriddenLevel, RootPathNormalizer, CodeLanguage.CSharp)
             {
                 TestCode = testCode,
                 TestCodeFilePath = testCodeFilePath,

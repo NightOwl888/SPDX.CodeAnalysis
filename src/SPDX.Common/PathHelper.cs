@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Buffers;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace SPDX.CodeAnalysis
 {
@@ -12,11 +8,19 @@ namespace SPDX.CodeAnalysis
     {
         private const int CharStackBufferSize = 64;
 
-        public static string NormalizeAndJoin(ReadOnlySpan<char> path1, ReadOnlySpan<char> path2)
+        public static string NormalizeAndCombine(ReadOnlySpan<char> path1, ReadOnlySpan<char> path2, bool ensureTrailingSlash = false)
         {
             int length = 0;
+            int rootLength = 0;
             bool hasPath1 = false, hasPath2 = false;
-            foreach (var dir in path1.SplitPath())
+            ReadOnlySpan<char> root = PathInternal.GetPathRoot(path1);
+            if (!root.IsEmpty)
+            {
+                rootLength = root.Length;
+                length += rootLength;
+                hasPath1 = true;
+            }
+            foreach (var dir in path1.Slice(rootLength).SplitPath())
             {
                 length += dir.Segment.Length + dir.Separator.Length;
                 hasPath1 = true;
@@ -30,7 +34,11 @@ namespace SPDX.CodeAnalysis
 
             // Pad by one more to ensure we have enough space to separate the paths
             if (hasPath1 && hasPath2)
-                length += 1;
+                length++;
+
+            // Pad by one more if we need to end with a slash
+            if (ensureTrailingSlash)
+                length++;
 
             char[]? arrayToReturnToPool = null;
             Span<char> buffer = length > CharStackBufferSize
@@ -38,8 +46,31 @@ namespace SPDX.CodeAnalysis
                 : stackalloc char[CharStackBufferSize];
             try
             {
-                bool path1EndsWithSlash = false;
                 int index = 0;
+                
+                if (rootLength > 0)
+                {
+                    // On Unix/macOS, / is a normal path character, so we need to preserve it. Otherwise,
+                    // correct it on Windows.
+                    if (PathInternal.DirectorySeparatorChar != PathInternal.AltDirectorySeparatorChar)
+                    {
+                        for (int i = index; i < rootLength; i++)
+                        {
+                            char c = root[i];
+                            if (c == PathInternal.AltDirectorySeparatorChar)
+                                c = PathInternal.DirectorySeparatorChar;
+
+                            buffer[index++] = c;
+                        }
+                    }
+                    else
+                    {
+                        root.CopyTo(buffer.Slice(index));
+                        index += rootLength;
+                    }
+                }
+                
+                bool path1EndsWithSlash = false;
                 foreach (var dir in path1.SplitPath())
                 {
                     if (dir.Segment.Length > 0)
@@ -57,6 +88,12 @@ namespace SPDX.CodeAnalysis
 
                 if (!hasPath2)
                 {
+                    if (ensureTrailingSlash && !path1EndsWithSlash)
+                    {
+                        buffer[index] = Path.DirectorySeparatorChar;
+                        index++;
+                    }
+                    
                     return buffer.Slice(0, index).ToString();
                 }
 
@@ -66,19 +103,27 @@ namespace SPDX.CodeAnalysis
                     index++;
                 }
 
+                bool path2EndsWithSlash = false;
+                
                 foreach (var dir in path2.SplitPath())
                 {
                     if (dir.Segment.Length > 0)
                     {
                         dir.Segment.CopyTo(buffer.Slice(index));
                         index += dir.Segment.Length;
-                        bool endsWithSlash = dir.Separator.Length > 0;
-                        if (endsWithSlash)
+                        path2EndsWithSlash = dir.Separator.Length > 0;
+                        if (path2EndsWithSlash)
                         {
                             buffer[index] = Path.DirectorySeparatorChar;
                             index++;
                         }
                     }
+                }
+
+                if (ensureTrailingSlash && !path2EndsWithSlash)
+                {
+                    buffer[index] = Path.DirectorySeparatorChar;
+                    index++;
                 }
 
                 return buffer.Slice(0, index).ToString();
