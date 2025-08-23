@@ -48,6 +48,36 @@ namespace SPDX.Common.Tests
                 // Check removal of multiple consecutive delimiters
                 yield return new object[] { new string[] { @"C:\foo\\bar\baz", @"stuff\\specialized\" }, false, @"C:\foo\bar\baz\stuff\specialized\" };
                 yield return new object[] { new string[] { @"C:\foo\\/\\bar\baz", @"stuff\\/\\specialized\" }, false, @"C:\foo\bar\baz\stuff\specialized\" };
+
+
+                // UNC paths with variations
+                yield return new object[] { new string[] { @"\\server\share", "folder" }, false, @"\\server\share\folder" };
+                yield return new object[] { new string[] { @"//server/share", "folder" }, false, @"\\server\share\folder" };
+                yield return new object[] { new string[] { @"\\server/share", "folder" }, false, @"\\server\share\folder" };
+                yield return new object[] { new string[] { @"//server\share", "folder" }, false, @"\\server\share\folder" };
+                yield return new object[] { new string[] { @"\\server\share\", "folder" }, true, @"\\server\share\folder\" };
+
+                // UNC paths with trailing slashes
+                yield return new object[] { new string[] { @"\\server\share", "" }, true, @"\\server\share\" };
+                yield return new object[] { new string[] { @"//server/share", "" }, true, @"\\server\share\" };
+
+                // UNC root only
+                yield return new object[] { new string[] { @"\\server\share", "" }, false, @"\\server\share" };
+                yield return new object[] { new string[] { @"\\server\share\", "" }, false, @"\\server\share" };
+                yield return new object[] { new string[] { @"//server/share/", "" }, false, @"\\server\share" };
+
+                // Long path prefix (\\?\)
+                yield return new object[] { new string[] { @"\\?\C:\folder", "sub" }, false, @"\\?\C:\folder\sub" };
+                yield return new object[] { new string[] { @"\\?\C:/folder/", "sub" }, true, @"\\?\C:\folder\sub\" };
+
+                // Device path prefix (\\.\)
+                yield return new object[] { new string[] { @"\\.\C:\folder", "sub" }, false, @"\\.\C:\folder\sub" };
+                yield return new object[] { new string[] { @"\\.\C:/folder/", "sub" }, true, @"\\.\C:\folder\sub\" };
+
+                // Path rooted with slash only (not technically rooted, but worth testing behavior)
+                yield return new object[] { new string[] { @"/folder", "sub" }, false, @"\folder\sub" };
+                yield return new object[] { new string[] { @"\folder", "sub" }, false, @"\folder\sub" };
+                yield return new object[] { new string[] { @"\", "sub" }, false, @"\sub" };
             }
             else // Unix-style paths
             {
