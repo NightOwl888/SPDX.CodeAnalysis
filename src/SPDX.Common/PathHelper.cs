@@ -71,7 +71,7 @@ namespace SPDX.CodeAnalysis
                 }
                 
                 bool path1EndsWithSlash = false;
-                foreach (var dir in path1.SplitPath())
+                foreach (var dir in path1.Slice(rootLength).SplitPath())
                 {
                     if (dir.Segment.Length > 0)
                     {
