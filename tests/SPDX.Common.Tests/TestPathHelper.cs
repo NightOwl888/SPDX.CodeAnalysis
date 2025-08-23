@@ -13,7 +13,7 @@ namespace SPDX.Common.Tests
             if (IsWindows)
             {
                 // Joining relative paths
-                yield return new object[] { new string[] { "foo", "bar" }, false, "foo\bar" };
+                yield return new object[] { new string[] { "foo", "bar" }, false, @"foo\bar" };
                 yield return new object[] { new string[] { "foo/bar/baz", "stuff" }, false, @"foo\bar\baz\stuff" };
                 yield return new object[] { new string[] { @"foo\bar\baz", "stuff" }, false, @"foo\bar\baz\stuff" };
                 yield return new object[] { new string[] { @"foo\bar\baz", "" }, true, @"foo\bar\baz\" };
