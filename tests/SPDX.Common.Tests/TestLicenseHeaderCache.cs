@@ -417,17 +417,29 @@ Special2 line3]]></file>
 
         private static LicenseHeaderCache InitializeCache(string fileSystemXml, string codeFilePath, string topLevelDirectoryName)
         {
-            var fileSystem = new FsmlFileSystem(fileSystemXml);
-            var reader = new LicenseHeaderConfigurationReader(fileSystem);
+            var fileSystem = new FsmlFileSystem(fileSystemXml, rootPathNormalizer);
+            var reader = new LicenseHeaderConfigurationReader(fileSystem, rootPathNormalizer);
             var loader = new LicenseHeaderCacheLoader(reader, codeFilePath);
             var cache = new LicenseHeaderCache(loader.LoadLicenseHeaders(topLevelDirectoryName));
 
             return cache;
         }
+        
+        private static IRootPathNormalizer rootPathNormalizer;
 
-        private static string NormalizePath(string path)
+        [OneTimeSetUp]
+        public static void OneTimeSetUp()
         {
-            return Path.GetFullPath(path);
+            rootPathNormalizer = new RootPathNormalizer(TestContext.CurrentContext.TestDirectory);
         }
+
+        [OneTimeTearDown]
+        public static void OneTimeTearDown()
+        {
+            rootPathNormalizer = null!;
+        }
+        
+
+        public static string NormalizePath(string path) => rootPathNormalizer.Normalize(path);
     }
 }

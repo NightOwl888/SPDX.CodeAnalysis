@@ -15,16 +15,19 @@ namespace SPDX.CodeAnalysis
     public class LicenseHeaderConfigurationReader : ILicenseHeaderConfigurationReader
     {
         private readonly IFileSystem fileSystem;
+        private readonly IRootPathNormalizer normalizer;
 
-        public LicenseHeaderConfigurationReader(IFileSystem fileSystem)
+        public LicenseHeaderConfigurationReader(IFileSystem fileSystem, IRootPathNormalizer normalizer)
         {
             this.fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            this.normalizer = normalizer ?? throw new ArgumentNullException(nameof(normalizer));
         }
 
         /// <inheritdoc/>
         public IEnumerable<LicenseHeaderFile> GetLicenseHeaderFiles(string codeFilePath, string topLevelDirectoryName)
         {
-            string root = FindLicenseHeaderRootDirectory(codeFilePath, topLevelDirectoryName.AsSpan());
+            string absoluteCodeFilePath = normalizer.Normalize(codeFilePath);
+            string root = FindLicenseHeaderRootDirectory(absoluteCodeFilePath, topLevelDirectoryName.AsSpan());
             if (!string.IsNullOrEmpty(root))
             {
                 return GetLicenseHeaderFilesWithinRoot(root, topLevelDirectoryName);
@@ -69,11 +72,11 @@ namespace SPDX.CodeAnalysis
         {
             ReadOnlySpan<char> root = default;
             // NOTE: This currently only supports full file paths, not directory paths.
-            ReadOnlySpan<char> current = PathHelper.GetDirectoryName(Path.GetFullPath(codeFilePath).AsSpan());
+            ReadOnlySpan<char> current = PathHelper.GetDirectoryName(codeFilePath.AsSpan());
 
             while (!current.IsEmpty)
             {
-                string candidate = PathHelper.NormalizeAndJoin(current, topLevelDirectoryName);
+                string candidate = PathHelper.NormalizeAndCombine(current, topLevelDirectoryName);
                 if (fileSystem.DirectoryExists(candidate))
                 {
                     root = current; // keep updating as we go up

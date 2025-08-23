@@ -2,10 +2,9 @@
 // found in the LICENSE.txt file or at https://opensource.org/licenses/MIT.
 
 using Microsoft.CodeAnalysis;
-using System;
+using NUnit.Framework;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace SPDX.CodeAnalysis.Tests
@@ -33,9 +32,23 @@ namespace SPDX.CodeAnalysis.Tests
 
         public abstract FileSystemXml FileSystemXml { get; }
 
+        private static IRootPathNormalizer rootPathNormalizer;
 
+        public static IRootPathNormalizer RootPathNormalizer => rootPathNormalizer;
 
-        public static string NormalizePath(string path) => Path.GetFullPath(path);
+        [OneTimeSetUp]
+        public static void OneTimeSetUp()
+        {
+            rootPathNormalizer = new RootPathNormalizer(TestContext.CurrentContext.TestDirectory);
+        }
+
+        public static void OneTimeTearDown()
+        {
+            rootPathNormalizer = null;
+        }
+        
+
+        public static string NormalizePath(string path) => rootPathNormalizer.Normalize(path);
 
         public static string FormatMessage(LocalizableString messageFormat, params object[] args)
         {
@@ -65,7 +78,7 @@ namespace SPDX.CodeAnalysis.Tests
 
         public async Task RunTestAsync(string fileSystemXml, string testCode, string testCodeFilePath, IList<string>? enabledDiagnostics, IList<DiagnosticResult>? expectedDiagnostics, bool suppressLocation = false)
         {
-            var test = new LicenseHeaderMustBeCorrectFormatTestDriver(fileSystemXml, Language, suppressLocation)
+            var test = new LicenseHeaderMustBeCorrectFormatTestDriver(fileSystemXml, rootPathNormalizer, Language, suppressLocation)
             {
                 TestCode = testCode,
                 TestCodeFilePath = testCodeFilePath,

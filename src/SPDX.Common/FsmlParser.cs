@@ -11,37 +11,39 @@ namespace SPDX.CodeAnalysis
 {
     public static class FsmlParser
     {
-        public static Dictionary<string, IDictionary<string, string>> Parse(string xml)
+        public static Dictionary<string, IDictionary<string, string>> Parse(string xml, IRootPathNormalizer normalizer)
         {
             using var reader = new StringReader(xml);
-            return Parse(reader);
+            return Parse(reader, normalizer);
         }
 
-        public static Dictionary<string, IDictionary<string, string>> Parse(Stream xmlStream)
+        public static Dictionary<string, IDictionary<string, string>> Parse(Stream xmlStream, IRootPathNormalizer normalizer)
         {
             using var reader = new StreamReader(xmlStream);
-            return Parse(reader);
+            return Parse(reader, normalizer);
         }
 
-        private static Dictionary<string, IDictionary<string, string>> Parse(TextReader reader)
+        private static Dictionary<string, IDictionary<string, string>> Parse(TextReader reader, IRootPathNormalizer normalizer)
         {
+            if (normalizer is null)
+                throw new ArgumentNullException(nameof(normalizer));
+            
             var doc = XDocument.Load(reader);
             var result = new Dictionary<string, IDictionary<string, string>>(StringComparer.Ordinal);
 
             var rootDirectory = doc.Root?.Elements().FirstOrDefault() ?? throw new InvalidOperationException("Root directory missing");
-            ParseDirectory(rootDirectory, ".", result);
+            ParseDirectory(rootDirectory, normalizer.RootPath, result);
             return result;
         }
 
-        private static void ParseDirectory(XElement dirElement, string currentPath, Dictionary<string, IDictionary<string, string>> result)
+        private static void ParseDirectory(XElement dirElement, string currentAbsolutePath, Dictionary<string, IDictionary<string, string>> result)
         {
-            string dirName = dirElement.Attribute("name")?.Value ?? throw new InvalidOperationException("Directory missing name");
-            //string fullPath = Path.Combine(currentPath.Replace('/', Path.DirectorySeparatorChar), dirName);
-            string rootedDirectory = Path.GetFullPath(currentPath);
-            string fullPath = PathHelper.NormalizeAndJoin(rootedDirectory.AsSpan(), dirName.AsSpan());
-            //string fullPath = Path.GetFullPath(PathHelper.NormalizeAndJoin(currentPath.AsSpan(), dirName.AsSpan()));
+            string dirName = dirElement.Attribute("name")?.Value
+                             ?? throw new InvalidOperationException("Directory missing name");
+            
+            string fullPath = PathHelper.NormalizeAndCombine(currentAbsolutePath.AsSpan(), dirName.AsSpan());
+            
             var files = new Dictionary<string, string>(StringComparer.Ordinal);
-
             foreach (var file in dirElement.Elements("file"))
             {
                 string name = file.Attribute("name")?.Value ?? throw new InvalidOperationException("File missing name");

@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace SPDX.CodeAnalysis
@@ -119,14 +118,13 @@ namespace SPDX.CodeAnalysis
                 }
             }
 
-            public FallbackTreeNode? FindBestMatch(string codeFilePath)
+            public FallbackTreeNode? FindBestMatch(string absoluteCodeFilePath)
             {
                 FallbackTreeNode? best = null;
-                string normalizedCodeFilePath = Path.GetFullPath(codeFilePath);
-
+                
                 void Search(FallbackTreeNode node)
                 {
-                    if (normalizedCodeFilePath.StartsWith(node.MatchDirectoryPath, StringComparison.Ordinal))
+                    if (absoluteCodeFilePath.StartsWith(node.MatchDirectoryPath, StringComparison.Ordinal))
                     {
                         if (best == null || node.MatchDirectoryPath.Length > best.MatchDirectoryPath.Length)
                         {

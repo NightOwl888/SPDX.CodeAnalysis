@@ -145,7 +145,9 @@ namespace SPDX.CodeAnalysis
                 return false;
 
             // Using PathInternal ensures that on Unix/macOS we will preserve backslash characters because they are valid in file names
-            var index = span.IndexOfAny(PathInternal.DirectorySeparatorChar, PathInternal.AltDirectorySeparatorChar);
+            int index = PathInternal.DirectorySeparatorChar == PathInternal.AltDirectorySeparatorChar ?
+                span.IndexOf(PathInternal.DirectorySeparatorChar) :
+                span.IndexOfAny(PathInternal.DirectorySeparatorChar, PathInternal.AltDirectorySeparatorChar);
             if (index == -1) // The string is composed of only one line
             {
                 _str = ReadOnlySpan<char>.Empty; // The remaining string is an empty string
