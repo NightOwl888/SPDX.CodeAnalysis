@@ -14,11 +14,14 @@ namespace SPDX.CodeAnalysis
             //bool IsDevice(ReadOnlySpan<char> path);
             //bool IsDeviceUNC(ReadOnlySpan<char> path);
             //bool IsExtended(ReadOnlySpan<char> path);
+
+            int GetRootSegmentLength(ReadOnlySpan<char> path);
             int GetRootLength(ReadOnlySpan<char> path);
             bool IsDirectorySeparator(char c);
             bool IsEffectivelyEmpty(ReadOnlySpan<char> path);
 
             bool IsPathRooted(ReadOnlySpan<char> path);
+            ReadOnlySpan<char> GetRootSegment(ReadOnlySpan<char> path);
             ReadOnlySpan<char> GetPathRoot(ReadOnlySpan<char> path);
 
             char DirectorySeparatorChar { get; }
@@ -204,6 +207,76 @@ namespace SPDX.CodeAnalysis
                 int pathRoot = PathInternal.GetRootLength(path);
                 return pathRoot <= 0 ? ReadOnlySpan<char>.Empty : path.Slice(0, pathRoot);
             }
+
+
+            /// <summary>
+            /// Gets the length of the root of the path (drive, share, etc.) excluding any folder names or trailing slashes.
+            /// </summary>
+            public int GetRootSegmentLength(ReadOnlySpan<char> path)
+            {
+                int pathLength = path.Length;
+                if (pathLength == 0) return 0;
+
+                bool deviceSyntax = IsDevice(path);
+                bool deviceUnc = deviceSyntax && IsDeviceUNC(path);
+
+                // (A) UNC or simple rooted (NOT \\?\C:\...)
+                if ((!deviceSyntax || deviceUnc) && IsDirectorySeparator(path[0]))
+                {
+                    // UNC: (\\ or //) OR device UNC (\\?\UNC\ or //?/UNC/)
+                    if (deviceUnc || (pathLength > 1 && IsDirectorySeparator(path[1])))
+                    {
+                        // We want: prefix + server (exclude share)
+                        int prefixLen = deviceUnc ? UncExtendedPrefixLength : UncPrefixLength; // after "\\?\UNC\" or "\\"/ "//"
+                        int i = prefixLen;
+
+                        // Take the server name only
+                        while (i < pathLength && !IsDirectorySeparator(path[i]))
+                            i++;
+
+                        // Special-case: If we have multiple slashes between UNC and sever name, we may end up catching the \ from UncExtendedPrefixLength.
+                        // We need to trim off the \ to be consistent. In this case, we don't return the server name.
+                        if (deviceUnc && i == UncExtendedPrefixLength)
+                            i--;
+
+                        // Result: "\\server" or "//server" or "\\?\UNC\server"
+                        return i;
+                    }
+                    else
+                    {
+                        // Current-drive rooted: "\" or "/"
+                        return 1;
+                    }
+                }
+
+                // (B) Device / extended (\\?\..., \\.\..., //?/..., //./...)
+                if (deviceSyntax)
+                {
+                    // We want the first token after the device prefix:
+                    //   \\?\C:            -> \\?\C:
+                    //   \\?\Volume{GUID}  -> \\?\Volume{GUID}
+                    //   \\.\pipe\name     -> \\.\pipe
+                    int i = DevicePrefixLength;
+                    while (i < pathLength && !IsDirectorySeparator(path[i]))
+                        i++;
+                    return i; // do NOT include the separator
+                }
+
+                // (C) Drive letter (C:, C:\, C:/, C:foo)
+                if (pathLength >= 2 && path[1] == VolumeSeparatorChar && IsValidDriveChar(path[0]))
+                {
+                    // Always just "C:" as the root segment (no slash)
+                    return 2;
+                }
+
+                return 0;
+            }
+
+            public ReadOnlySpan<char> GetRootSegment(ReadOnlySpan<char> path)
+            {
+                int len = GetRootSegmentLength(path);
+                return len <= 0 ? ReadOnlySpan<char>.Empty : path.Slice(0, len);
+            }
         }
 
         private sealed class Unix : IPath
@@ -244,6 +317,16 @@ namespace SPDX.CodeAnalysis
             {
                 return IsPathRooted(path) ? DirectorySeparatorCharAsString.AsSpan() : ReadOnlySpan<char>.Empty;
             }
+
+            public int GetRootSegmentLength(ReadOnlySpan<char> path)
+            {
+                return path.Length > 0 && IsDirectorySeparator(path[0]) ? 1 : 0;
+            }
+
+            public ReadOnlySpan<char> GetRootSegment(ReadOnlySpan<char> path)
+            {
+                return IsPathRooted(path) ? DirectorySeparatorCharAsString.AsSpan() : ReadOnlySpan<char>.Empty;
+            }
         }
 
 
@@ -264,6 +347,9 @@ namespace SPDX.CodeAnalysis
         internal static bool IsPathRooted(ReadOnlySpan<char> path) => osPath.IsPathRooted(path);
 
         internal static ReadOnlySpan<char> GetPathRoot(ReadOnlySpan<char> path) => osPath.GetPathRoot(path);
+
+        internal static int GetRootSegmentLength(ReadOnlySpan<char> path) => osPath.GetRootSegmentLength(path);
+        internal static ReadOnlySpan<char> GetRootSegment(ReadOnlySpan<char> path) => osPath.GetRootSegment(path);
 
         internal static char DirectorySeparatorChar => osPath.DirectorySeparatorChar;
         internal static char AltDirectorySeparatorChar => osPath.AltDirectorySeparatorChar;
