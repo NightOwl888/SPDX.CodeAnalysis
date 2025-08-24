@@ -11,16 +11,8 @@ namespace SPDX.CodeAnalysis
         public static string NormalizeAndCombine(ReadOnlySpan<char> path1, ReadOnlySpan<char> path2, bool ensureTrailingSlash = false)
         {
             int length = 0;
-            int rootLength = 0;
             bool hasPath1 = false, hasPath2 = false;
-            ReadOnlySpan<char> root = PathInternal.GetPathRoot(path1);
-            if (!root.IsEmpty)
-            {
-                rootLength = root.Length;
-                length += rootLength;
-                hasPath1 = true;
-            }
-            foreach (var dir in path1.Slice(rootLength).SplitPath())
+            foreach (var dir in path1.SplitPath())
             {
                 length += dir.Segment.Length + dir.Separator.Length;
                 hasPath1 = true;
@@ -48,47 +40,64 @@ namespace SPDX.CodeAnalysis
             {
                 bool path1EndsWithSlash = false;
                 int index = 0;
-                
-                if (rootLength > 0)
+                bool hasAltSlash = PathInternal.DirectorySeparatorChar != PathInternal.AltDirectorySeparatorChar;
+                if (hasAltSlash) // Windows-style paths
                 {
-                    // On Unix/macOS, / is a normal path character, so we need to preserve it. Otherwise,
-                    // correct it on Windows.
-                    if (PathInternal.DirectorySeparatorChar != PathInternal.AltDirectorySeparatorChar)
+                    foreach (var dir in path1.SplitPath())
                     {
-                        for (int i = index; i < rootLength; i++)
+                        int segmentLength = dir.Segment.Length;
+                        if (segmentLength > 0)
                         {
-                            char c = root[i];
-                            if (c == PathInternal.AltDirectorySeparatorChar)
-                                c = PathInternal.DirectorySeparatorChar;
+                            if (dir.IsRoot)
+                            {
+                                for (int i = index; i < segmentLength; i++)
+                                {
+                                    char c = dir.Segment[i];
+                                    if (c == PathInternal.AltDirectorySeparatorChar)
+                                        c = PathInternal.DirectorySeparatorChar;
 
-                            buffer[index++] = c;
-                            if (i == rootLength - 1)
-                                path1EndsWithSlash = c == PathInternal.DirectorySeparatorChar;
-                        }
-                    }
-                    else
-                    {
-                        for (int i = index; i < rootLength; i++)
-                        {
-                            char c = root[i];
-                            buffer[index++] = c;
-                            if (i == rootLength - 1)
-                                path1EndsWithSlash = c == PathInternal.DirectorySeparatorChar;
+                                    buffer[index++] = c;
+                                    // Should never happen, but just being vigilent so we don't duplicate separators
+                                    if (i == segmentLength - 1)
+                                        path1EndsWithSlash = c == PathInternal.DirectorySeparatorChar;
+                                }
+                            }
+                            else
+                            {
+                                dir.Segment.CopyTo(buffer.Slice(index));
+                                index += dir.Segment.Length;
+                            }
+
+                            path1EndsWithSlash = dir.Separator.Length > 0;
+                            if (path1EndsWithSlash)
+                            {
+                                buffer[index] = Path.DirectorySeparatorChar;
+                                index++;
+                            }
                         }
                     }
                 }
-                
-                foreach (var dir in path1.Slice(rootLength).SplitPath())
+                else // Unix-style paths
                 {
-                    if (dir.Segment.Length > 0)
+                    foreach (var dir in path1.SplitPath())
                     {
-                        dir.Segment.CopyTo(buffer.Slice(index));
-                        index += dir.Segment.Length;
-                        path1EndsWithSlash = dir.Separator.Length > 0;
-                        if (path1EndsWithSlash)
+                        if (dir.Segment.Length > 0)
                         {
+                            dir.Segment.CopyTo(buffer.Slice(index));
+                            index += dir.Segment.Length;
+                            path1EndsWithSlash = dir.Separator.Length > 0;
+                            if (path1EndsWithSlash)
+                            {
+                                buffer[index] = Path.DirectorySeparatorChar;
+                                index++;
+                            }
+                        }
+                        else if (dir.IsRoot)
+                        {
+                            // The flag is enough to indicate we need to write a single /
                             buffer[index] = Path.DirectorySeparatorChar;
                             index++;
+                            path1EndsWithSlash = true;
                         }
                     }
                 }

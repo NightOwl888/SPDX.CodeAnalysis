@@ -63,8 +63,14 @@ namespace SPDX.Common.Tests
 
                 // UNC root only
                 yield return new object[] { new string[] { @"\\server\share", "" }, false, @"\\server\share" };
-                yield return new object[] { new string[] { @"\\server\share\", "" }, false, @"\\server\share" };
-                yield return new object[] { new string[] { @"//server/share/", "" }, false, @"\\server\share" };
+                yield return new object[] { new string[] { @"\\server\share\", "" }, false, @"\\server\share\" };
+                yield return new object[] { new string[] { @"//server/share/", "" }, false, @"\\server\share\" };
+
+                // UNC with multiple slashes
+                yield return new object[] { new string[] { @"\\server\\share", "folder" }, false, @"\\server\share\folder" };
+                yield return new object[] { new string[] { @"//server//share", "folder" }, false, @"\\server\share\folder" };
+                yield return new object[] { new string[] { @"\\server\\/\\share", "folder" }, false, @"\\server\share\folder" };
+                yield return new object[] { new string[] { @"//server//\//share", "folder" }, false, @"\\server\share\folder" };
 
                 // Long path prefix (\\?\)
                 yield return new object[] { new string[] { @"\\?\C:\folder", "sub" }, false, @"\\?\C:\folder\sub" };
@@ -74,10 +80,17 @@ namespace SPDX.Common.Tests
                 yield return new object[] { new string[] { @"\\.\C:\folder", "sub" }, false, @"\\.\C:\folder\sub" };
                 yield return new object[] { new string[] { @"\\.\C:/folder/", "sub" }, true, @"\\.\C:\folder\sub\" };
 
-                // Path rooted with slash only (not technically rooted, but worth testing behavior)
-                yield return new object[] { new string[] { @"/folder", "sub" }, false, @"\folder\sub" };
-                yield return new object[] { new string[] { @"\folder", "sub" }, false, @"\folder\sub" };
-                yield return new object[] { new string[] { @"\", "sub" }, false, @"\sub" };
+                // Drive-relative paths (C:foo\bar, C:.foo\bar, C:..foo\bar)
+                yield return new object[] { new string[] { @"C:foo", "sub" }, false, @"C:foo\sub" };
+                yield return new object[] { new string[] { @"C:.foo", "sub" }, false, @"C:.foo\sub" };
+                yield return new object[] { new string[] { @"C:..foo", "sub" }, false, @"C:..foo\sub" };
+                yield return new object[] { new string[] { @"C:..foo", "sub" }, true, @"C:..foo\sub\" };
+                yield return new object[] { new string[] { @"C:foo\bar", "sub" }, false, @"C:foo\bar\sub" };
+                yield return new object[] { new string[] { @"C:.foo\bar", "sub" }, false, @"C:.foo\bar\sub" };
+                yield return new object[] { new string[] { @"C:..foo\bar", "sub" }, false, @"C:..foo\bar\sub" };
+                yield return new object[] { new string[] { @"C:foo/bar", "sub" }, false, @"C:foo\bar\sub" };
+                yield return new object[] { new string[] { @"C:.foo/bar", "sub" }, false, @"C:.foo\bar\sub" };
+                yield return new object[] { new string[] { @"C:..foo/bar", "sub" }, false, @"C:..foo\bar\sub" };
             }
             else // Unix-style paths
             {
