@@ -128,11 +128,13 @@ namespace SPDX.CodeAnalysis
     public ref struct PathSplitEnumerator
     {
         private ReadOnlySpan<char> _str;
+        private bool rootProcessed;
 
         public PathSplitEnumerator(ReadOnlySpan<char> str)
         {
             _str = str;
             Current = default;
+            rootProcessed = false;
         }
 
         // Needed to be compatible with the foreach operator
@@ -143,6 +145,45 @@ namespace SPDX.CodeAnalysis
             var span = _str;
             if (span.Length == 0) // Reach the end of the string
                 return false;
+
+            if (!rootProcessed && PathInternal.IsPathRooted(span))
+            {
+                rootProcessed = true;
+                ReadOnlySpan<char> root = PathInternal.GetPathRoot(span);
+                int rootLength = root.Length;
+                // Take at most 1 extra character (always a slash) as the separator for the root. We consider any duplicate slashes as
+                // empty segments with separators, which can be filtered out by ensuring that the segment is not empty.
+                char lastChar = root[rootLength - 1];
+                bool rootEndsWithSlash = lastChar == PathInternal.DirectorySeparatorChar || lastChar == PathInternal.AltDirectorySeparatorChar;
+                if (rootEndsWithSlash)
+                {
+                    Current = new PathSplitEntry(root.Slice(0, rootLength - 1), root.Slice(rootLength - 1, 1), isRoot: true);
+                    _str = span.Slice(rootLength);
+                    return true;
+                }
+                else
+                {
+                    bool nextCharIsSlash = false;
+                    bool hasNextChar = span.Length > rootLength;
+                    if (hasNextChar)
+                    {
+                        char nextChar = span[rootLength];
+                        nextCharIsSlash = nextChar == PathInternal.DirectorySeparatorChar || nextChar == PathInternal.AltDirectorySeparatorChar;
+                    }
+                    if (!hasNextChar || !nextCharIsSlash)
+                    {
+                        Current = new PathSplitEntry(root, ReadOnlySpan<char>.Empty, isRoot: true);
+                        _str = span.Slice(rootLength);
+                        return true;
+                    }
+
+                    Current = new PathSplitEntry(root, span.Slice(rootLength, 1), isRoot: true);
+                    _str = span.Slice(rootLength + 1);
+                    return true;
+                }
+            }
+            // We can only process the root if it is at the beginning, so anything beyond this is not a root.
+            rootProcessed |= true;
 
             // Using PathInternal ensures that on Unix/macOS we will preserve backslash characters because they are valid in file names
             int index = PathInternal.DirectorySeparatorChar == PathInternal.AltDirectorySeparatorChar ?
@@ -165,27 +206,31 @@ namespace SPDX.CodeAnalysis
 
     public readonly ref struct PathSplitEntry
     {
-        public PathSplitEntry(ReadOnlySpan<char> line, ReadOnlySpan<char> separator)
+        public PathSplitEntry(ReadOnlySpan<char> line, ReadOnlySpan<char> separator, bool isRoot = false)
         {
             Segment = line;
             Separator = separator;
+            IsRoot = isRoot;
         }
 
         public ReadOnlySpan<char> Segment { get; }
         public ReadOnlySpan<char> Separator { get; }
 
+        public bool IsRoot { get; }
+
         // This method allow to deconstruct the type, so you can write any of the following code
-        // foreach (var entry in str.SplitLines()) { _ = entry.Line; }
-        // foreach (var (segment, separator) in str.SplitLines()) { _ = line; }
+        // foreach (var entry in str.SplitPath()) { _ = entry.Segment; }
+        // foreach (var (segment, separator, isRoot) in str.SplitPath()) { _ = line; }
         // https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/functional/deconstruct?WT.mc_id=DT-MVP-5003978#deconstructing-user-defined-types
-        public void Deconstruct(out ReadOnlySpan<char> segment, out ReadOnlySpan<char> separator)
+        public void Deconstruct(out ReadOnlySpan<char> segment, out ReadOnlySpan<char> separator, out bool isRoot)
         {
             segment = Segment;
             separator = Separator;
+            isRoot = IsRoot;
         }
 
         // This method allow to implicitly cast the type into a ReadOnlySpan<char>, so you can write the following code
-        // foreach (ReadOnlySpan<char> entry in str.SplitLines())
+        // foreach (ReadOnlySpan<char> entry in str.SplitPath())
         public static implicit operator ReadOnlySpan<char>(PathSplitEntry entry) => entry.Segment;
     }
 }
