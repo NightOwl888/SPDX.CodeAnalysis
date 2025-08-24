@@ -40,34 +40,16 @@ namespace SPDX.CodeAnalysis
             {
                 bool path1EndsWithSlash = false;
                 int index = 0;
-                bool hasAltSlash = PathInternal.DirectorySeparatorChar != PathInternal.AltDirectorySeparatorChar;
-                if (hasAltSlash) // Windows-style paths
+
+                foreach (var dir in path1.SplitPath())
                 {
-                    foreach (var dir in path1.SplitPath())
+                    int segmentLength = dir.Segment.Length;
+                    if (!dir.IsRoot)
                     {
-                        int segmentLength = dir.Segment.Length;
                         if (segmentLength > 0)
                         {
-                            if (dir.IsRoot)
-                            {
-                                for (int i = index; i < segmentLength; i++)
-                                {
-                                    char c = dir.Segment[i];
-                                    if (c == PathInternal.AltDirectorySeparatorChar)
-                                        c = PathInternal.DirectorySeparatorChar;
-
-                                    buffer[index++] = c;
-                                    // Should never happen, but just being vigilent so we don't duplicate separators
-                                    if (i == segmentLength - 1)
-                                        path1EndsWithSlash = c == PathInternal.DirectorySeparatorChar;
-                                }
-                            }
-                            else
-                            {
-                                dir.Segment.CopyTo(buffer.Slice(index));
-                                index += dir.Segment.Length;
-                            }
-
+                            dir.Segment.CopyTo(buffer.Slice(index));
+                            index += segmentLength;
                             path1EndsWithSlash = dir.Separator.Length > 0;
                             if (path1EndsWithSlash)
                             {
@@ -76,25 +58,31 @@ namespace SPDX.CodeAnalysis
                             }
                         }
                     }
-                }
-                else // Unix-style paths
-                {
-                    foreach (var dir in path1.SplitPath())
+                    else
                     {
-                        if (dir.Segment.Length > 0)
+                        // Windows-style root
+                        if (PathInternal.DirectorySeparatorChar != PathInternal.AltDirectorySeparatorChar)
                         {
-                            dir.Segment.CopyTo(buffer.Slice(index));
-                            index += dir.Segment.Length;
+                            for (int i = index; i < segmentLength; i++)
+                            {
+                                char c = dir.Segment[i];
+                                // The alternate char is never valid in a Windows root, so we always replace it
+                                if (c == PathInternal.AltDirectorySeparatorChar)
+                                    c = PathInternal.DirectorySeparatorChar;
+
+                                buffer[index] = c;
+                                index++;
+                            }
                             path1EndsWithSlash = dir.Separator.Length > 0;
                             if (path1EndsWithSlash)
                             {
-                                buffer[index] = Path.DirectorySeparatorChar;
+                                buffer[index] = PathInternal.DirectorySeparatorChar;
                                 index++;
                             }
                         }
-                        else if (dir.IsRoot)
+                        else // Unix-style root
                         {
-                            // The flag is enough to indicate we need to write a single /
+                            // The IsRoot flag is enough to indicate we need to write a single /
                             buffer[index] = Path.DirectorySeparatorChar;
                             index++;
                             path1EndsWithSlash = true;

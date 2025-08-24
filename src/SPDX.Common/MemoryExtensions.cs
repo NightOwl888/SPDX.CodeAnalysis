@@ -149,19 +149,10 @@ namespace SPDX.CodeAnalysis
             if (!rootProcessed && PathInternal.IsPathRooted(span))
             {
                 rootProcessed = true;
-                ReadOnlySpan<char> root = PathInternal.GetPathRoot(span);
+                ReadOnlySpan<char> root = PathInternal.GetRootSegment(span);
                 int rootLength = root.Length;
-                // Take at most 1 extra character (always a slash) as the separator for the root. We consider any duplicate slashes as
-                // empty segments with separators, which can be filtered out by ensuring that the segment is not empty.
-                char lastChar = root[rootLength - 1];
-                bool rootEndsWithSlash = lastChar == PathInternal.DirectorySeparatorChar || lastChar == PathInternal.AltDirectorySeparatorChar;
-                if (rootEndsWithSlash)
-                {
-                    Current = new PathSplitEntry(root.Slice(0, rootLength - 1), root.Slice(rootLength - 1, 1), isRoot: true);
-                    _str = span.Slice(rootLength);
-                    return true;
-                }
-                else
+                // Windows-style root
+                if (PathInternal.DirectorySeparatorChar != PathInternal.AltDirectorySeparatorChar)
                 {
                     bool nextCharIsSlash = false;
                     bool hasNextChar = span.Length > rootLength;
@@ -177,10 +168,17 @@ namespace SPDX.CodeAnalysis
                         return true;
                     }
 
+                    // If the next segment begins with a slash, include it as a separator.
                     Current = new PathSplitEntry(root, span.Slice(rootLength, 1), isRoot: true);
                     _str = span.Slice(rootLength + 1);
                     return true;
                 }
+
+                // Unix never returns a separator, since any additional slashes should be their own zero-length segment.
+                // The first slash is part of the segment, not considered a separator.
+                Current = new PathSplitEntry(root, ReadOnlySpan<char>.Empty, isRoot: true);
+                _str = span.Slice(rootLength);
+                return true;
             }
             // We can only process the root if it is at the beginning, so anything beyond this is not a root.
             rootProcessed |= true;

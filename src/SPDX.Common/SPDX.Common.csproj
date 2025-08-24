@@ -17,4 +17,8 @@
     <PackageReference Include="System.Memory" Version="$(SystemMemoryPackageReferenceVersion)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="SPDX.Common.Tests"/>
+  </ItemGroup>
+
 </Project>
