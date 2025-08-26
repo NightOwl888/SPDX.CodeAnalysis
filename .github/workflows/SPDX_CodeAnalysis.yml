@@ -1,4 +1,4 @@
-name: SPDX.CodeAnalysis
+﻿name: SPDX.CodeAnalysis
 
 on:
   workflow_dispatch:
@@ -154,6 +154,9 @@ jobs:
           $resultsRootDir = "$env:WORKPATH/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}"
           New-Item -ItemType Directory -Force -Path $resultsRootDir | Out-Null
 
+          $failedProjects = @()
+          $crashedProjects  = @()
+
           Get-ChildItem -Directory $env:WORKPATH | ForEach-Object {
               $dllPath = Join-Path $_.FullName ($_.Name + ".dll")
               $resultsDirectory = Join-Path $resultsRootDir $_.Name
@@ -165,12 +168,51 @@ jobs:
                       --logger:"console;verbosity=normal" `
                       --logger:"trx;LogFileName=TestResults.trx" `
                       --results-directory $resultsDirectory `
+                      --blame-hang-timeout 10m `
+                      --blame-hang-dump-type mini `
+                      --blame-crash `
                       -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
+
+                  if ($LASTEXITCODE -ne 0) {
+                      $failedProjects += $_.Name
+                  }
+
+                  # Look for blame crash/hang markers in test result logs
+                  $trxFile = Join-Path $resultsDirectory "TestResults.trx"
+                  if (Test-Path $trxFile) {
+                      $content = Get-Content $trxFile -Raw
+                      if ($content -match "ABORTED|CRASHED|HANG") {
+                          $crashedProjects += $_.Name
+                      }
+                  }
               }
           }
 
+          # Store failure state for later steps
+          if ($failedProjects.Count -gt 0 -or $crashedProjects -gt 0) {
+              Add-Content $env:GITHUB_ENV "`nTESTS_FAILED=true"
+          }
+
+          # Write summary
+          Add-Content $env:GITHUB_STEP_SUMMARY "## Test Results`n"
+
+          if ($failedProjects.Count -gt 0) {
+              Add-Content $env:GITHUB_STEP_SUMMARY "❌ Failed Projects:`n- " + ($failedProjects -join "`n- ")
+          } else {
+              Add-Content $env:GITHUB_STEP_SUMMARY "✅ All projects passed unit tests."
+          }
+
+          if ($crashedProjects.Count -gt 0) {
+              Add-Content $env:GITHUB_STEP_SUMMARY "`n⚠️ Crashed/Hung Projects:`n- " + ($crashedProjects -join "`n- ")
+          }
+
       - name: Upload Test Results
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.arch }}
           path: ${{ env.WORKPATH }}/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}
+
+      - name: Report Test Failure
+        if: env.TESTS_FAILED == 'true'
+        run: exit 1
