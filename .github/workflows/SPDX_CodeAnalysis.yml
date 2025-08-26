@@ -30,16 +30,37 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build -c Release --no-restore
+        shell: pwsh
+        run: |
+          $nugetOut = "$(Join-Path $PWD 'dist/nuget')"
+          dotnet build -c Release --no-restore -p:PackageOutputPath=$nugetOut
 
-      - name: Test
-        run: dotnet test -c Release --no-build
+      - name: Publish test assemblies
+        shell: pwsh
+        run: |
+          $testsOut = "$(Join-Path $PWD 'dist/tests')"
+          New-Item -ItemType Directory -Force -Path $testsOut | Out-Null
+          Get-ChildItem -Recurse -Filter *.csproj -Path test | ForEach-Object {
+              $projName = $_.BaseName
+              $outDir = Join-Path $testsOut $projName
+              dotnet publish $_.FullName -c Release --no-restore -o $outDir
+          }
 
-      - name: Pack
-        run: dotnet pack -c Release --no-build -o dist/nuget
+      - name: Collect NuGet packages
+        shell: pwsh
+        run: |
+          $nugetOut = "$(Join-Path $PWD 'dist/nuget')"
+          New-Item -ItemType Directory -Force -Path $nugetOut | Out-Null
+          Get-ChildItem -Recurse -Filter *.nupkg | Copy-Item -Destination $nugetOut -Force
 
-      - name: Upload artifacts
+      - name: Upload NuGet packages
         uses: actions/upload-artifact@v4
         with:
           name: nuget-packages
           path: dist/nuget
+
+      - name: Upload test assemblies
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-assemblies
+          path: dist/tests
