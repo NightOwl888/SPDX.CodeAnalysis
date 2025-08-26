@@ -174,18 +174,9 @@ jobs:
                       --blame-crash `
                       -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
 
-                  #if ($LASTEXITCODE -ne 0) {
-                  #    $failedProjects += $_.Name
-                  #}
-
                   # Look for blame crash/hang markers in test result logs
                   $trxFile = Join-Path $resultsDirectory "TestResults.trx"
                   if (Test-Path $trxFile) {
-                      #$content = Get-Content $trxFile -Raw
-                      #if ($content -match "ABORTED|CRASHED|HANG") {
-                      #    $crashedProjects += $_.Name
-                      #}
-
                       $reader = [System.Xml.XmlReader]::Create($trxFile)
                       try
                       {
@@ -203,19 +194,6 @@ jobs:
                                       $passedCount = $reader.GetAttribute('passed')
                                       $ignoredCount = (([int]$reader.GetAttribute('total')) - ([int]$reader.GetAttribute('executed'))).ToString()
                                       $countersFound = $true
-
-                                      # Store result for reporting
-                                      #$results += [PSCustomObject]@{
-                                      #    Project = $_.Name
-                                      #    Failed  = $failed
-                                      #    Passed  = $passed
-                                      #    Ignored = $ignored
-                                      #}
-
-                                      # Also mark as failed if needed
-                                      #if ($failed -gt 0) {
-                                      #    $failedProjects += $_.Name
-                                      #}
                                   }
                                   # Report a crash of the test runner (dotnet test with NUnit runner)
                                   if ($reader.Name -eq 'RunInfos') {
@@ -229,9 +207,7 @@ jobs:
                                           -or $innerXml.Contains("Could not find `'dotnet.exe`' host") `
                                           -or $innerXml.Contains('No test is available') `
                                           -or $innerXml.Contains('exited with error'))) {
-                                          #Write-Host "##vso[task.setvariable variable=HostCrashed;]true"
-                                          # Report all of the test projects that crashed
-                                          #$crashedProjects += $_.Name
+
                                           $crashed = $true
                                       }
                                   }
@@ -273,21 +249,9 @@ jobs:
           Add-Content $env:GITHUB_STEP_SUMMARY "## Test Results`n"
 
           foreach ($r in $results) {
-              $line = "- $($r.Status) $($r.StatusText) $($r.Project): Passed=$($r.Passed), Failed=$($r.Failed), Ignored=$($r.Ignored)"
+              $line = "- $($r.Status) $($r.StatusText) **$($r.Project)**: Passed=$($r.Passed), Failed=$($r.Failed), Ignored=$($r.Ignored)"
               Add-Content $env:GITHUB_STEP_SUMMARY $line
           }
-
-          #if ($failedProjects.Count -gt 0) {
-          #    $msg = "❌ Failed Projects:`n- " + ($failedProjects -join "`n- ")
-          #    Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value $msg
-          #} else {
-          #    Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "✅ All projects passed unit tests."
-          #}
-
-          #if ($crashedProjects.Count -gt 0) {
-          #    $msg = "`n⚠️ Crashed/Hung Projects:`n- " + ($crashedProjects -join "`n- ")
-          #    Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value $msg
-          #}
 
           # Store failure state for later steps
           if ($results | Where-Object { $_.Failed -gt 0 -or $_.StatusText -eq 'Crashed' }) {
