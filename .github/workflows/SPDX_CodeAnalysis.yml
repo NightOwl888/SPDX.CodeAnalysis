@@ -83,6 +83,8 @@ jobs:
           os: macos-latest
         - arch: arm64
           os: windows-latest
+        - arch: arm64
+          os: ubuntu-latest
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
