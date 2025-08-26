@@ -96,11 +96,11 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $dir="C:\w"
-          mkdir $dir -ErrorAction SilentlyContinue
-          mkdir $dir\temp -ErrorAction SilentlyContinue
-          mkdir $dir\dotnet -ErrorAction SilentlyContinue
-          mkdir $dir\work -ErrorAction SilentlyContinue
+          $dir = "C:\w"
+          New-Item -ItemType Directory -Force -Path $dir
+          New-Item -ItemType Directory -Force -Path "$dir\temp"
+          New-Item -ItemType Directory -Force -Path "$dir\dotnet"
+          New-Item -ItemType Directory -Force -Path "$dir\work"
           Add-Content $env:GITHUB_ENV "`nWORKPATH=$dir\work"
           Add-Content $env:GITHUB_ENV "`nTMP=$dir\temp`nTEMP=$dir\temp`nTMPDIR=$dir\temp"
           Add-Content $env:GITHUB_ENV "`nDOTNET_INSTALL_DIR=$dir\dotnet"
@@ -109,11 +109,11 @@ jobs:
         if: runner.os == 'Linux' || runner.os == 'macOS'
         shell: pwsh
         run: |
-          $dir="${{ runner.temp }}/w"
-          mkdir $dir -ErrorAction SilentlyContinue
-          mkdir $dir/temp -ErrorAction SilentlyContinue
-          mkdir $dir/dotnet -ErrorAction SilentlyContinue
-          mkdir $dir/work -ErrorAction SilentlyContinue
+          $dir = "$env:RUNNER_TEMP/w"
+          New-Item -ItemType Directory -Force -Path $dir
+          New-Item -ItemType Directory -Force -Path "$dir/temp"
+          New-Item -ItemType Directory -Force -Path "$dir/dotnet"
+          New-Item -ItemType Directory -Force -Path "$dir/work"
           Add-Content $env:GITHUB_ENV "`nWORKPATH=$dir/work"
           Add-Content $env:GITHUB_ENV "`nTMP=$dir/temp`nTEMP=$dir/temp`nTMPDIR=$dir/temp"
           Add-Content $env:GITHUB_ENV "`nDOTNET_INSTALL_DIR=$dir/dotnet"
