@@ -425,7 +425,7 @@ Special2 line3]]></file>
             return cache;
         }
         
-        private static IRootPathNormalizer rootPathNormalizer;
+        private static IRootPathNormalizer rootPathNormalizer = null!;
 
         [OneTimeSetUp]
         public static void OneTimeSetUp()

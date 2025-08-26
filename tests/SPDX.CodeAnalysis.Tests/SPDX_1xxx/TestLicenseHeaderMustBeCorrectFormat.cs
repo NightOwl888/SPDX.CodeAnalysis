@@ -32,7 +32,7 @@ namespace SPDX.CodeAnalysis.Tests
 
         public abstract FileSystemXml FileSystemXml { get; }
 
-        private static IRootPathNormalizer rootPathNormalizer;
+        private static IRootPathNormalizer rootPathNormalizer = null!;
 
         public static IRootPathNormalizer RootPathNormalizer => rootPathNormalizer;
 
@@ -44,7 +44,7 @@ namespace SPDX.CodeAnalysis.Tests
 
         public static void OneTimeTearDown()
         {
-            rootPathNormalizer = null;
+            rootPathNormalizer = null!;
         }
         
 
