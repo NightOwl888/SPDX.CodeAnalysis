@@ -149,13 +149,15 @@ jobs:
 
           Get-ChildItem -Directory $env:WORKPATH | ForEach-Object {
               $dllPath = Join-Path $_.FullName ($_.Name + ".dll")
+              $resultsDirectory = Join-Path $resultsDir $_.Name
+              New-Item -ItemType Directory -Force -Path $resultsDirectory | Out-Null
               if (Test-Path $dllPath) {
                   Write-Host "Running tests in $dllPath"
                   dotnet test $dllPath `
                       --framework ${{ matrix.tfm }} `
                       --logger:"console;verbosity=normal" `
                       --logger:"trx;LogFileName=TestResults.trx" `
-                      --results-directory $resultsDir `
+                      --results-directory $resultsDirectory `
                       -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
               }
           }
