@@ -290,7 +290,7 @@ jobs:
           #}
 
           # Store failure state for later steps
-          if ($failedProjects.Count -gt 0 -or $crashedProjects -gt 0) {
+          if ($results | Where-Object { $_.Failed -gt 0 -or $_.StatusText -eq 'Crashed' }) {
               Add-Content $env:GITHUB_ENV "`nTESTS_FAILED=true"
           }
 
