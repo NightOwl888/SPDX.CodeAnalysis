@@ -50,7 +50,7 @@ jobs:
                 $outDir = Join-Path $testsOut $projName
                 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
                 Write-Host "Publishing $($_.FullName) -> $outDir"
-                dotnet publish $_.FullName -c Release --no-restore -o $outDir --verbosity normal -f net8.0
+                dotnet publish $_.FullName -c Release --no-build -o $outDir --verbosity normal
                 if ($LASTEXITCODE -ne 0) { throw "Publish failed for $($_.FullName)" }
             }
           }
