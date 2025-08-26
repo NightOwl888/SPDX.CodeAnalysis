@@ -205,7 +205,7 @@ jobs:
 
           # Store failure state for later steps
           if ($failedProjects.Count -gt 0 -or $crashedProjects -gt 0) {
-              exit 1
+              Add-Content $env:GITHUB_ENV "`nTESTS_FAILED=true"
           }
 
       - name: Upload Test Results
@@ -214,3 +214,7 @@ jobs:
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.arch }}
           path: ${{ env.WORKPATH }}/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}
+
+      - name: Report Test Failure
+        if: env.TESTS_FAILED == 'true'
+        run: exit 1
