@@ -135,32 +135,41 @@ jobs:
         env:
           PROCESSOR_ARCHITECTURE: x86
 
-      # Download test binaries
-      - name: Download test assemblies
+      - name: Download Test Binaries
         uses: actions/download-artifact@v4
         with:
           name: test-assemblies
           path: ${{ env.WORKPATH }}
 
-      # Run tests
-      - name: Run NUnit tests
+      - name: Run Tests
         shell: pwsh
         run: |
-          $resultsDir = "$env:WORKPATH/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}"
-          New-Item -ItemType Directory -Force -Path $resultsDir | Out-Null
+          $resultsRootDir = "$env:WORKPATH/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}"
+          New-Item -ItemType Directory -Force -Path $resultsRootDir | Out-Null
 
           Get-ChildItem -Directory $env:WORKPATH | ForEach-Object {
               $dllPath = Join-Path $_.FullName ($_.Name + ".dll")
-              $resultsDirectory = Join-Path $resultsDir $_.Name
+              $resultsDirectory = Join-Path $resultsRootDir $_.Name
               New-Item -ItemType Directory -Force -Path $resultsDirectory | Out-Null
-              if (Test-Path $dllPath) {
-                  Write-Host "Running tests in $dllPath"
-                  dotnet test $dllPath `
-                      --framework ${{ matrix.tfm }} `
-                      --logger:"console;verbosity=normal" `
-                      --logger:"trx;LogFileName=TestResults.trx" `
-                      --results-directory $resultsDirectory `
-                      -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
+              if (-not (Test-Path $dllPath)) { return }
+
+              Write-Host "Running tests in $dllPath on $($env:RUNNER_OS) ${matrix.arch}"
+
+              $args = @(
+                  "test", "$dllPath",
+                  "--framework", "${{ matrix.tfm }}",
+                  "--logger:console;verbosity=normal",
+                  "--logger:trx;LogFileName=TestResults.trx",
+                  "--results-directory", "$resultsDirectory",
+                  "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
+              )
+
+              if ($env:RUNNER_OS -eq "macOS" -and "${{ matrix.arch }}" -eq "x64") {
+                  # macOS x64: run under Rosetta
+                  Start-Process "arch" -ArgumentList "-x86_64", "dotnet", $args -NoNewWindow -Wait
+              } else {
+                  # Other platforms: normal dotnet
+                  Start-Process "dotnet" -ArgumentList $args -NoNewWindow -Wait
               }
           }
 
