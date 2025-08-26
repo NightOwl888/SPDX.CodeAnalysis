@@ -59,10 +59,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nuget-packages
-          path: dist/nuget
+          path: ${{ github.workspace }}/dist/nuget
 
       - name: Upload test assemblies
         uses: actions/upload-artifact@v4
         with:
           name: test-assemblies
-          path: dist/testBinaries
+          path: ${{ github.workspace }}/dist/testBinaries
