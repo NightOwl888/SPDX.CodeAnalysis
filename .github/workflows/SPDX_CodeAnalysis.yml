@@ -120,11 +120,18 @@ jobs:
 
       # Install the .NET SDK
       - name: Setup .NET 8.0
+        if: matrix.arch != 'x86'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Setup .NET 8.0 (x86)
+        if: matrix.arch == 'x86'
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
         env:
-          PROCESSOR_ARCHITECTURE: ${{ matrix.arch == 'x86' && 'x86' || '' }}
+          PROCESSOR_ARCHITECTURE: x86
 
       # Download test binaries
       - name: Download test assemblies
