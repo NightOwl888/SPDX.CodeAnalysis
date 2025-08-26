@@ -121,19 +121,19 @@ jobs:
           Add-Content $env:GITHUB_ENV "`nDOTNET_INSTALL_DIR=$dir/dotnet"
 
       # Install the .NET SDK
-      - name: Setup .NET 8.0
-        if: matrix.arch != 'x86'
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
+      - name: Set .NET SDK Environment Variables
+        shell: pwsh
+        run: |
+          if ($IsWindows -and ${{ matrix.arch }} -eq "x86") {
+              Add-Content $env:GITHUB_ENV "`nPROCESSOR_ARCHITECTURE=x86"
+          } elseif ($IsMacOS -and ${{ matrix.arch }} -eq "x64") {
+              Add-Content $env:GITHUB_ENV "`nDOTNET_OSX_ARCH=x64"
+          }
 
-      - name: Setup .NET 8.0 (x86)
-        if: matrix.arch == 'x86'
+      - name: Setup .NET 8.0
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
-        env:
-          PROCESSOR_ARCHITECTURE: x86
 
       - name: Download Test Binaries
         uses: actions/download-artifact@v4
@@ -151,25 +151,14 @@ jobs:
               $dllPath = Join-Path $_.FullName ($_.Name + ".dll")
               $resultsDirectory = Join-Path $resultsRootDir $_.Name
               New-Item -ItemType Directory -Force -Path $resultsDirectory | Out-Null
-              if (-not (Test-Path $dllPath)) { return }
-
-              Write-Host "Running tests in $dllPath on $($env:RUNNER_OS) ${matrix.arch}"
-
-              $args = @(
-                  "test", "$dllPath",
-                  "--framework", "${{ matrix.tfm }}",
-                  "--logger:console;verbosity=normal",
-                  "--logger:trx;LogFileName=TestResults.trx",
-                  "--results-directory", "$resultsDirectory",
-                  "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
-              )
-
-              if ($env:RUNNER_OS -eq "macOS" -and "${{ matrix.arch }}" -eq "x64") {
-                  # macOS x64: run under Rosetta
-                  Start-Process "arch" -ArgumentList "-x86_64", "dotnet", $args -NoNewWindow -Wait
-              } else {
-                  # Other platforms: normal dotnet
-                  Start-Process "dotnet" -ArgumentList $args -NoNewWindow -Wait
+              if (Test-Path $dllPath) {
+                  Write-Host "Running tests in $dllPath"
+                  dotnet test $dllPath `
+                      --framework ${{ matrix.tfm }} `
+                      --logger:"console;verbosity=normal" `
+                      --logger:"trx;LogFileName=TestResults.trx" `
+                      --results-directory $resultsDirectory `
+                      -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
               }
           }
 
