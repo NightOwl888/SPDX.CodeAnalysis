@@ -68,3 +68,93 @@ jobs:
           path: ${{ env.DIST_DIR }}/testBinaries
     env:
       DIST_DIR: ${{ github.workspace }}/dist
+
+  test:
+    needs: build
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        arch: [x64, x86, arm64]
+        tfm: [net8.0]
+        exclude:
+        - arch: x86
+          os: ubuntu-latest
+        - arch: x86
+          os: macos-latest
+        - arch: arm64
+          os: windows-latest
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      # Set up working directories consistently
+      - name: Set Paths (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $dir="C:\w"
+          mkdir $dir -ErrorAction SilentlyContinue
+          mkdir $dir\temp -ErrorAction SilentlyContinue
+          mkdir $dir\dotnet -ErrorAction SilentlyContinue
+          mkdir $dir\work -ErrorAction SilentlyContinue
+          Add-Content $env:GITHUB_ENV "`nWORKPATH=$dir\work"
+          Add-Content $env:GITHUB_ENV "`nTMP=$dir\temp`nTEMP=$dir\temp`nTMPDIR=$dir\temp"
+          Add-Content $env:GITHUB_ENV "`nDOTNET_INSTALL_DIR=$dir\dotnet"
+
+      - name: Set Paths (Linux/macOS)
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        shell: pwsh
+        run: |
+          $dir="${{ runner.temp }}/w"
+          mkdir $dir -ErrorAction SilentlyContinue
+          mkdir $dir/temp -ErrorAction SilentlyContinue
+          mkdir $dir/dotnet -ErrorAction SilentlyContinue
+          mkdir $dir/work -ErrorAction SilentlyContinue
+          Add-Content $env:GITHUB_ENV "`nWORKPATH=$dir/work"
+          Add-Content $env:GITHUB_ENV "`nTMP=$dir/temp`nTEMP=$dir/temp`nTMPDIR=$dir/temp"
+          Add-Content $env:GITHUB_ENV "`nDOTNET_INSTALL_DIR=$dir/dotnet"
+
+      # Install the .NET SDK
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+        env:
+          PROCESSOR_ARCHITECTURE: ${{ matrix.arch == 'x86' && 'x86' || '' }}
+
+      # Download test binaries
+      - name: Download test assemblies
+        uses: actions/download-artifact@v4
+        with:
+          name: test-assemblies
+          path: ${{ env.WORKPATH }}
+
+      # Run tests
+      - name: Run NUnit tests
+        shell: pwsh
+        run: |
+          $resultsDir = "$env:WORKPATH/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}"
+          New-Item -ItemType Directory -Force -Path $resultsDir | Out-Null
+
+          Get-ChildItem -Directory $env:WORKPATH | ForEach-Object {
+              $dllPath = Join-Path $_.FullName ($_.Name + ".dll")
+              if (Test-Path $dllPath) {
+                  Write-Host "Running tests in $dllPath"
+                  dotnet test $dllPath `
+                      --framework ${{ matrix.tfm }} `
+                      --logger:"console;verbosity=normal" `
+                      --logger:"trx;LogFileName=TestResults.trx" `
+                      --results-directory $resultsDir `
+                      -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
+              }
+          }
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-${{ matrix.arch }}
+          path: ${{ env.WORKPATH }}/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}
