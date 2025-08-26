@@ -32,13 +32,13 @@ jobs:
       - name: Build
         shell: pwsh
         run: |
-          $nugetOut = "$(Join-Path $PWD 'dist/nuget')"
+          $nugetOut = "${{ github.workspace }}/dist/nuget"
           dotnet build -c Release --no-restore -p:PackageOutputPath=$nugetOut
 
       - name: Publish Test Assemblies
         shell: pwsh
         run: |
-          $testsOut = "$(Join-Path $PWD 'dist/testBinaries')"
+          $testsOut = "${{ github.workspace }}/dist/testBinaries"
           New-Item -ItemType Directory -Force -Path $testsOut | Out-Null
 
           # Find all csproj files where a segment is exactly 'Tests'
