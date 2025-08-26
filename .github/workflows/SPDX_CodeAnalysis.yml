@@ -188,22 +188,24 @@ jobs:
               }
           }
 
-          # Store failure state for later steps
-          if ($failedProjects.Count -gt 0 -or $crashedProjects -gt 0) {
-              Add-Content $env:GITHUB_ENV "`nTESTS_FAILED=true"
-          }
-
           # Write summary
           Add-Content $env:GITHUB_STEP_SUMMARY "## Test Results`n"
 
           if ($failedProjects.Count -gt 0) {
-              Add-Content $env:GITHUB_STEP_SUMMARY "❌ Failed Projects:`n- " + ($failedProjects -join "`n- ")
+              $msg = "❌ Failed Projects:`n- " + ($failedProjects -join "`n- ")
+              Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value $msg
           } else {
-              Add-Content $env:GITHUB_STEP_SUMMARY "✅ All projects passed unit tests."
+              Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "✅ All projects passed unit tests."
           }
 
           if ($crashedProjects.Count -gt 0) {
-              Add-Content $env:GITHUB_STEP_SUMMARY "`n⚠️ Crashed/Hung Projects:`n- " + ($crashedProjects -join "`n- ")
+              $msg = "`n⚠️ Crashed/Hung Projects:`n- " + ($crashedProjects -join "`n- ")
+              Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value $msg
+          }
+
+          # Store failure state for later steps
+          if ($failedProjects.Count -gt 0 -or $crashedProjects -gt 0) {
+              exit 1
           }
 
       - name: Upload Test Results
@@ -212,7 +214,3 @@ jobs:
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.arch }}
           path: ${{ env.WORKPATH }}/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}
-
-      - name: Report Test Failure
-        if: env.TESTS_FAILED == 'true'
-        run: exit 1
