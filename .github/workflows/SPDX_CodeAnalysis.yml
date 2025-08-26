@@ -128,7 +128,7 @@ jobs:
           if ($IsWindows -and $arch -eq "x86") {
               Add-Content $env:GITHUB_ENV "`nPROCESSOR_ARCHITECTURE=x86"
           } elseif ($IsMacOS -and $arch -eq "x64") {
-              Add-Content $env:GITHUB_ENV "`nDOTNET_OSX_ARCH=x64"
+              Add-Content $env:GITHUB_ENV "`nPROCESSOR_ARCHITECTURE=x64"
           }
 
       - name: Setup .NET 8.0
