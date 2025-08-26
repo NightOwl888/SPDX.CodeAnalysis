@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="$(RepositoryRoot).build/nuget.props" />
+
   <PropertyGroup>
     <!-- Note TargetFramework or TargetFrameworks must match the output projects for the directories to be build correctly -->
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -10,6 +12,10 @@
     <!-- We intentionally don't have a ref or lib directory in our NuGet package because this is an analyzer-only package -->
     <NoWarn>$(NoWarn);NU5127;NU5128</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup Label="NuGet Package Settings">
+    <None Include="$(RepositoryRoot)README.md" Pack="true" PackagePath="$(PackageReadmeFile)"/>
+  </ItemGroup>
 
   <PropertyGroup Label="NuGet Package Settings">
     <PackageId>SPDX.CodeAnalysis</PackageId>

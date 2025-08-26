@@ -1,8 +1,6 @@
 <Project>
   <PropertyGroup Label="NuGet Package Properties">
     <IsPackable>true</IsPackable>
-    <!-- This is the new symbols format (the only one currently supported at NuGet.org) -->
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Authors>NightOwl888</Authors>
     <PackageProjectUrl>https://github.com/$(GitHubOrganization)/$(GitHubProject)/</PackageProjectUrl>
     <!--<PackageIconUrl>https://raw.githubusercontent.com/$(GitHubOrganization)/$(GitHubProject)/main/branding/netfx-icon-128x128.jpg</PackageIconUrl>
@@ -12,8 +10,8 @@
     <PackageReleaseNotes>$(ReleaseNotesUrl)</PackageReleaseNotes>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
-  <ItemGroup>
+  <!--<ItemGroup>
     <None Include="$(RepositoryRoot)README.md" Pack="true" PackagePath="$(PackageReadmeFile)"/>
-    <!--<None Include="$(RepositoryRoot)branding\$(PackageIcon)" Pack="true" PackagePath="$(PackageIcon)" Visible="false"/>-->
-  </ItemGroup>
+    <None Include="$(RepositoryRoot)branding\$(PackageIcon)" Pack="true" PackagePath="$(PackageIcon)" Visible="false"/>
+  </ItemGroup>-->
 </Project>
