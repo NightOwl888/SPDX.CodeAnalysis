@@ -35,15 +35,21 @@ jobs:
           $nugetOut = "$(Join-Path $PWD 'dist/nuget')"
           dotnet build -c Release --no-restore -p:PackageOutputPath=$nugetOut
 
-      - name: Publish test assemblies
+      - name: Publish Test Assemblies
         shell: pwsh
         run: |
-          $testsOut = "$(Join-Path $PWD 'dist/tests')"
+          $testsOut = "$(Join-Path $PWD 'dist/testBinaries')"
           New-Item -ItemType Directory -Force -Path $testsOut | Out-Null
-          Get-ChildItem -Recurse -Filter *.csproj -Path test | ForEach-Object {
-              $projName = $_.BaseName
-              $outDir = Join-Path $testsOut $projName
-              dotnet publish $_.FullName -c Release --no-restore -o $outDir
+
+          # Find all csproj files where a segment is exactly 'Tests'
+          Get-ChildItem -Recurse -Filter *.csproj | ForEach-Object {
+            $segments = $_.BaseName -split '\.'
+            if ($segments -contains 'Tests') {
+                $projName = $_.BaseName
+                $outDir = Join-Path $testsOut $projName
+                Write-Host "Publishing $($_.FullName) -> $outDir"
+                dotnet publish $_.FullName -c Release --no-restore -o $outDir
+            }
           }
 
       - name: Upload NuGet packages
@@ -56,4 +62,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-assemblies
-          path: dist/tests
+          path: dist/testBinaries
