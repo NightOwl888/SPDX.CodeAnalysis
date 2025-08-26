@@ -43,6 +43,7 @@ jobs:
 
           # Find all csproj files where a segment is exactly 'Tests'
           Get-ChildItem -Recurse -Filter *.csproj | ForEach-Object {
+            Write-Host "Found project: $($_.FullName)"
             $segments = $_.BaseName -split '\.'
             if ($segments -contains 'Tests') {
                 $projName = $_.BaseName
