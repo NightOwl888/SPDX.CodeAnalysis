@@ -2,6 +2,7 @@
 // found in the LICENSE.txt file or at https://opensource.org/licenses/MIT.
 
 using NUnit.Framework;
+using System.Text;
 
 namespace SPDX.CodeAnalysis.Tests.CSharp
 {
@@ -33,7 +34,7 @@ public class MyClass
     {
     }
 }
-".TrimStart();
+".TrimStart().NormalizeLineEndings();
 
             Assert.That(result, Is.EqualTo(expected));
         }
@@ -62,7 +63,7 @@ namespace MyNamespace
 {
     // Before type
 }
-".TrimStart();
+".TrimStart().NormalizeLineEndings();
 
             Assert.That(result, Is.EqualTo(expected));
         }
@@ -96,7 +97,7 @@ public class MyClass
     {
     }
 }
-".TrimStart();
+".TrimStart().NormalizeLineEndings();
 
             Assert.That(result, Is.EqualTo(expected));
         }
@@ -120,7 +121,7 @@ using System.Text;
 
 namespace MyNamespace;
 
-".TrimStart();
+".TrimStart().NormalizeLineEndings();
 
             Assert.That(result, Is.EqualTo(expected));
         }
@@ -150,7 +151,7 @@ public class MyClass
     {
     }
 }
-".TrimStart();
+".TrimStart().NormalizeLineEndings();
 
             Assert.That(result, Is.EqualTo(expected));
         }
@@ -182,7 +183,7 @@ public class MyClass
     {
     }
 }
-".TrimStart();
+".TrimStart().NormalizeLineEndings();
 
             Assert.That(result, Is.EqualTo(expected));
         }
@@ -211,7 +212,7 @@ namespace MyNamespace
 {
     // Before type
 }
-".TrimStart();
+".TrimStart().NormalizeLineEndings();
 
             Assert.That(result, Is.EqualTo(expected));
         }
@@ -250,7 +251,7 @@ namespace MyNamespace
         }
     }
 }
-".TrimStart();
+".TrimStart().NormalizeLineEndings();
 
             Assert.That(result, Is.EqualTo(expected));
         }
@@ -284,7 +285,7 @@ public class MyClass
     {
     }
 }
-".TrimStart();
+".TrimStart().NormalizeLineEndings();
 
             Assert.That(result, Is.EqualTo(expected));
         }
@@ -308,7 +309,7 @@ using System.Text;
 
 namespace MyNamespace;
 
-".TrimStart();
+".TrimStart().NormalizeLineEndings();
 
             Assert.That(result, Is.EqualTo(expected));
         }
@@ -338,7 +339,8 @@ public class MyClass
     {
     }
 }
-".TrimStart();
+".TrimStart().NormalizeLineEndings();
+            
 
             Assert.That(result, Is.EqualTo(expected));
         }

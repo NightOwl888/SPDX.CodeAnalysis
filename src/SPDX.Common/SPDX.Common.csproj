@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="SPDX.Common.Tests"/>
+    <InternalsVisibleTo Include="SPDX.CodeAnalysis.Tests"/>
   </ItemGroup>
 
 </Project>

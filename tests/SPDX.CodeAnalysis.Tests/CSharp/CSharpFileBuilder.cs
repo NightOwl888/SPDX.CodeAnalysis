@@ -144,7 +144,7 @@ namespace SPDX.CodeAnalysis.Tests.CSharp
                     if (_includeType)
                     {
                         sb.AppendLine();
-                        sb.AppendLine(GlobalTypeDeclaration());
+                        sb.AppendLine(GlobalTypeDeclaration);
                     }
                     break;
 
@@ -157,7 +157,7 @@ namespace SPDX.CodeAnalysis.Tests.CSharp
                     if (_includeType)
                     {
                         sb.AppendLine();
-                        sb.AppendLine(GlobalTypeDeclaration());
+                        sb.AppendLine(GlobalTypeDeclaration);
                     }
                     break;
 
@@ -170,7 +170,7 @@ namespace SPDX.CodeAnalysis.Tests.CSharp
                     if (_includeType)
                     {
                         sb.AppendLine();
-                        sb.AppendIndentedLine(GlobalTypeDeclaration(), indentLevel: 1);
+                        sb.AppendIndentedLine(GlobalTypeDeclaration, indentLevel: 1);
                     }
                     sb.AppendLine("}");
                     break;
@@ -179,13 +179,13 @@ namespace SPDX.CodeAnalysis.Tests.CSharp
             return sb.ToString();
         }
 
-        private static string GlobalTypeDeclaration() => @"
+        private static readonly string GlobalTypeDeclaration = @"
 public class MyClass
 {
     public void MyMethod()
     {
     }
 }
-".Trim();
+".Trim().NormalizeLineEndings();
     }
 }

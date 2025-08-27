@@ -7,7 +7,7 @@ using System.Text;
 
 namespace SPDX.CodeAnalysis
 {
-    internal class StringHelper
+    internal static class StringHelper
     {
         private const int CharStackBufferSize = 64;
 
@@ -54,6 +54,62 @@ namespace SPDX.CodeAnalysis
             // Multiplication below will not overflow since going from positive Int32 to UInt32.
             return Marvin.ComputeHash32(ref Unsafe.As<char, byte>(ref MemoryMarshal.GetReference(value)), (uint)value.Length * 2 /* in bytes, not chars */, (uint)seed, (uint)(seed >> 32));
 #endif
+        }
+
+        /// <summary>
+        /// Changes line endings to match the current operating system.
+        /// </summary>
+        /// <param name="value">The value to normalize.</param>
+        /// <returns>The value with line endings normalized to for the current operating system.</returns>
+        public static string NormalizeLineEndings(this string value)
+        {
+            if (value is null)
+                throw new ArgumentNullException(nameof(value));
+
+            return NormalizeLineEndings(value.AsSpan());
+        }
+
+        /// <summary>
+        /// Changes line endings to match the current operating system.
+        /// </summary>
+        /// <param name="value">The value to normalize.</param>
+        /// <returns>The value with line endings normalized to for the current operating system.</returns>
+        public static string NormalizeLineEndings(this ReadOnlySpan<char> value)
+        {
+            int length = value.Length;
+            if (length == 0)
+                return string.Empty;
+
+            var sb = length <= CharStackBufferSize
+                ? new ValueStringBuilder(stackalloc char[length])
+                : new ValueStringBuilder(length);
+
+            NormalizeLineEndings(value, ref sb);
+            return sb.ToString();
+        }
+
+        internal static void NormalizeLineEndings(ReadOnlySpan<char> value, ref ValueStringBuilder result)
+        {
+            int length = value.Length;
+            for (int i = 0; i < length; i++)
+            {
+                char c = value[i];
+                if (c == '\r')
+                {
+                    // Skip '\r' if followed by '\n'
+                    if (i + 1 < length && value[i + 1] == '\n')
+                        i++;
+                    result.Append(Environment.NewLine);
+                }
+                else if (c == '\n')
+                {
+                    result.Append(Environment.NewLine);
+                }
+                else
+                {
+                    result.Append(c);
+                }
+            }
         }
     }
 }
