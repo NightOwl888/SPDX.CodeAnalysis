@@ -1,0 +1,69 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Source files
+*.cs            text eol=lf diff=csharp
+*.vb            text eol=lf diff=vb
+*.fs            text eol=lf diff=fsharp
+*.fsi           text eol=lf diff=fsharp
+*.fsx           text eol=lf diff=fsharp
+
+# Solution and project files
+*.sln           text eol=lf merge=union
+*.csproj        text eol=lf merge=union
+*.vbproj        text eol=lf merge=union
+*.fsproj        text eol=lf merge=union
+*.dbproj        text eol=lf merge=union
+*.msbuildproj   text eol=lf
+*.props         text eol=lf
+*.targets       text eol=lf
+
+# Other .NET Files
+*.resx          text eol=lf
+*.vsixmanifest  text eol=lf
+
+# Configs & docs
+.gitignore      text eol=lf
+.editorconfig   text eol=lf
+*.config        text eol=lf
+*.md            text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+*.json          text eol=lf
+*.xml           text eol=lf
+
+# Scripts
+build           text eol=lf
+*.sh            text eol=lf
+*.bat           text eol=crlf
+*.cmd           text eol=crlf
+*.ps1           text eol=lf
+*.psm1          text eol=lf
+*.psd1          text eol=lf
+*.ps1xml        text eol=lf
+
+# Binary formats (treat as-is, no line ending conversion)
+*.png           binary
+*.jpg           binary
+*.jpeg          binary
+*.gif           binary
+*.ico           binary
+*.zip           binary
+*.gz            binary
+*.tar           binary
+*.7z            binary
+*.dll           binary
+*.exe           binary
+*.snk           binary
+
+# Standard msysgit doc filters
+*.doc           diff=astextplain
+*.DOC           diff=astextplain
+*.docx          diff=astextplain
+*.DOCX          diff=astextplain
+*.dot           diff=astextplain
+*.DOT           diff=astextplain
+*.pdf           diff=astextplain
+*.PDF           diff=astextplain
+*.rtf           diff=astextplain
+*.RTF           diff=astextplain
