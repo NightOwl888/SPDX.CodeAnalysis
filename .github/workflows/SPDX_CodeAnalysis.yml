@@ -249,7 +249,7 @@ jobs:
           Add-Content $env:GITHUB_STEP_SUMMARY "## Test Results`n"
 
           foreach ($r in $results) {
-              $line = "- $($r.Status) $($r.StatusText) **$($r.Project)**: Passed=$($r.Passed), Failed=$($r.Failed), Ignored=$($r.Ignored)"
+              $line = "- $($r.Status) $($r.StatusText) - **$($r.Project)** | Passed=$($r.Passed), Failed=$($r.Failed), Ignored=$($r.Ignored)"
               Add-Content $env:GITHUB_STEP_SUMMARY $line
           }
 
