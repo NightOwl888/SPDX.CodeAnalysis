@@ -3,13 +3,66 @@ root = true
 # All files
 [*]
 indent_style = space
-
-# Xml files
-[*.xml]
-indent_size = 2
+# default: use LF everywhere unless overridden
+end_of_line = lf
+insert_final_newline = true
+resharper_enforce_empty_line_at_end_of_file = true
+indent_size = 4
 
 # C Sharp code files
 [*.cs]
 
 # CS1591: Missing XML comment for publicly visible type or member
 dotnet_diagnostic.CS1591.severity = none
+
+# Xml files
+[*.xml]
+indent_size = 2
+
+# .config files
+[*.config]
+indent_size = 2
+
+# YAML files
+[*.yml]
+indent_size = 2
+
+[*.yaml]
+indent_size = 2
+
+# Batch files
+[*.bat]
+end_of_line = crlf
+
+[*.cmd]
+end_of_line = crlf
+
+[*.json]
+indent_size = 2
+
+[*.md]
+indent_size = 2
+
+# MSBuild / project files
+[*.csproj]
+indent_size = 2
+[*.vbproj]
+indent_size = 2
+[*.fsproj]
+indent_size = 2
+[*.dbproj]
+indent_size = 2
+[*.msbuildproj]
+indent_size = 2
+[*.props]
+indent_size = 2
+[*.targets]
+indent_size = 2
+
+# Resources
+[*.resx]
+indent_size = 2
+
+# VSIX manifests
+[*.vsixmanifest]
+indent_size = 2
