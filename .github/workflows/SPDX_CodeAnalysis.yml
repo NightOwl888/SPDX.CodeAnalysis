@@ -167,7 +167,7 @@ jobs:
           body: ${{ steps.notes.outputs.release_notes }}
           prerelease: ${{ steps.tagversion.outputs.prerelease }}
           draft: true
-          allowUpdates: true
+          allowUpdates: false
           omitBodyDuringUpdate: false
           artifacts: dist/nuget/*.nupkg,dist/nuget/*.snupkg
           makeLatest: true
