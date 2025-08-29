@@ -165,7 +165,7 @@ jobs:
         with:
           tag: ${{ github.ref_name }}
           body: ${{ steps.notes.outputs.release_notes }}
-          prerelease: ${{ steps.tagversion.outputs.prerelease }}
+          #prerelease: ${{ steps.tagversion.outputs.prerelease }}
           draft: true
           allowUpdates: false
           omitBodyDuringUpdate: false
