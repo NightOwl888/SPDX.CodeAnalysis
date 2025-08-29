@@ -154,11 +154,13 @@ jobs:
         shell: pwsh
         run: |
           # Try to authenticate gh CLI safely
-          #try {
+          try {
+              $ErrorActionPreference = 'Continue'
+
               echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token 2> $null
 
               # Try to generate release notes
-              #try {
+              try {
                   $generated = gh release generate "${{ github.ref_name }}" --repo "${{ github.repository }}" 2>&1
 
                   if ($LASTEXITCODE -eq 0 -and $generated) {
@@ -175,12 +177,12 @@ jobs:
                   } else {
                       Write-Host "gh CLI not permitted or returned empty, skipping body output."
                   }
-              #} catch {
-              #    Write-Host "gh CLI failed, skipping body output."
-              #}
-          #} catch {
-          #    Write-Host "gh CLI authentication failed or not permitted, continuing without release notes."
-          #}
+              } catch {
+                  Write-Host "gh CLI failed, skipping body output."
+              }
+          } catch {
+              Write-Host "gh CLI authentication failed or not permitted, continuing without release notes."
+          }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
