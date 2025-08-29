@@ -151,6 +151,7 @@ jobs:
         uses: release-drafter/release-drafter@v5
         with:
           config-name: release.yml
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       # Create GitHub Release and attach artifacts
       - name: Create Draft GitHub Release
