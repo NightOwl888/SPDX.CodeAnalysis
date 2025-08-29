@@ -112,6 +112,10 @@ jobs:
           Write-Host "Version: $tag"
           echo "version=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
 
+          # prerelease = true if contains a hyphen (semver prerelease part)
+          $prerelease = if ($tag -match '-') { 'true' } else { 'false' }
+          echo "prerelease=$prerelease" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
+
       - name: Get Version from NBGV
         id: nbgv
         shell: pwsh
@@ -162,6 +166,7 @@ jobs:
         with:
           tag: ${{ github.ref_name }}
           body: ${{ steps.notes.outputs.release_notes }}
+          prerelease: ${{ steps.tagversion.outputs.prerelease }}
           draft: true
           allowUpdates: true
           omitBodyDuringUpdate: false
