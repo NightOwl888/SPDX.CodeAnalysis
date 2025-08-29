@@ -150,7 +150,7 @@ jobs:
         id: notes
         uses: release-drafter/release-drafter@v5
         with:
-          config-name: release.yml
+          config-name: release-drafter.yml
           token: ${{ secrets.GITHUB_TOKEN }}
 
       # Create GitHub Release and attach artifacts
