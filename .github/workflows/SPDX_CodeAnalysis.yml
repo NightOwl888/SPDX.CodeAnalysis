@@ -164,3 +164,60 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Publishing release artifacts"
+  
+      - name: Download Release Assets
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const path = require("path");
+
+            const release = context.payload.release;
+            if (!release) {
+              core.setFailed("No release payload found.");
+              return;
+            }
+
+            const assets = release.assets || [];
+            const dir = "dist/nuget";
+            fs.mkdirSync(dir, { recursive: true });
+
+            for (const asset of assets) {
+              if (!asset.name.endsWith(".nupkg") && !asset.name.endsWith(".snupkg")) {
+                continue;
+              }
+              core.info(`Downloading ${asset.name}...`);
+              const response = await github.request("GET /repos/{owner}/{repo}/releases/assets/{asset_id}", {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                asset_id: asset.id,
+                headers: { Accept: "application/octet-stream" },
+              });
+              const filePath = path.join(dir, asset.name);
+              fs.writeFileSync(filePath, Buffer.from(response.data));
+              core.info(`Saved to ${filePath}`);
+            }
+      - name: List Files in dist
+        run: find dist -type f
+  
+      # - name: Push To MyGet
+      #   shell: pwsh
+      #   run: |
+      #     $files = Get-ChildItem "dist/nuget/*.nupkg", "dist/nuget/*.snupkg" -ErrorAction Ignore
+      #     foreach ($file in $files) {
+      #         dotnet nuget push $file.FullName --source $env:MYGET_SOURCE_URL --api-key $env:MYGET_API_KEY --skip-duplicate
+      #     }
+      #   env:
+      #     MYGET_SOURCE_URL: ${{ secrets.MYGET_SOURCE_URL }}
+      #     MYGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
+
+      # - name: Push To NuGet
+      #   shell: pwsh
+      #   run: |
+      #     $files = Get-ChildItem "dist/nuget/*.nupkg", "dist/nuget/*.snupkg" -ErrorAction Ignore
+      #     foreach ($file in $files) {
+      #         dotnet nuget push $file.FullName --source $env:NUGET_SOURCE_URL --api-key $env:NUGET_API_KEY --skip-duplicate
+      #     }
+      #   env:
+      #     NUGET_SOURCE_URL: 'https://api.nuget.org/v3/index.json'
+      #     NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
