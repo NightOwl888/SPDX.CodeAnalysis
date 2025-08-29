@@ -146,11 +146,18 @@ jobs:
               }
           }
 
+      - name: Generate Draft Release Notes
+        id: notes
+        uses: release-drafter/release-drafter@v5
+        with:
+          config-name: release.yml
+
       # Create GitHub Release and attach artifacts
-      - name: Create GitHub Release
+      - name: Create Draft GitHub Release
         uses: ncipollo/release-action@v1.18.0
         with:
           tag: ${{ github.ref_name }}
+          body: ${{ steps.notes.outputs.release_notes }}
           draft: true
           allowUpdates: true
           omitBodyDuringUpdate: false
