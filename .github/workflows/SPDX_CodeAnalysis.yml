@@ -137,7 +137,7 @@ jobs:
         run: |
           $tagVersion = '${{ steps.tagversion.outputs.version }}'
           $repoVersion = '${{ steps.nbgv.outputs.version }}'
-    
+
           if ($tagVersion -ne $repoVersion) {
               throw "Tag version $tagVersion does not match repository version $repoVersion. Make sure there are no typos in the Git tag name."
           }
@@ -149,13 +149,30 @@ jobs:
               }
           }
 
-      - name: Generate Draft Release Notes
+      - name: Generate Draft Release Notes (safe)
         id: notes
-        uses: release-drafter/release-drafter@v5
-        with:
-          config-name: release-drafter.yml
-          tag: ${{ github.ref_name }}
-          version: ${{ github.ref_name }}
+        shell: pwsh
+        run: |
+          try {
+              # Try to generate release notes using gh
+              $generated = gh release generate "${{ github.ref_name }}" --repo "${{ github.repository }}" 2> $null
+              if ($generated) {
+                  $generated | Out-File -FilePath release_notes.md -Encoding utf8
+                  $body = Get-Content release_notes.md -Raw
+
+                  # Only set the output if body has content
+                  if ($body) {
+                      $output  = "body<<EOF`n"
+                      $output += $body + "`n"
+                      $output += "EOF`n"
+                      Add-Content -Path $env:GITHUB_OUTPUT -Value $output -Encoding utf8
+                  }
+              } else {
+                  Write-Host "gh CLI not permitted or returned empty, skipping body output."
+              }
+          } catch {
+              Write-Host "gh CLI failed, skipping body output."
+          }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -164,10 +181,10 @@ jobs:
         uses: ncipollo/release-action@v1.18.0
         with:
           tag: ${{ github.ref_name }}
-          body: ${{ steps.notes.outputs.release_notes }}
+          body: ${{ steps.notes.outputs.body }}
           prerelease: ${{ steps.tagversion.outputs.prerelease }}
           draft: true
-          allowUpdates: false
+          allowUpdates: true
           omitBodyDuringUpdate: false
           artifacts: dist/nuget/*.nupkg,dist/nuget/*.snupkg
           makeLatest: true
