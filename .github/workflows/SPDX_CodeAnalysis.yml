@@ -136,7 +136,7 @@ jobs:
           $repoVersion = '${{ steps.nbgv.outputs.version }}'
     
           if ($tagVersion -ne $repoVersion) {
-              throw "Tag version $tagVersion does not match repository version $repoVersion"
+              throw "Tag version $tagVersion does not match repository version $repoVersion. Make sure there are no typos in the Git tag name."
           }
 
           # Also check that all .nupkg files contain the version
