@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - main
+      - 'releases/v*.*'      # matches releases/v1.2
+      - 'releases/v*.*.*'    # matches releases/v1.2.3
+      - release-workflow
     tags:
       - 'v*'
   pull_request:
@@ -13,7 +16,7 @@ on:
 
 jobs:
   build:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: windows-latest
     steps:
       - name: Checkout Source
