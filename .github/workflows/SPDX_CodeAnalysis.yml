@@ -200,16 +200,16 @@ jobs:
       - name: List Files in dist
         run: find dist -type f
   
-      # - name: Push To MyGet
-      #   shell: pwsh
-      #   run: |
-      #     $files = Get-ChildItem "dist/nuget/*.nupkg", "dist/nuget/*.snupkg" -ErrorAction Ignore
-      #     foreach ($file in $files) {
-      #         dotnet nuget push $file.FullName --source $env:MYGET_SOURCE_URL --api-key $env:MYGET_API_KEY --skip-duplicate
-      #     }
-      #   env:
-      #     MYGET_SOURCE_URL: ${{ secrets.MYGET_SOURCE_URL }}
-      #     MYGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
+      - name: Push To MyGet
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem "dist/nuget/*.nupkg", "dist/nuget/*.snupkg" -ErrorAction Ignore
+          foreach ($file in $files) {
+              dotnet nuget push $file.FullName --source $env:MYGET_SOURCE_URL --api-key $env:MYGET_API_KEY --skip-duplicate
+          }
+        env:
+          MYGET_SOURCE_URL: ${{ secrets.MYGET_SOURCE_URL }}
+          MYGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
 
       # - name: Push To NuGet
       #   shell: pwsh
