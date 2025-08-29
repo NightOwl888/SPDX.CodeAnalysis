@@ -9,6 +9,7 @@ on:
 
 jobs:
   build:
+    if: github.ref_type != 'tag'
     runs-on: windows-latest
     steps:
       - name: Checkout Source
@@ -69,4 +70,76 @@ jobs:
     env:
       DIST_DIR: ${{ github.workspace }}/dist
 
+  release:
+    name: Release
+    if: startsWith(github.ref_name, 'v')
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
 
+      - name: Checkout Source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Required for NuGet push
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # Determine the release version from the tag
+      - name: Get Tag Version
+        id: tagversion
+        shell: pwsh
+        run: |
+          $tag = '${{ github.ref_name }}'
+          Write-Host "Git tag: $tag"
+          # Remove leading 'v' if present
+          if ($tag.StartsWith('v')) { $tag = $tag.Substring(1) }
+          Write-Host "Version: $tag"
+          echo "version=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
+
+      - name: Get Version from NBGV
+        id: nbgv
+        shell: pwsh
+        run: |
+          $version = & nbgv get-version
+          Write-Host "Repository version: $version"
+          echo "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
+
+      # Download NuGet artifacts from the build job
+      - name: Download NuGet Packages
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-packages
+          path: dist/nuget
+
+      - name: Verify Versions Match
+        shell: pwsh
+        run: |
+          $tagVersion = '${{ steps.tagversion.outputs.version }}'
+          $repoVersion = '${{ steps.nbgv.outputs.version }}'
+    
+          if ($tagVersion -ne $repoVersion) {
+              throw "Tag version $tagVersion does not match repository version $repoVersion"
+          }
+
+          # Also check that all .nupkg files contain the version
+          Get-ChildItem dist/nuget/*.nupkg | ForEach-Object {
+              if (-not $_.Name.Contains($tagVersion)) {
+                  throw "Artifact version mismatch: $($_.Name) vs tag version $tagVersion"
+              }
+          }
+
+      # Create GitHub Release and attach artifacts
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1.18.0
+        with:
+          tag: ${{ github.ref_name }}
+          draft: true
+          allowUpdates: true
+          omitBodyDuringUpdate: false
+          artifacts: dist/nuget/*.nupkg,dist/nuget/*.snupkg
+          makeLatest: true
+          token: ${{ secrets.GITHUB_TOKEN }}
