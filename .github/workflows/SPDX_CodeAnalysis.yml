@@ -149,56 +149,13 @@ jobs:
               }
           }
 
-      - name: Generate Draft Release Notes (safe)
-        id: notes
-        shell: pwsh
-        continue-on-error: true
-        run: |
-          # Try to authenticate gh CLI safely
-          try {
-              $ErrorActionPreference = 'Continue'
-
-              #echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token 2> $null
-
-              # Try to generate release notes
-              try {
-                  $generated = gh release generate "${{ github.ref_name }}" --repo "${{ github.repository }}" 2>&1
-
-                  if ($LASTEXITCODE -eq 0 -and $generated) {
-                      $generated | Out-File -FilePath release_notes.md -Encoding utf8
-                      $body = Get-Content release_notes.md -Raw
-
-                      if ($body) {
-                          # Set GitHub Actions output only if body has content
-                          $output  = "body<<EOF`n$body`nEOF`n"
-                          Add-Content -Path $env:GITHUB_OUTPUT -Value $output -Encoding utf8
-                      } else {
-                          Write-Host "gh CLI returned empty body, skipping output."
-                      }
-                  } else {
-                      Write-Host "gh CLI not permitted or returned empty, skipping body output."
-                  }
-              } catch {
-                  Write-Host "gh CLI failed, skipping body output."
-              }
-          } catch {
-              Write-Host "gh CLI authentication failed or not permitted, continuing without release notes."
-          }
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Create GitHub Release and attach artifacts
       - name: Create Draft GitHub Release
-        uses: ncipollo/release-action@v1.18.0
+        uses: softprops/action-gh-release@v2
         with:
-          tag: ${{ github.ref_name }}
-          body: ${{ steps.notes.outputs.body }}
-          prerelease: ${{ steps.tagversion.outputs.prerelease }}
           draft: true
-          allowUpdates: true
-          omitBodyDuringUpdate: false
-          artifacts: dist/nuget/*.nupkg,dist/nuget/*.snupkg
-          makeLatest: true
+          prerelease: ${{ steps.tagversion.outputs.prerelease }}
+          files: dist/nuget/*.nupkg,dist/nuget/*.snupkg
+          generate_release_notes: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
   publish:
