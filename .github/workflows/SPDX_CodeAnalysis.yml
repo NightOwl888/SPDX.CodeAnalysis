@@ -177,7 +177,7 @@ jobs:
 
       - name: Run Tests
         shell: pwsh
-        continue-on-error: true
+        #continue-on-error: true
         run: |
           $resultsRootDir = "$env:WORKPATH/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}"
           New-Item -ItemType Directory -Force -Path $resultsRootDir | Out-Null
