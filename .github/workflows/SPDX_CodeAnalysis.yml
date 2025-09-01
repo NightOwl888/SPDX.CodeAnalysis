@@ -217,7 +217,7 @@ jobs:
                   #     --exclude "'[Microsoft.*]*'"
 
                   dotnet-coverage collect `
-                      --settings "$env:GITHUB_WORKSPACE/.build/coverage.config" `
+                      --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
                       --format cobertura `
                       --output (Join-Path $coverageDir "coverage.xml") `
                       dotnet test "$dllPath" `
