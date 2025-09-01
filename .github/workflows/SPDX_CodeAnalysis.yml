@@ -213,8 +213,8 @@ jobs:
                   dotnet-coverage collect "$testCmd" `
                       --format cobertura `
                       --output (Join-Path $coverageDir "coverage.xml") `
-                      --exclude '[System.*]*' `
-                      --exclude '[Microsoft.*]*'
+                      --exclude "'[System.*]*'" `
+                      --exclude "'[Microsoft.*]*'"
 
                   # TRX inspection / status computation
                   $trxFile = Join-Path $resultsDirectory "TestResults.trx"
