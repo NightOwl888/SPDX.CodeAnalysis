@@ -218,6 +218,7 @@ jobs:
                     "--blame-hang-timeout", "10m",
                     "--blame-hang-dump-type", "mini",
                     "--blame-crash",
+                    "--working-directory $_.FullName"
                     "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
                   ) -join ' '
 
