@@ -211,13 +211,13 @@ jobs:
           MYGET_SOURCE_URL: ${{ secrets.MYGET_SOURCE_URL }}
           MYGET_API_KEY: ${{ secrets.MYGET_API_KEY }}
 
-      # - name: Push To NuGet
-      #   shell: pwsh
-      #   run: |
-      #     $files = Get-ChildItem "dist/nuget/*.nupkg", "dist/nuget/*.snupkg" -ErrorAction Ignore
-      #     foreach ($file in $files) {
-      #         dotnet nuget push $file.FullName --source $env:NUGET_SOURCE_URL --api-key $env:NUGET_API_KEY --skip-duplicate
-      #     }
-      #   env:
-      #     NUGET_SOURCE_URL: 'https://api.nuget.org/v3/index.json'
-      #     NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+      - name: Push To NuGet
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem "dist/nuget/*.nupkg", "dist/nuget/*.snupkg" -ErrorAction Ignore
+          foreach ($file in $files) {
+              dotnet nuget push $file.FullName --source $env:NUGET_SOURCE_URL --api-key $env:NUGET_API_KEY --skip-duplicate
+          }
+        env:
+          NUGET_SOURCE_URL: 'https://api.nuget.org/v3/index.json'
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
