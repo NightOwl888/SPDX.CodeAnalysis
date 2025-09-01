@@ -207,10 +207,10 @@ jobs:
                     "--blame-hang-dump-type", "mini",
                     "--blame-crash",
                     "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
-                  ) -join ' '
+                  )
 
                   # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
-                  dotnet-coverage collect "$testCmd" `
+                  dotnet-coverage collect $testCmd `
                       --format cobertura `
                       --output (Join-Path $coverageDir "coverage.xml") `
                       --exclude "'[System.*]*'" `
