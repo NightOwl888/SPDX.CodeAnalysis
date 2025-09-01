@@ -244,11 +244,10 @@ jobs:
                   #     --format cobertura `
                   #     --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings")
 
-                  dotnet-coverage collect `
+                  dotnet-coverage collect "$testCmd" `
                       --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
                       --format cobertura `
                       --output (Join-Path $coverageDir "coverage.xml") `
-                      -- $testCmd
 
                   # TRX inspection / status computation
                   $trxFile = Join-Path $resultsDirectory "TestResults.trx"
