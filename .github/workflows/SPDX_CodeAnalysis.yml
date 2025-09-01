@@ -216,10 +216,21 @@ jobs:
                   #     --exclude "'[System.*]*'" `
                   #     --exclude "'[Microsoft.*]*'"
 
+                  # dotnet-coverage collect `
+                  #     --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
+                  #     --format cobertura `
+                  #     --output (Join-Path $coverageDir "coverage.xml") `
+                  #     dotnet test "$dllPath" `
+                  #         --framework "${{ matrix.tfm }}" `
+                  #         --logger "console;verbosity=normal" `
+                  #         --logger "trx;LogFileName=TestResults.trx" `
+                  #         --results-directory "$resultsDirectory" `
+                  #         --blame-hang-timeout "10m" `
+                  #         --blame-hang-dump-type "mini" `
+                  #         --blame-crash `
+                  #         -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
+
                   dotnet-coverage collect `
-                      --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
-                      --format cobertura `
-                      --output (Join-Path $coverageDir "coverage.xml") `
                       dotnet test "$dllPath" `
                           --framework "${{ matrix.tfm }}" `
                           --logger "console;verbosity=normal" `
@@ -228,7 +239,10 @@ jobs:
                           --blame-hang-timeout "10m" `
                           --blame-hang-dump-type "mini" `
                           --blame-crash `
-                          -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
+                          -- RunConfiguration.TargetPlatform=${{ matrix.arch }} `
+                      --output (Join-Path $coverageDir "coverage.xml") `
+                      --format cobertura `
+                      --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings")
 
                   # TRX inspection / status computation
                   $trxFile = Join-Path $resultsDirectory "TestResults.trx"
