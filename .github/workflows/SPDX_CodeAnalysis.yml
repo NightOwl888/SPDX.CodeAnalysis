@@ -256,8 +256,13 @@ jobs:
                   #     --format cobertura `
                   #     --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings")
 
+                  $coverageRunsettingsFile = Join-Path $env:GITHUB_WORKSPACE ".build"
+                  $coverageRunsettingsFile = Join-Path $coverageRunsettingsFile "coverage.runsettings"
+
+                  Write-Host "coverageRunsettingsFile: $coverageRunsettingsFile"
+
                   dotnet-coverage collect "$testCmd" `
-                      --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
+                      --settings "$coverageRunsettingsFile" `
                       --format cobertura `
                       --output (Join-Path $coverageDir "coverage.xml") `
 
