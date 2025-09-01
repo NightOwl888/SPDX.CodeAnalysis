@@ -196,25 +196,39 @@ jobs:
                   $coverageDir = Join-Path $resultsDirectory "coverage"
                   New-Item -ItemType Directory -Force -Path $coverageDir | Out-Null
 
-                  # Build the inner dotnet test command
-                  $testCmd = @(
-                    "dotnet", "test", "`"$dllPath`"",
-                    "--framework", "${{ matrix.tfm }}",
-                    "--logger:`"console;verbosity=normal`"",
-                    "--logger:`"trx;LogFileName=TestResults.trx`"",
-                    "--results-directory", "`"$resultsDirectory`"",
-                    "--blame-hang-timeout", "10m",
-                    "--blame-hang-dump-type", "mini",
-                    "--blame-crash",
-                    "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
-                  )
+                  # # Build the inner dotnet test command
+                  # $testCmd = @(
+                  #   "dotnet", "test", "`"$dllPath`"",
+                  #   "--framework", "${{ matrix.tfm }}",
+                  #   "--logger:`"console;verbosity=normal`"",
+                  #   "--logger:`"trx;LogFileName=TestResults.trx`"",
+                  #   "--results-directory", "`"$resultsDirectory`"",
+                  #   "--blame-hang-timeout", "10m",
+                  #   "--blame-hang-dump-type", "mini",
+                  #   "--blame-crash",
+                  #   "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
+                  # )
 
-                  # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
-                  dotnet-coverage collect $testCmd `
+                  # # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
+                  # dotnet-coverage collect $testCmd `
+                  #     --format cobertura `
+                  #     --output (Join-Path $coverageDir "coverage.xml") `
+                  #     --exclude "'[System.*]*'" `
+                  #     --exclude "'[Microsoft.*]*'"
+
+                  dotnet-coverage collect `
+                      --settings "$env:GITHUB_WORKSPACE/.build/coverage.config" `
                       --format cobertura `
                       --output (Join-Path $coverageDir "coverage.xml") `
-                      --exclude "'[System.*]*'" `
-                      --exclude "'[Microsoft.*]*'"
+                      dotnet test "$dllPath" `
+                          --framework "${{ matrix.tfm }}" `
+                          --logger "console;verbosity=normal" `
+                          --logger "trx;LogFileName=TestResults.trx" `
+                          --results-directory "$resultsDirectory" `
+                          --blame-hang-timeout "10m" `
+                          --blame-hang-dump-type "mini" `
+                          --blame-crash `
+                          -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
 
                   # TRX inspection / status computation
                   $trxFile = Join-Path $resultsDirectory "TestResults.trx"
