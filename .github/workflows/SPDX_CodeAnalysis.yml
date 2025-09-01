@@ -177,6 +177,7 @@ jobs:
 
       - name: Run Tests
         shell: pwsh
+        continue-on-error: true
         run: |
           $resultsRootDir = "$env:WORKPATH/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}"
           New-Item -ItemType Directory -Force -Path $resultsRootDir | Out-Null
@@ -299,7 +300,7 @@ jobs:
           # Append collapsible coverage section to the job summary
           $md = Join-Path $summaryDir "SummaryGithub.md"
           if (Test-Path $md) {
-            Add-Content $env:GITHUB_STEP_SUMMARY "`n<details><summary>Coverage (per-job)</summary>`n"
+            Add-Content $env:GITHUB_STEP_SUMMARY "`n<details><summary>Coverage</summary>`n"
             Get-Content $md | Add-Content $env:GITHUB_STEP_SUMMARY
             Add-Content $env:GITHUB_STEP_SUMMARY "`n</details>`n"
           } else {
@@ -319,8 +320,56 @@ jobs:
           path: ${{ env.WORKPATH }}/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}
 
       - name: Report Test Failure
-        if: env.TESTS_FAILED == 'true'
+        if: always() && env.TESTS_FAILED == 'true'
         run: exit 1
+
+  coverage:
+    name: Aggregate Coverage
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all test result artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-results-*
+          path: all-results
+          merge-multiple: true
+
+      # Required for ReportGenerator
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install ReportGenerator
+        shell: pwsh
+        run: |
+          dotnet tool install --global dotnet-reportgenerator-globaltool
+          echo "$HOME/.dotnet/tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Build Aggregate Report
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "coverage/aggregate" | Out-Null
+          reportgenerator `
+            "-reports:all-results/**/coverage/coverage.xml" `
+            "-targetdir:coverage/aggregate" `
+            "-reporttypes:MarkdownSummaryGithub;HtmlInline_AzurePipelines;HtmlChart" `
+            "-verbosity:Warning"
+
+          $md = "coverage/aggregate/SummaryGithub.md"
+          if (Test-Path $md) {
+            Add-Content $env:GITHUB_STEP_SUMMARY "## Aggregate Coverage`n"
+            Get-Content $md | Add-Content $env:GITHUB_STEP_SUMMARY
+          } else {
+            Add-Content $env:GITHUB_STEP_SUMMARY "## Aggregate Coverage`n_No coverage files found._"
+          }
+
+      - name: Upload Aggregate Coverage HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-aggregate-html
+          path: coverage/aggregate
 
   release:
     name: Release
