@@ -82,6 +82,206 @@ jobs:
     env:
       DIST_DIR: ${{ github.workspace }}/dist
 
+  test:
+    needs: build
+    strategy:
+      matrix:
+        # macos-13 is specifically for running x64, macos-latest for arm64
+        os: [windows-latest, ubuntu-latest, macos-13, macos-latest]
+        arch: [x64, x86, arm64]
+        tfm: [net8.0]
+        exclude:
+        - arch: x86
+          os: ubuntu-latest
+        - arch: x86
+          os: macos-latest
+        - arch: x86
+          os: macos-13
+        - arch: arm64
+          os: macos-13
+        - arch: arm64
+          os: windows-latest
+        - arch: arm64
+          os: ubuntu-latest
+        - arch: x64
+          os: macos-latest
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      # Set up working directories consistently
+      - name: Set Paths (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $dir = "C:\w"
+          New-Item -ItemType Directory -Force -Path $dir
+          New-Item -ItemType Directory -Force -Path "$dir\temp"
+          New-Item -ItemType Directory -Force -Path "$dir\dotnet"
+          New-Item -ItemType Directory -Force -Path "$dir\work"
+          Add-Content $env:GITHUB_ENV "`nWORKPATH=$dir\work"
+          Add-Content $env:GITHUB_ENV "`nTMP=$dir\temp`nTEMP=$dir\temp`nTMPDIR=$dir\temp"
+          Add-Content $env:GITHUB_ENV "`nDOTNET_INSTALL_DIR=$dir\dotnet"
+
+      - name: Set Paths (Linux/macOS)
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        shell: pwsh
+        run: |
+          $dir = "$env:RUNNER_TEMP/w"
+          New-Item -ItemType Directory -Force -Path $dir
+          New-Item -ItemType Directory -Force -Path "$dir/temp"
+          New-Item -ItemType Directory -Force -Path "$dir/dotnet"
+          New-Item -ItemType Directory -Force -Path "$dir/work"
+          Add-Content $env:GITHUB_ENV "`nWORKPATH=$dir/work"
+          Add-Content $env:GITHUB_ENV "`nTMP=$dir/temp`nTEMP=$dir/temp`nTMPDIR=$dir/temp"
+          Add-Content $env:GITHUB_ENV "`nDOTNET_INSTALL_DIR=$dir/dotnet"
+
+      # Install the .NET SDK
+      - name: Setup .NET 8.0
+        if: matrix.arch != 'x86'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Setup .NET 8.0 (x86)
+        if: matrix.arch == 'x86'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+        env:
+          PROCESSOR_ARCHITECTURE: x86
+
+      - name: Download Test Binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: test-assemblies
+          path: ${{ env.WORKPATH }}
+
+      - name: Run Tests
+        shell: pwsh
+        run: |
+          $resultsRootDir = "$env:WORKPATH/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}"
+          New-Item -ItemType Directory -Force -Path $resultsRootDir | Out-Null
+
+          $results = @()
+          $failedProjects = @()
+          $crashedProjects  = @()
+
+          Get-ChildItem -Directory $env:WORKPATH | ForEach-Object {
+              $dllPath = Join-Path $_.FullName ($_.Name + ".dll")
+              $resultsDirectory = Join-Path $resultsRootDir $_.Name
+              New-Item -ItemType Directory -Force -Path $resultsDirectory | Out-Null
+              if (Test-Path $dllPath) {
+                  Write-Host "Running tests in $dllPath"
+                  dotnet test $dllPath `
+                      --framework ${{ matrix.tfm }} `
+                      --logger:"console;verbosity=normal" `
+                      --logger:"trx;LogFileName=TestResults.trx" `
+                      --results-directory $resultsDirectory `
+                      --blame-hang-timeout 10m `
+                      --blame-hang-dump-type mini `
+                      --blame-crash `
+                      -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
+
+                  # Look for blame crash/hang markers in test result logs
+                  $trxFile = Join-Path $resultsDirectory "TestResults.trx"
+                  if (Test-Path $trxFile) {
+                      $reader = [System.Xml.XmlReader]::Create($trxFile)
+                      try
+                      {
+                          $countersFound = $false
+                          $inRunInfos = $false
+                          $crashed = $false
+                          $failedCount = 0
+                          $passedCount = 0
+                          $ignoredCount = 0
+
+                          while ($reader.Read()) {
+                              if ($reader.NodeType -eq [System.Xml.XmlNodeType]::Element) {
+                                  if (!$countersFound -and $reader.Name -eq 'Counters') {
+                                      $failedCount = $reader.GetAttribute('failed')
+                                      $passedCount = $reader.GetAttribute('passed')
+                                      $ignoredCount = (([int]$reader.GetAttribute('total')) - ([int]$reader.GetAttribute('executed'))).ToString()
+                                      $countersFound = $true
+                                  }
+                                  # Report a crash of the test runner (dotnet test with NUnit runner)
+                                  if ($reader.Name -eq 'RunInfos') {
+                                      $inRunInfos = $true
+                                  }
+                                  if ($inRunInfos -and !$crashed -and $reader.Name -eq 'Text') {
+                                      $innerXml = $reader.ReadInnerXml()
+                                      # Test for specific error messages - we may need to adjust this, as needed
+                                      if ($innerXml -and ($innerXml.Contains('Test host process crashed') `
+                                          -or $innerXml.Contains('Could not load file or assembly') `
+                                          -or $innerXml.Contains("Could not find `'dotnet.exe`' host") `
+                                          -or $innerXml.Contains('No test is available') `
+                                          -or $innerXml.Contains('exited with error'))) {
+
+                                          $crashed = $true
+                                      }
+                                  }
+                              }
+                              if ($reader.NodeType -eq [System.Xml.XmlNodeType]::EndElement -and $reader.Name -eq 'RunInfos') {
+                                  $inRunInfos = $false
+                              }
+                          }
+
+                          # Determine status for this project
+                          if ($crashed) {
+                              $statusIcon = '⚠️'
+                              $statusText = 'Crashed'
+                          } elseif ($failedCount -gt 0) {
+                              $statusIcon = '❌'
+                              $statusText = 'Failed'
+                          } else {
+                              $statusIcon = '✅'
+                              $statusText = 'Passed'
+                          }
+
+                          # Store results
+                          $results += [PSCustomObject]@{
+                              Project = $_.Name
+                              Passed  = $passedCount
+                              Failed  = $failedCount
+                              Ignored = $ignoredCount
+                              Status  = $statusIcon
+                              StatusText = $statusText
+                          }
+                      } finally {
+                          $reader.Dispose()
+                      }
+                  }
+              }
+          }
+
+          # Write summary
+          Add-Content $env:GITHUB_STEP_SUMMARY "## Test Results`n"
+
+          foreach ($r in $results) {
+              $line = "- $($r.Status) $($r.StatusText) - **$($r.Project)** | Passed=$($r.Passed), Failed=$($r.Failed), Ignored=$($r.Ignored)"
+              Add-Content $env:GITHUB_STEP_SUMMARY $line
+          }
+
+          # Store failure state for later steps
+          if ($results | Where-Object { $_.Failed -gt 0 -or $_.StatusText -eq 'Crashed' }) {
+              Add-Content $env:GITHUB_ENV "`nTESTS_FAILED=true"
+          }
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-${{ matrix.arch }}
+          path: ${{ env.WORKPATH }}/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}
+
+      - name: Report Test Failure
+        if: env.TESTS_FAILED == 'true'
+        run: exit 1
+
   release:
     name: Release
     if: github.event_name == 'push' && github.ref_type == 'tag'
