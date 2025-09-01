@@ -5,6 +5,7 @@ VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
+		.build\coverage.runsettings = .build\coverage.runsettings
 		.build\dependencies.props = .build\dependencies.props
 		.build\nuget.props = .build\nuget.props
 		version.json = version.json
