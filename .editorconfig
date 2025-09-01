@@ -58,6 +58,8 @@ indent_size = 2
 indent_size = 2
 [*.targets]
 indent_size = 2
+[*.sln]
+indent_style = tab
 
 # Resources
 [*.resx]
