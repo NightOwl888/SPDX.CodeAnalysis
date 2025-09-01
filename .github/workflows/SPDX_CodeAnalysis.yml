@@ -210,7 +210,11 @@ jobs:
                   ) -join ' '
 
                   # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
-                  dotnet-coverage collect "$testCmd" -f cobertura -o (Join-Path $coverageDir "coverage.xml")
+                  dotnet-coverage collect "$testCmd" `
+                      --format cobertura `
+                      --output (Join-Path $coverageDir "coverage.xml") `
+                      --exclude '[System.*]*' `
+                      --exclude '[Microsoft.*]*'
 
                   # TRX inspection / status computation
                   $trxFile = Join-Path $resultsDirectory "TestResults.trx"
