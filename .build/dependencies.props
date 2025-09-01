@@ -1,7 +1,6 @@
 
 <Project>
   <PropertyGroup Label="NuGet Package Reference Versions">
-    <CoverletCollectorPackageReferenceVersion>6.0.4</CoverletCollectorPackageReferenceVersion>
     <MicrosoftNETTestSdkPackageReferenceVersion>16.1.1</MicrosoftNETTestSdkPackageReferenceVersion>
     <!--<NerdBankGitVersioningPackageReferenceVersion>[3.5.73-alpha]</NerdBankGitVersioningPackageReferenceVersion>-->
     <NerdBankGitVersioningPackageReferenceVersion>3.7.115</NerdBankGitVersioningPackageReferenceVersion>
