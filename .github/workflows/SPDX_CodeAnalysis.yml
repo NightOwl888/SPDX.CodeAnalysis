@@ -182,31 +182,40 @@ jobs:
           New-Item -ItemType Directory -Force -Path $resultsRootDir | Out-Null
 
           $results = @()
-          $failedProjects = @()
-          $crashedProjects  = @()
 
           Get-ChildItem -Directory $env:WORKPATH | ForEach-Object {
               $dllPath = Join-Path $_.FullName ($_.Name + ".dll")
               $resultsDirectory = Join-Path $resultsRootDir $_.Name
               New-Item -ItemType Directory -Force -Path $resultsDirectory | Out-Null
+
               if (Test-Path $dllPath) {
                   Write-Host "Running tests in $dllPath"
-                  dotnet test $dllPath `
-                      --framework ${{ matrix.tfm }} `
-                      --logger:"console;verbosity=normal" `
-                      --logger:"trx;LogFileName=TestResults.trx" `
-                      --results-directory $resultsDirectory `
-                      --blame-hang-timeout 10m `
-                      --blame-hang-dump-type mini `
-                      --blame-crash `
-                      -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
 
-                  # Look for blame crash/hang markers in test result logs
+                  # Ensure a coverage folder per test project output
+                  $coverageDir = Join-Path $resultsDirectory "coverage"
+                  New-Item -ItemType Directory -Force -Path $coverageDir | Out-Null
+
+                  # Build the inner dotnet test command
+                  $testCmd = @(
+                    "dotnet", "test", "`"$dllPath`"",
+                    "--framework", "${{ matrix.tfm }}",
+                    "--logger:`"console;verbosity=normal`"",
+                    "--logger:`"trx;LogFileName=TestResults.trx`"",
+                    "--results-directory", "`"$resultsDirectory`"",
+                    "--blame-hang-timeout", "10m",
+                    "--blame-hang-dump-type", "mini",
+                    "--blame-crash",
+                    "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
+                  ) -join ' '
+
+                  # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
+                  dotnet-coverage collect "$testCmd" -f cobertura -o (Join-Path $coverageDir "coverage.xml")
+
+                  # TRX inspection / status computation
                   $trxFile = Join-Path $resultsDirectory "TestResults.trx"
                   if (Test-Path $trxFile) {
                       $reader = [System.Xml.XmlReader]::Create($trxFile)
-                      try
-                      {
+                      try {
                           $countersFound = $false
                           $inRunInfos = $false
                           $crashed = $false
@@ -222,7 +231,7 @@ jobs:
                                       $ignoredCount = (([int]$reader.GetAttribute('total')) - ([int]$reader.GetAttribute('executed'))).ToString()
                                       $countersFound = $true
                                   }
-                                  # Report a crash of the test runner (dotnet test with NUnit runner)
+                                  # Report a crash of the test runner
                                   if ($reader.Name -eq 'RunInfos') {
                                       $inRunInfos = $true
                                   }
@@ -246,14 +255,11 @@ jobs:
 
                           # Determine status for this project
                           if ($crashed) {
-                              $statusIcon = '⚠️'
-                              $statusText = 'Crashed'
+                              $statusIcon = '⚠️'; $statusText = 'Crashed'
                           } elseif ($failedCount -gt 0) {
-                              $statusIcon = '❌'
-                              $statusText = 'Failed'
+                              $statusIcon = '❌'; $statusText = 'Failed'
                           } else {
-                              $statusIcon = '✅'
-                              $statusText = 'Passed'
+                              $statusIcon = '✅'; $statusText = 'Passed'
                           }
 
                           # Store results
@@ -274,13 +280,33 @@ jobs:
 
           # Write summary
           Add-Content $env:GITHUB_STEP_SUMMARY "## Test Results`n"
-
           foreach ($r in $results) {
               $line = "- $($r.Status) $($r.StatusText) - **$($r.Project)** | Passed=$($r.Passed), Failed=$($r.Failed), Ignored=$($r.Ignored)"
               Add-Content $env:GITHUB_STEP_SUMMARY $line
           }
 
-          # Store failure state for later steps
+          # Generate a per-job coverage summary + HTML reports from all coverage.xml files created above
+          $summaryDir = Join-Path $resultsRootDir "coverage-report"
+          New-Item -ItemType Directory -Force -Path $summaryDir | Out-Null
+
+          $reportsGlob = Join-Path $resultsRootDir "**/coverage/coverage.xml"
+          reportgenerator `
+            "-reports:$reportsGlob" `
+            "-targetdir:$summaryDir" `
+            "-reporttypes:MarkdownSummaryGithub;HtmlInline_AzurePipelines;HtmlChart" `
+            "-verbosity:Warning"
+
+          # Append collapsible coverage section to the job summary
+          $md = Join-Path $summaryDir "SummaryGithub.md"
+          if (Test-Path $md) {
+            Add-Content $env:GITHUB_STEP_SUMMARY "`n<details><summary>Coverage (per-job)</summary>`n"
+            Get-Content $md | Add-Content $env:GITHUB_STEP_SUMMARY
+            Add-Content $env:GITHUB_STEP_SUMMARY "`n</details>`n"
+          } else {
+            Write-Host "Coverage summary not generated (no coverage.xml found)."
+          }
+
+          # Mark failure state for later steps
           if ($results | Where-Object { $_.Failed -gt 0 -or $_.StatusText -eq 'Crashed' }) {
               Add-Content $env:GITHUB_ENV "`nTESTS_FAILED=true"
           }
