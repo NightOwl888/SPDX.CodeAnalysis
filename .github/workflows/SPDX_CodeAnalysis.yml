@@ -113,7 +113,7 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Debug: Show checkout location
+      - name: "Debug: Show checkout location"
         run: |
           echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
           pwd
@@ -133,7 +133,7 @@ jobs:
           Add-Content $env:GITHUB_ENV "`nTMP=$dir\temp`nTEMP=$dir\temp`nTMPDIR=$dir\temp"
           Add-Content $env:GITHUB_ENV "`nDOTNET_INSTALL_DIR=$dir\dotnet"
 
-      - name: Debug: Show checkout location
+      - name: "Debug: Show checkout location"
         run: |
           echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
           pwd
