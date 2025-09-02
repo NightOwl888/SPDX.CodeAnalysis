@@ -229,15 +229,16 @@ jobs:
                     "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
                   ) -join ' '
 
-                  # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
-                  dotnet-coverage collect "$testCmd" -f cobertura -o (Join-Path $coverageDir "coverage.xml")
+                  # # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
+                  # dotnet-coverage collect "$testCmd" -f cobertura -o (Join-Path $coverageDir "coverage.xml")
 
                   # "--working-directory", "`"$env:WORKPATH`"",
 
-                  # # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
-                  # dotnet-coverage collect "$testCmd" `
-                  #     --format cobertura `
-                  #     --output (Join-Path $coverageDir "coverage.xml")
+                  # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
+                  dotnet-coverage collect "$testCmd" `
+                      --output-format cobertura `
+                      --output (Join-Path $coverageDir "coverage.xml") `
+                      --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings")
 
                   # # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
                   # dotnet-coverage collect $testCmd `
