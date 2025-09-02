@@ -9,6 +9,25 @@
         Included items must then not match any entries in the exclude list to remain included.
         -->
 
+        <!-- Exclude test assemblies that contain 'Tests' as a segment -->
+        <ModulePaths>
+            <Include>
+                <ModulePath>.*\.dll$</ModulePath>
+                <ModulePath>.*\.exe$</ModulePath>
+            </Include>
+            <Exclude>
+                <!--
+                  Exclude assemblies where the filename contains ".Tests" as a dot-separated segment.
+                  Matches:
+                    - Something.Tests.dll
+                    - Something.Foo.Tests.dll
+                  Does NOT match:
+                    - SomethingTests.dll
+                -->
+                <ModulePath>.*\.Tests(\.|$).*</ModulePath>
+            </Exclude>
+        </ModulePaths>
+
         <!-- Match attributes on any code element: -->
         <Attributes>
             <Exclude>
