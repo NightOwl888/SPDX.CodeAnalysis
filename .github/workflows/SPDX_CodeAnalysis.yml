@@ -205,9 +205,9 @@ jobs:
                     --blame-hang-timeout 10m `
                     --blame-hang-dump-type mini `
                     --blame-crash `
-                    -p:CollectCoverage=true `
-                    -p:CoverletOutputFormat=cobertura `
-                    -p:CoverletOutput="$coverletOutputBase" `
+                    /p:CollectCoverage=true `
+                    /p:CoverletOutputFormat=cobertura `
+                    /p:CoverletOutput="$coverletOutputBase" `
                     -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
 
                   # coverlet typically writes e.g. $coverletOutputBase + ".cobertura.xml"
