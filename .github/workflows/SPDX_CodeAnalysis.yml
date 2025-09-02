@@ -240,7 +240,40 @@ jobs:
                   # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
                   if ("${{ matrix.arch }}" -eq 'arm64' -and "${{ runner.os }}" -eq 'macOS') {
                       Write-Host "...macOS on ARM64 detected, skipping coverage..."
-                      Invoke-Expression $testCmd
+
+                      # Create a folder for the instrumented DLL
+                      $instrumentedDir = Join-Path $coverageDir "instrumented"
+                      New-Item -ItemType Directory -Force -Path $instrumentedDir | Out-Null
+
+                      $instrumentedDll = Join-Path $instrumentedDir ($_.Name + ".dll")
+
+                      # Instrument the DLL into a copy
+                      dotnet-coverage instrument `
+                          --include-files "$dllPath" `
+                          --output "$instrumentedDll" `
+                          --log-level Verbose
+
+                      # Collect coverage from the instrumented DLL
+                      dotnet-coverage collect "$testCmd" `
+                          --output-format cobertura `
+                          --output (Join-Path $coverageDir "coverage.xml") `
+                          --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
+                          --include-files "$instrumentedDll"
+
+
+                      # # Run tests without coverage, because instrumenting 
+                      # dotnet test "$dllPath" `
+                      #   --framework ${{ matrix.tfm }} `
+                      #   --logger:"console;verbosity=normal" `
+                      #   --logger:"trx;LogFileName=TestResults.trx" `
+                      #   --results-directory "$resultsDirectory" `
+                      #   --blame-hang-timeout 10m `
+                      #   --blame-hang-dump-type mini `
+                      #   --blame-crash `
+                      #   -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
+
+
+                      #Invoke-Expression $testCmd
 
                       # Write-Host "...macOS on ARM64 detected..."
                       # # Dynamic instrumentation is not supported on macOS arm64, so we need to
