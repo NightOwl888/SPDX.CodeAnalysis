@@ -251,6 +251,7 @@ jobs:
                       dotnet-coverage instrument `
                           --include-files "$dllPath" `
                           --output "$instrumentedDll" `
+                          --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
                           --log-level Verbose
 
                       # Collect coverage from the instrumented DLL
