@@ -91,7 +91,10 @@
     <!-- Exclude test asssemblies -->
     <IncludeTestAssembly>False</IncludeTestAssembly>
 
-    <!-- Recommended to be set to false when the project has no C++ code -->
-    <EnableStaticManagedInstrumentation>False</EnableStaticManagedInstrumentation>
+    <EnableStaticManagedInstrumentation>True</EnableStaticManagedInstrumentation>
     <EnableDynamicManagedInstrumentation>False</EnableDynamicManagedInstrumentation>
+    <UseVerifiableInstrumentation>False</UseVerifiableInstrumentation>
+    <!-- Recommended to be set to false when the project has no C++ code -->
+    <EnableStaticNativeInstrumentation>False</EnableStaticNativeInstrumentation>
+    <EnableDynamicNativeInstrumentation>False</EnableDynamicNativeInstrumentation>
 </Configuration>
