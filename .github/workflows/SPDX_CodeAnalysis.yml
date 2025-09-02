@@ -5,9 +5,8 @@ on:
   push:
     branches:
       - main
-      - 'releases/v*.*'      # matches releases/v1.2
-      - 'releases/v*.*.*'    # matches releases/v1.2.3
-      - release-workflow
+      - 'release/v*.*'      # matches release/v1.2
+      - 'release/v*.*.*'    # matches release/v1.2.3
     tags:
       - 'v*'
   pull_request:
