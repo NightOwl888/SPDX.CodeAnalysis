@@ -241,10 +241,11 @@ jobs:
                   if ("${{ matrix.arch}}" -eq 'arm64') {
                       # dotnet-coverage isn't working on arm64, so we run the coverage command with Rosetta
                       # on x64. The inner dotnet test command runs on arm64.
-                      arch -x86_64 dotnet-coverage collect "$testCmd" `
+                      dotnet-coverage collect "$testCmd" `
                           --output-format cobertura `
                           --output (Join-Path $coverageDir "coverage.xml") `
-                          --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings")
+                          --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
+                          --log-level Verbose
                   } else {
                       dotnet-coverage collect "$testCmd" `
                           --output-format cobertura `
