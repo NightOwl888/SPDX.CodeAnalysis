@@ -25,6 +25,12 @@
                     - SomethingTests.dll
                 -->
                 <ModulePath>.*\.Tests(\.|$).*</ModulePath>
+            
+                <!-- Exclude NUnit adapter -->
+                <ModulePath>.*NUnit3\.TestAdapter.*</ModulePath>
+
+                <!-- Exclude Roslyn analyzer test helpers -->
+                <ModulePath>.*Microsoft\.CodeAnalysis\.Analyzer\.Testing.*</ModulePath>
             </Exclude>
         </ModulePaths>
 
