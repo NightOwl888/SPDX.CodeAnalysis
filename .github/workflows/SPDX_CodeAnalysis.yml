@@ -231,6 +231,7 @@ jobs:
                     "--logger:`"console;verbosity=normal`"",
                     "--logger:`"trx;LogFileName=TestResults.trx`"",
                     "--results-directory", "`"$resultsDirectory`"",
+                    "--collect", "`"Code Coverage;Format=cobertura`""
                     "--blame-hang-timeout", "10m",
                     "--blame-hang-dump-type", "mini",
                     "--blame-crash",
