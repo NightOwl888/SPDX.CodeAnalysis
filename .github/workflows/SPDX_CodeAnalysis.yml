@@ -197,13 +197,13 @@ jobs:
                   $coverletOutputBase = Join-Path $coverageDir "coverage"      # coverlet will append suffix/extension
                   New-Item -ItemType Directory -Force -Path $coverletOutputBase | Out-Null
 
-                  dotnet test "`"$dllPath`"" `
-                    --framework "${{ matrix.tfm }}" `
-                    --logger "console;verbosity=normal" `
-                    --logger "trx;LogFileName=TestResults.trx" `
-                    --results-directory "`"$resultsDirectory`"" `
-                    --blame-hang-timeout "10m" `
-                    --blame-hang-dump-type "mini" `
+                  dotnet test "$dllPath" `
+                    --framework ${{ matrix.tfm }} `
+                    --logger:"console;verbosity=normal" `
+                    --logger:"trx;LogFileName=TestResults.trx" `
+                    --results-directory "$resultsDirectory" `
+                    --blame-hang-timeout 10m `
+                    --blame-hang-dump-type mini `
                     --blame-crash `
                     -p:CollectCoverage=true `
                     -p:CoverletOutputFormat=cobertura `
