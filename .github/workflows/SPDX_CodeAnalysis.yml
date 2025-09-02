@@ -277,7 +277,7 @@ jobs:
                       dotnet-coverage collect "$testCmd" `
                           --settings "$coverageRunsettingsFile" `
                           --format cobertura `
-                          --output (Join-Path $coverageDir "coverage.xml") `
+                          --output (Join-Path $coverageDir "coverage.xml")
                   } finally {
                       Pop-Location
                   }
