@@ -275,12 +275,13 @@ jobs:
                   Push-Location $env:WORKPATH
                   try {
                       dotnet-coverage collect "$testCmd" `
-                          --settings "$coverageRunsettingsFile" `
                           --format cobertura `
                           --output (Join-Path $coverageDir "coverage.xml")
                   } finally {
                       Pop-Location
                   }
+
+                  #--settings "$coverageRunsettingsFile" `
 
                   # TRX inspection / status computation
                   $trxFile = Join-Path $resultsDirectory "TestResults.trx"
