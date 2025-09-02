@@ -241,15 +241,20 @@ jobs:
                   if ("${{ matrix.arch }}" -eq 'arm64' -and "${{ runner.os }}" -eq 'macOS') {
                       Write-Host "...macOS on ARM64 detected..."
                       # Dynamic instrumentation is not supported on macOS arm64, so we need to
-                      # enable static instrumentation by passing --include-files and --include-directory
+                      # enable static instrumentation by passing --include-files
                       # to tell it exactly where to look.
+
+                      # Escape DLL path for regex
+                      $escapedDll = [regex]::Escape($dllPath)
+
                       dotnet-coverage collect "$testCmd" `
                           --output-format cobertura `
                           --output (Join-Path $coverageDir "coverage.xml") `
                           --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
                           --log-level Verbose `
-                          --include-files "$WORKPATH/**/*.dll" `
-                          --include-directory "$env:WORKPATH"
+                          --include-files "$escapedDll"
+                          #--include-files "$WORKPATH/**/*.dll" `
+                          #--include-directory "$env:WORKPATH"
                   } else {
                       dotnet-coverage collect "$testCmd" `
                           --output-format cobertura `
