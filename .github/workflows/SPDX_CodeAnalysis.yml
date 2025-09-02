@@ -239,20 +239,23 @@ jobs:
 
                   # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
                   if ("${{ matrix.arch }}" -eq 'arm64' -and "${{ runner.os }}" -eq 'macOS') {
-                      Write-Host "...macOS on ARM64 detected..."
-                      # Dynamic instrumentation is not supported on macOS arm64, so we need to
-                      # enable static instrumentation by passing --include-files
-                      # to tell it exactly where to look.
+                      Write-Host "...macOS on ARM64 detected, skipping coverage..."
+                      Invoke-Expression $testCmd
 
-                      # Escape DLL path for regex
-                      $escapedDll = [regex]::Escape($dllPath)
+                      # Write-Host "...macOS on ARM64 detected..."
+                      # # Dynamic instrumentation is not supported on macOS arm64, so we need to
+                      # # enable static instrumentation by passing --include-files
+                      # # to tell it exactly where to look.
 
-                      dotnet-coverage collect "$testCmd" `
-                          --output-format cobertura `
-                          --output (Join-Path $coverageDir "coverage.xml") `
-                          --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
-                          --instrument `
-                          --include-files "$escapedDll"
+                      # # Escape DLL path for regex
+                      # $escapedDll = [regex]::Escape($dllPath)
+
+                      # dotnet-coverage collect "$testCmd" `
+                      #     --output-format cobertura `
+                      #     --output (Join-Path $coverageDir "coverage.xml") `
+                      #     --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
+                      #     --instrument `
+                      #     --include-files "$escapedDll"
                   } else {
                       dotnet-coverage collect "$testCmd" `
                           --output-format cobertura `
