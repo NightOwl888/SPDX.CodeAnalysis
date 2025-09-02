@@ -272,14 +272,14 @@ jobs:
 
                   Write-Host "coverageRunsettingsFile: $coverageRunsettingsFile"
 
-                  Push-Location $env:WORKPATH
-                  try {
+                  # Push-Location $env:WORKPATH
+                  # try {
                       dotnet-coverage collect "$testCmd" `
                           --format cobertura `
                           --output (Join-Path $coverageDir "coverage.xml")
-                  } finally {
-                      Pop-Location
-                  }
+                  # } finally {
+                  #     Pop-Location
+                  # }
 
                   #--settings "$coverageRunsettingsFile" `
 
