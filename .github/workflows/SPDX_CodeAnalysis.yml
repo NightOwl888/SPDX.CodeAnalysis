@@ -237,6 +237,8 @@ jobs:
                     "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
                   ) -join ' '
 
+                  $includesCoverage = $true
+
                   # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
                   if ("${{ matrix.arch }}" -eq 'arm64' -and "${{ runner.os }}" -eq 'macOS') {
                       Write-Host "...macOS on ARM64 detected, skipping coverage..."
@@ -261,6 +263,7 @@ jobs:
                       #     --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
                       #     --include-files "$instrumentedDll"
 
+                      $includesCoverage = $false
 
                       # Run tests without coverage, because static instrumenting is complex.
                       dotnet test "$dllPath" `
@@ -371,25 +374,27 @@ jobs:
               Add-Content $env:GITHUB_STEP_SUMMARY $line
           }
 
-          # Generate a per-job coverage summary + HTML reports from all coverage.xml files created above
-          $summaryDir = Join-Path $resultsRootDir "coverage-report"
-          New-Item -ItemType Directory -Force -Path $summaryDir | Out-Null
+          if ($includesCoverage) {
+              # Generate a per-job coverage summary + HTML reports from all coverage.xml files created above
+              $summaryDir = Join-Path $resultsRootDir "coverage-report"
+              New-Item -ItemType Directory -Force -Path $summaryDir | Out-Null
 
-          $reportsGlob = Join-Path $resultsRootDir "**/coverage/coverage.xml"
-          reportgenerator `
-            "-reports:$reportsGlob" `
-            "-targetdir:$summaryDir" `
-            "-reporttypes:MarkdownSummaryGithub;HtmlInline_AzurePipelines;HtmlChart" `
-            "-verbosity:Warning"
+              $reportsGlob = Join-Path $resultsRootDir "**/coverage/coverage.xml"
+              reportgenerator `
+                "-reports:$reportsGlob" `
+                "-targetdir:$summaryDir" `
+                "-reporttypes:MarkdownSummaryGithub;HtmlInline_AzurePipelines;HtmlChart" `
+                "-verbosity:Warning"
 
-          # Append collapsible coverage section to the job summary
-          $md = Join-Path $summaryDir "SummaryGithub.md"
-          if (Test-Path $md) {
-            Add-Content $env:GITHUB_STEP_SUMMARY "`n<details><summary>Coverage</summary>`n"
-            Get-Content $md | Add-Content $env:GITHUB_STEP_SUMMARY
-            Add-Content $env:GITHUB_STEP_SUMMARY "`n</details>`n"
-          } else {
-            Write-Host "Coverage summary not generated (no coverage.xml found)."
+              # Append collapsible coverage section to the job summary
+              $md = Join-Path $summaryDir "SummaryGithub.md"
+              if (Test-Path $md) {
+                Add-Content $env:GITHUB_STEP_SUMMARY "`n<details><summary>Coverage</summary>`n"
+                Get-Content $md | Add-Content $env:GITHUB_STEP_SUMMARY
+                Add-Content $env:GITHUB_STEP_SUMMARY "`n</details>`n"
+              } else {
+                Write-Host "Coverage summary not generated (no coverage.xml found)."
+              }
           }
 
           # Mark failure state for later steps
