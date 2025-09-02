@@ -113,12 +113,6 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: "Debug: Show checkout location"
-        run: |
-          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
-          pwd
-          ls -la
-
       # Set up working directories consistently
       - name: Set Paths (Windows)
         if: runner.os == 'Windows'
@@ -132,12 +126,6 @@ jobs:
           Add-Content $env:GITHUB_ENV "`nWORKPATH=$dir\work"
           Add-Content $env:GITHUB_ENV "`nTMP=$dir\temp`nTEMP=$dir\temp`nTMPDIR=$dir\temp"
           Add-Content $env:GITHUB_ENV "`nDOTNET_INSTALL_DIR=$dir\dotnet"
-
-      - name: "Debug: Show checkout location"
-        run: |
-          echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
-          pwd
-          ls -la
 
       - name: Set Paths (Linux/macOS)
         if: runner.os == 'Linux' || runner.os == 'macOS'
@@ -172,14 +160,6 @@ jobs:
         with:
           name: test-assemblies
           path: ${{ env.WORKPATH }}
-
-      - name: Copy Coverage Settings to Work Path
-        shell: pwsh
-        run: |
-          $coverageSettings = Join-Path $env:GITHUB_WORKSPACE ".build\coverage.runsettings"
-          $dest = Join-Path $env:WORKPATH "coverage.runsettings"
-          Write-Host "Copying $coverageSettings to $dest"
-          Copy-Item -Path $coverageSettings -Destination $dest -Force
 
       - name: Install Coverage + Report Tools
         shell: pwsh
@@ -229,69 +209,11 @@ jobs:
                     "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
                   ) -join ' '
 
-                  # # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
-                  # dotnet-coverage collect "$testCmd" -f cobertura -o (Join-Path $coverageDir "coverage.xml")
-
-                  # "--working-directory", "`"$env:WORKPATH`"",
-
                   # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
                   dotnet-coverage collect "$testCmd" `
                       --output-format cobertura `
                       --output (Join-Path $coverageDir "coverage.xml") `
                       --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings")
-
-                  # # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
-                  # dotnet-coverage collect $testCmd `
-                  #     --format cobertura `
-                  #     --output (Join-Path $coverageDir "coverage.xml") `
-                  #     --exclude "'[System.*]*'" `
-                  #     --exclude "'[Microsoft.*]*'"
-
-                  # dotnet-coverage collect `
-                  #     --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
-                  #     --format cobertura `
-                  #     --output (Join-Path $coverageDir "coverage.xml") `
-                  #     dotnet test "$dllPath" `
-                  #         --framework "${{ matrix.tfm }}" `
-                  #         --logger "console;verbosity=normal" `
-                  #         --logger "trx;LogFileName=TestResults.trx" `
-                  #         --results-directory "$resultsDirectory" `
-                  #         --blame-hang-timeout "10m" `
-                  #         --blame-hang-dump-type "mini" `
-                  #         --blame-crash `
-                  #         -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
-
-                  # dotnet-coverage collect `
-                  #     dotnet test "$dllPath" `
-                  #         --framework "${{ matrix.tfm }}" `
-                  #         --logger "console;verbosity=normal" `
-                  #         --logger "trx;LogFileName=TestResults.trx" `
-                  #         --results-directory "$resultsDirectory" `
-                  #         --blame-hang-timeout "10m" `
-                  #         --blame-hang-dump-type "mini" `
-                  #         --blame-crash `
-                  #         -- RunConfiguration.TargetPlatform=${{ matrix.arch }} `
-                  #     --output (Join-Path $coverageDir "coverage.xml") `
-                  #     --format cobertura `
-                  #     --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings")
-
-                  #$coverageRunsettingsFile = Join-Path $env:GITHUB_WORKSPACE ".build"
-                  #$coverageRunsettingsFile = Join-Path $coverageRunsettingsFile "coverage.runsettings"
-
-                  # $coverageRunsettingsFile = Join-Path $env:WORKPATH "coverage.runsettings"
-
-                  # Write-Host "coverageRunsettingsFile: $coverageRunsettingsFile"
-
-                  # Push-Location $env:WORKPATH
-                  # try {
-                  #     dotnet-coverage collect "$testCmd" `
-                  #         --format cobertura `
-                  #         --output (Join-Path $coverageDir "coverage.xml")
-                  # } finally {
-                  #     Pop-Location
-                  # }
-
-                  # #--settings "$coverageRunsettingsFile" `
 
                   # TRX inspection / status computation
                   $trxFile = Join-Path $resultsDirectory "TestResults.trx"
