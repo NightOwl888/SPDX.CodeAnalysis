@@ -182,6 +182,7 @@ jobs:
           $resultsRootDir = "$env:WORKPATH/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}"
           New-Item -ItemType Directory -Force -Path $resultsRootDir | Out-Null
 
+          $includesCoverage = $false
           $results = @()
 
           Get-ChildItem -Directory $env:WORKPATH | ForEach-Object {
@@ -194,35 +195,7 @@ jobs:
 
                   # Ensure a coverage folder per test project output
                   $coverageDir = Join-Path $resultsDirectory "coverage"
-                  # $coverletOutputBase = Join-Path $coverageDir "coverage"      # coverlet will append suffix/extension
                   New-Item -ItemType Directory -Force -Path $coverageDir | Out-Null
-
-                  # # dotnet test "$dllPath" `
-                  # #   --framework ${{ matrix.tfm }} `
-                  # #   --logger:"console;verbosity=normal" `
-                  # #   --logger:"trx;LogFileName=TestResults.trx" `
-                  # #   --results-directory "$resultsDirectory" `
-                  # #   --blame-hang-timeout 10m `
-                  # #   --blame-hang-dump-type mini `
-                  # #   --blame-crash `
-                  # #   /p:CollectCoverage=true `
-                  # #   /p:CoverletOutputFormat=cobertura `
-                  # #   /p:CoverletOutput="$coverletOutputBase" `
-                  # #   -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
-
-                  # # # coverlet typically writes e.g. $coverletOutputBase + ".cobertura.xml"
-                  # # # find whatever cobertura file was generated and rename/copy it to coverage.xml (your pipeline expects coverage/coverage.xml)
-                  # # $generated = Get-ChildItem -Path $coverageDir -Filter "*cobertura*.xml" -File -ErrorAction SilentlyContinue
-                  # # if (-not $generated) {
-                  # #     # sometimes file is named coverage.json or coverage.cobertura.xml; be a little more tolerant
-                  # #     $generated = Get-ChildItem -Path $coverageDir -Filter "*coverage*.*xml" -File -ErrorAction SilentlyContinue
-                  # # }
-                  # # if ($generated -and $generated.Count -gt 0) {
-                  # #     # copy first match to coverage.xml
-                  # #     Copy-Item -Path $generated[0].FullName -Destination (Join-Path $coverageDir "coverage.xml") -Force
-                  # # } else {
-                  # #     Write-Host "No coverage file found in $coverageDir"
-                  # # }
 
                   # Build the inner dotnet test command
                   $testCmd = @(
@@ -237,33 +210,11 @@ jobs:
                     "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
                   ) -join ' '
 
-                  $includesCoverage = $true
+                  $coverageFile = Join-Path $coverageDir "coverage.xml"
 
                   # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
                   if ("${{ matrix.arch }}" -eq 'arm64' -and "${{ runner.os }}" -eq 'macOS') {
                       Write-Host "...macOS on ARM64 detected, skipping coverage..."
-
-                      # # Create a folder for the instrumented DLL
-                      # $instrumentedDir = Join-Path $coverageDir "instrumented"
-                      # New-Item -ItemType Directory -Force -Path $instrumentedDir | Out-Null
-
-                      # $instrumentedDll = Join-Path $instrumentedDir ($_.Name + ".dll")
-
-                      # # Instrument the DLL into a copy
-                      # dotnet-coverage instrument `
-                      #     --include-files "$dllPath" `
-                      #     --output "$instrumentedDll" `
-                      #     --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
-                      #     --log-level Verbose
-
-                      # # Collect coverage from the instrumented DLL
-                      # dotnet-coverage collect "$testCmd" `
-                      #     --output-format cobertura `
-                      #     --output (Join-Path $coverageDir "coverage.xml") `
-                      #     --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
-                      #     --include-files "$instrumentedDll"
-
-                      $includesCoverage = $false
 
                       # Run tests without coverage, because static instrumenting is complex.
                       dotnet test "$dllPath" `
@@ -275,29 +226,15 @@ jobs:
                         --blame-hang-dump-type mini `
                         --blame-crash `
                         -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
-
-
-                      #Invoke-Expression $testCmd
-
-                      # Write-Host "...macOS on ARM64 detected..."
-                      # # Dynamic instrumentation is not supported on macOS arm64, so we need to
-                      # # enable static instrumentation by passing --include-files
-                      # # to tell it exactly where to look.
-
-                      # # Escape DLL path for regex
-                      # $escapedDll = [regex]::Escape($dllPath)
-
-                      # dotnet-coverage collect "$testCmd" `
-                      #     --output-format cobertura `
-                      #     --output (Join-Path $coverageDir "coverage.xml") `
-                      #     --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
-                      #     --instrument `
-                      #     --include-files "$escapedDll"
                   } else {
                       dotnet-coverage collect "$testCmd" `
                           --output-format cobertura `
-                          --output (Join-Path $coverageDir "coverage.xml") `
+                          --output "$coverageFile" `
                           --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings")
+                  }
+
+                  if (Test-Path $coverageFile) {
+                      $includesCoverage = $true
                   }
 
                   # TRX inspection / status computation
