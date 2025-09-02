@@ -231,7 +231,6 @@ jobs:
                     "--logger:`"console;verbosity=normal`"",
                     "--logger:`"trx;LogFileName=TestResults.trx`"",
                     "--results-directory", "`"$resultsDirectory`"",
-                    "--collect", "`"Code Coverage;Format=cobertura`""
                     "--blame-hang-timeout", "10m",
                     "--blame-hang-dump-type", "mini",
                     "--blame-crash",
@@ -239,7 +238,9 @@ jobs:
                   ) -join ' '
 
                   # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
-                  if ("${{ matrix.arch}}" -eq 'arm64') {
+                  if ("${{ matrix.arch }}" -eq 'arm64' -and "${{ runner.os }}" -eq 'macOS') {
+                      Write-Host "...macOS on ARM64 detected..."
+
                       # dotnet-coverage isn't working on arm64, so we run the coverage command with Rosetta
                       # on x64. The inner dotnet test command runs on arm64.
                       dotnet-coverage collect "$testCmd" `
@@ -247,7 +248,7 @@ jobs:
                           --output (Join-Path $coverageDir "coverage.xml") `
                           --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
                           --log-level Verbose `
-                          --include-files REGEX
+                          --include-files "$WORKPATH/**/*.dll"
                   } else {
                       dotnet-coverage collect "$testCmd" `
                           --output-format cobertura `
