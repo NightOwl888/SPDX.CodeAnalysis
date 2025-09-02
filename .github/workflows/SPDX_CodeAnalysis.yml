@@ -226,7 +226,7 @@ jobs:
                     "--blame-hang-timeout", "10m",
                     "--blame-hang-dump-type", "mini",
                     "--blame-crash",
-                    "--working-directory", "$env:WORKPATH",
+                    "--working-directory", "`"$env:WORKPATH`"",
                     "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
                   ) -join ' '
 
