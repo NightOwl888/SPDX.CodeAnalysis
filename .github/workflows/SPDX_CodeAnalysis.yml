@@ -272,10 +272,15 @@ jobs:
 
                   Write-Host "coverageRunsettingsFile: $coverageRunsettingsFile"
 
-                  dotnet-coverage collect "$testCmd" `
-                      --settings "$coverageRunsettingsFile" `
-                      --format cobertura `
-                      --output (Join-Path $coverageDir "coverage.xml") `
+                  Push-Location $env:WORKPATH
+                  try {
+                      dotnet-coverage collect "$testCmd" `
+                          --settings "$coverageRunsettingsFile" `
+                          --format cobertura `
+                          --output (Join-Path $coverageDir "coverage.xml") `
+                  } finally {
+                      Pop-Location
+                  }
 
                   # TRX inspection / status computation
                   $trxFile = Join-Path $resultsDirectory "TestResults.trx"
