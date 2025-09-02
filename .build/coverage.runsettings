@@ -16,9 +16,15 @@
                 <ModulePath>.*\.exe$</ModulePath>
             </Include>
             <Exclude>
-                <!-- Matches Something.Tests.dll, Something.Foo.Tests.dll -->
-                <!-- but not SomethingTests.dll -->
-                <ModulePath>(^|\.|\\)Tests(\.|\\|$)</ModulePath>
+                <!--
+                  Exclude assemblies where the filename contains ".Tests" as a dot-separated segment.
+                  Matches:
+                    - Something.Tests.dll
+                    - Something.Foo.Tests.dll
+                  Does NOT match:
+                    - SomethingTests.dll
+                -->
+                <ModulePath>.*\.Tests(\.|$).*</ModulePath>
             </Exclude>
         </ModulePaths>
 
