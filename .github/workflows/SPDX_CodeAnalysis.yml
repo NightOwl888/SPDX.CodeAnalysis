@@ -194,26 +194,54 @@ jobs:
 
                   # Ensure a coverage folder per test project output
                   $coverageDir = Join-Path $resultsDirectory "coverage"
-                  New-Item -ItemType Directory -Force -Path $coverageDir | Out-Null
+                  $coverletOutputBase = Join-Path $coverageDir "coverage"      # coverlet will append suffix/extension
+                  New-Item -ItemType Directory -Force -Path $coverletOutputBase | Out-Null
 
-                  # Build the inner dotnet test command
-                  $testCmd = @(
-                    "dotnet", "test", "`"$dllPath`"",
-                    "--framework", "${{ matrix.tfm }}",
-                    "--logger:`"console;verbosity=normal`"",
-                    "--logger:`"trx;LogFileName=TestResults.trx`"",
-                    "--results-directory", "`"$resultsDirectory`"",
-                    "--blame-hang-timeout", "10m",
-                    "--blame-hang-dump-type", "mini",
-                    "--blame-crash",
-                    "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
-                  ) -join ' '
+                  dotnet test "`"$dllPath`"" `
+                    --framework "${{ matrix.tfm }}" `
+                    --logger "console;verbosity=normal" `
+                    --logger "trx;LogFileName=TestResults.trx" `
+                    --results-directory "`"$resultsDirectory`"" `
+                    --blame-hang-timeout "10m" `
+                    --blame-hang-dump-type "mini" `
+                    --blame-crash `
+                    -p:CollectCoverage=true `
+                    -p:CoverletOutputFormat=cobertura `
+                    -p:CoverletOutput="$coverletOutputBase" `
+                    -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
 
-                  # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
-                  dotnet-coverage collect "$testCmd" `
-                      --output-format cobertura `
-                      --output (Join-Path $coverageDir "coverage.xml") `
-                      --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings")
+                  # coverlet typically writes e.g. $coverletOutputBase + ".cobertura.xml"
+                  # find whatever cobertura file was generated and rename/copy it to coverage.xml (your pipeline expects coverage/coverage.xml)
+                  $generated = Get-ChildItem -Path $coverageDir -Filter "*cobertura*.xml" -File -ErrorAction SilentlyContinue
+                  if (-not $generated) {
+                      # sometimes file is named coverage.json or coverage.cobertura.xml; be a little more tolerant
+                      $generated = Get-ChildItem -Path $coverageDir -Filter "*coverage*.*xml" -File -ErrorAction SilentlyContinue
+                  }
+                  if ($generated -and $generated.Count -gt 0) {
+                      # copy first match to coverage.xml
+                      Copy-Item -Path $generated[0].FullName -Destination (Join-Path $coverageDir "coverage.xml") -Force
+                  } else {
+                      Write-Host "No coverage file found in $coverageDir"
+                  }
+
+                  # # Build the inner dotnet test command
+                  # $testCmd = @(
+                  #   "dotnet", "test", "`"$dllPath`"",
+                  #   "--framework", "${{ matrix.tfm }}",
+                  #   "--logger:`"console;verbosity=normal`"",
+                  #   "--logger:`"trx;LogFileName=TestResults.trx`"",
+                  #   "--results-directory", "`"$resultsDirectory`"",
+                  #   "--blame-hang-timeout", "10m",
+                  #   "--blame-hang-dump-type", "mini",
+                  #   "--blame-crash",
+                  #   "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
+                  # ) -join ' '
+
+                  # # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
+                  # dotnet-coverage collect "$testCmd" `
+                  #     --output-format cobertura `
+                  #     --output (Join-Path $coverageDir "coverage.xml") `
+                  #     --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings")
 
                   # TRX inspection / status computation
                   $trxFile = Join-Path $resultsDirectory "TestResults.trx"
