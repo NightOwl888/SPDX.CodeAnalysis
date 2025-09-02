@@ -251,10 +251,8 @@ jobs:
                           --output-format cobertura `
                           --output (Join-Path $coverageDir "coverage.xml") `
                           --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings") `
-                          --log-level Verbose `
+                          --instrument `
                           --include-files "$escapedDll"
-                          #--include-files "$WORKPATH/**/*.dll" `
-                          #--include-directory "$env:WORKPATH"
                   } else {
                       dotnet-coverage collect "$testCmd" `
                           --output-format cobertura `
