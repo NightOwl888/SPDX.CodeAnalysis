@@ -173,6 +173,14 @@ jobs:
           name: test-assemblies
           path: ${{ env.WORKPATH }}
 
+      - name: Copy Coverage Settings to Work Path
+        shell: pwsh
+        run: |
+          $coverageSettings = Join-Path $env:GITHUB_WORKSPACE ".build\coverage.runsettings"
+          $dest = Join-Path $env:WORKPATH "coverage.runsettings"
+          Write-Host "Copying $coverageSettings to $dest"
+          Copy-Item -Path $coverageSettings -Destination $dest -Force
+
       - name: Install Coverage + Report Tools
         shell: pwsh
         run: |
@@ -218,7 +226,7 @@ jobs:
                     "--blame-hang-timeout", "10m",
                     "--blame-hang-dump-type", "mini",
                     "--blame-crash",
-                    "--working-directory $_.FullName"
+                    "--working-directory", "$_.FullName",
                     "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
                   ) -join ' '
 
@@ -259,6 +267,8 @@ jobs:
 
                   $coverageRunsettingsFile = Join-Path $env:GITHUB_WORKSPACE ".build"
                   $coverageRunsettingsFile = Join-Path $coverageRunsettingsFile "coverage.runsettings"
+
+                  #$coverageRunsettingsFile = Join-Path $env:WORKPATH "coverage.runsettings"
 
                   Write-Host "coverageRunsettingsFile: $coverageRunsettingsFile"
 
