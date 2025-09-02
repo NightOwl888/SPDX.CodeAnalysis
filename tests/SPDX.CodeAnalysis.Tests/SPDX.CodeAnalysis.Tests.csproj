@@ -11,9 +11,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzer.Testing" Version="$(MicrosoftCodeAnalysisAnalyzerTestingPackageReferenceVersion)" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(MicrosoftCodeAnalysisCSharpWorkspacesPackageReferenceVersion)" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="$(MicrosoftCodeAnalysisVisualBasicWorkspacesPackageReferenceVersion)" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkPackageReferenceVersion)" />
-    <PackageReference Include="NUnit" Version="$(NUnitPackageReferenceVersion)" />
-    <PackageReference Include="NUnit3TestAdapter" Version="$(NUnit3TestAdapterPackageReferenceVersion)" />
   </ItemGroup>
 
   <ItemGroup>
