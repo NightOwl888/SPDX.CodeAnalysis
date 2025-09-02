@@ -91,7 +91,7 @@
     <!-- Exclude test asssemblies -->
     <IncludeTestAssembly>False</IncludeTestAssembly>
 
-    <!-- Required for arm64 support (disabled by default) -->
-    <EnableStaticManagedInstrumentation>True</EnableStaticManagedInstrumentation>
-    <EnableDynamicManagedInstrumentation>True</EnableDynamicManagedInstrumentation>
+    <!-- Recommended to be set to false when the project has no C++ code -->
+    <EnableStaticManagedInstrumentation>False</EnableStaticManagedInstrumentation>
+    <EnableDynamicManagedInstrumentation>False</EnableDynamicManagedInstrumentation>
 </Configuration>
