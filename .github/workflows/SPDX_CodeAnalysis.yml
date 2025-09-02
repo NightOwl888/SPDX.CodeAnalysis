@@ -351,7 +351,7 @@ jobs:
         run: exit 1
 
   coverage:
-    name: Aggregate Coverage
+    name: aggregate-coverage
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -399,7 +399,7 @@ jobs:
           path: coverage/aggregate
 
   release:
-    name: Release
+    name: release
     if: github.event_name == 'push' && github.ref_type == 'tag'
     runs-on: ubuntu-latest
     needs:
