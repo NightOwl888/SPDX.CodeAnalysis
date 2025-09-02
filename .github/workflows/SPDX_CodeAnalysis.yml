@@ -265,10 +265,10 @@ jobs:
                   #     --format cobertura `
                   #     --settings (Join-Path "$env:GITHUB_WORKSPACE" ".build" "coverage.runsettings")
 
-                  $coverageRunsettingsFile = Join-Path $env:GITHUB_WORKSPACE ".build"
-                  $coverageRunsettingsFile = Join-Path $coverageRunsettingsFile "coverage.runsettings"
+                  #$coverageRunsettingsFile = Join-Path $env:GITHUB_WORKSPACE ".build"
+                  #$coverageRunsettingsFile = Join-Path $coverageRunsettingsFile "coverage.runsettings"
 
-                  #$coverageRunsettingsFile = Join-Path $env:WORKPATH "coverage.runsettings"
+                  $coverageRunsettingsFile = Join-Path $env:WORKPATH "coverage.runsettings"
 
                   Write-Host "coverageRunsettingsFile: $coverageRunsettingsFile"
 
