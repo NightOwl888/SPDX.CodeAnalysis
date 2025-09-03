@@ -5,7 +5,6 @@ VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
-		.build\coverage.runsettings = .build\coverage.runsettings
 		.build\dependencies.props = .build\dependencies.props
 		.build\nuget.props = .build\nuget.props
 		version.json = version.json
@@ -63,6 +62,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.CodeFixes.Common", "src\SPDX.CodeAnalysis.CodeFixes.Common\SPDX.CodeAnalysis.CodeFixes.Common.csproj", "{915EF32A-E09C-4831-BAD4-085C5327093B}"
 EndProject
 Project("{13B669BE-BB05-4DDF-9536-439F39A36129}") = ".github", "proj\.github.msbuildproj", "{873A3BE7-3364-F423-9686-FFB58C0896C4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ci", "ci", "{8BBD1A0B-1595-4E12-B8D9-E444AFCFAE80}"
+	ProjectSection(SolutionItems) = preProject
+		.build\ci\coverage.runsettings = .build\ci\coverage.runsettings
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -134,6 +138,7 @@ Global
 		{3E28FBE0-19C8-0AA5-5954-D62AF67FDA69} = {E2E910FF-6635-4D9D-A7BE-39037849DC4E}
 		{6A0C7A4D-8044-90BE-FF66-B0C8A849DADA} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
 		{915EF32A-E09C-4831-BAD4-085C5327093B} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
+		{8BBD1A0B-1595-4E12-B8D9-E444AFCFAE80} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3157D387-AA18-46F2-B109-7994C3E12BE1}
