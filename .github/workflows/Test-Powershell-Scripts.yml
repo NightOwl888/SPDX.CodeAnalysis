@@ -1,0 +1,13 @@
+jobs:
+  pester:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Restore Powershell Dependencies
+        shell: pwsh
+        run: ./.build/Ensure-Powershell-Dependencies.ps1
+
+      - name: Run Pester
+        shell: pwsh
+        run: Invoke-Pester -Output Detailed -CI
