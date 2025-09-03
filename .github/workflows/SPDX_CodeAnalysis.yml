@@ -5,8 +5,9 @@ on:
   push:
     branches:
       - main
-      - 'release/v*.*'      # matches release/v1.2
-      - 'release/v*.*.*'    # matches release/v1.2.3
+      - 'release/v*.*'       # matches release/v1.2
+      - 'release/v*.*.*'     # matches release/v1.2.3
+      - 'release-workflow*'  # special branch names for testing release workflow (this file) from a PR
     tags:
       - 'v*'
   pull_request:
