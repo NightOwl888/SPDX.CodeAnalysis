@@ -1,3 +1,8 @@
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+  
 jobs:
   pester:
     runs-on: ubuntu-latest
