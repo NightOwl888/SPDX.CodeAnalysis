@@ -17,5 +17,6 @@ jobs:
 
       - name: Run Pester
         shell: pwsh
-        working-directory: ${{ github.workspace }}
-        run: Invoke-Pester -Output Detailed -CI -Path '.','./.build','./.build/ci'
+        run: |
+          $tests = Get-ChildItem -Path '.build' -Recurse -Filter '*.Tests.ps1' | ForEach-Object FullName
+          Invoke-Pester -Output Detailed -CI -Path $tests
