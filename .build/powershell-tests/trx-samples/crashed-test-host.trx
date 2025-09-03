@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun>
+  <ResultSummary outcome="Failed">
+    <Counters total="0" executed="0" passed="0" failed="0" />
+  </ResultSummary>
+  <RunInfos>
+    <RunInfo computerName="localhost" outcome="Error">
+      <Text>Test host process crashed : exited with error</Text>
+    </RunInfo>
+  </RunInfos>
+</TestRun>
