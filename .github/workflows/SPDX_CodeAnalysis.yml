@@ -31,12 +31,12 @@ jobs:
           fetch-depth: 0
 
       - name: Setup .NET 8.0
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.0.x
 
       - name: Setup .NET 9.0
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 9.0.x
 
@@ -144,13 +144,13 @@ jobs:
       # Install the .NET SDK
       - name: Setup .NET 8.0
         if: matrix.arch != 'x86'
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.0.x
 
       - name: Setup .NET 8.0 (x86)
         if: matrix.arch == 'x86'
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.0.x
         env:
@@ -365,7 +365,7 @@ jobs:
 
       # Required for ReportGenerator
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.0.x
 
@@ -415,7 +415,7 @@ jobs:
 
       # Required for NuGet push
       - name: Setup .NET 8.0
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.0.x
 
