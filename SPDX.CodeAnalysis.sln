@@ -68,22 +68,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ci", "ci", "{8BBD1A0B-1595-
 	ProjectSection(SolutionItems) = preProject
 		.build\ci\coverage.runsettings = .build\ci\coverage.runsettings
 		.build\ci\Parse-Test-Results.ps1 = .build\ci\Parse-Test-Results.ps1
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "powershell-tests", "powershell-tests", "{FB9549DF-9CD5-4F10-BB22-777B369ACE07}"
-	ProjectSection(SolutionItems) = preProject
-		.build\powershell-tests\Parse-Test-Results.Tests.ps1 = .build\powershell-tests\Parse-Test-Results.Tests.ps1
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "trx-samples", "trx-samples", "{FFA9FD65-7A23-4AD4-822D-45304400C77C}"
-	ProjectSection(SolutionItems) = preProject
-		.build\powershell-tests\trx-samples\crashed-could-not-find-dotnet.trx = .build\powershell-tests\trx-samples\crashed-could-not-find-dotnet.trx
-		.build\powershell-tests\trx-samples\crashed-could-not-load-assembly.trx = .build\powershell-tests\trx-samples\crashed-could-not-load-assembly.trx
-		.build\powershell-tests\trx-samples\crashed-exited-with-error.trx = .build\powershell-tests\trx-samples\crashed-exited-with-error.trx
-		.build\powershell-tests\trx-samples\crashed-no-test-is-available.trx = .build\powershell-tests\trx-samples\crashed-no-test-is-available.trx
-		.build\powershell-tests\trx-samples\crashed-test-host.trx = .build\powershell-tests\trx-samples\crashed-test-host.trx
-		.build\powershell-tests\trx-samples\failed.trx = .build\powershell-tests\trx-samples\failed.trx
-		.build\powershell-tests\trx-samples\passed.trx = .build\powershell-tests\trx-samples\passed.trx
+		.build\ci\Parse-Test-Results.Tests.ps1 = .build\ci\Parse-Test-Results.Tests.ps1
 	EndProjectSection
 EndProject
 Global
@@ -157,8 +142,6 @@ Global
 		{6A0C7A4D-8044-90BE-FF66-B0C8A849DADA} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
 		{915EF32A-E09C-4831-BAD4-085C5327093B} = {C2EF017A-5599-40FA-A1C4-E30C8587B058}
 		{8BBD1A0B-1595-4E12-B8D9-E444AFCFAE80} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{FB9549DF-9CD5-4F10-BB22-777B369ACE07} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{FFA9FD65-7A23-4AD4-822D-45304400C77C} = {FB9549DF-9CD5-4F10-BB22-777B369ACE07}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3157D387-AA18-46F2-B109-7994C3E12BE1}

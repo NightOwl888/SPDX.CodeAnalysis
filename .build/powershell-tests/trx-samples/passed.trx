@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<TestRun>
-  <ResultSummary outcome="Completed">
-    <Counters total="3" executed="3" passed="3" failed="0" />
-  </ResultSummary>
-</TestRun>
