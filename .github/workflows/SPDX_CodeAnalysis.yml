@@ -195,8 +195,8 @@ jobs:
                   New-Item -ItemType Directory -Force -Path $coverageDir | Out-Null
 
                   # Build the inner dotnet test command
-                  $testArgs = @(
-                    "`"$dllPath`"",
+                  $testCmd = @(
+                    "dotnet", "test", "`"$dllPath`"",
                     "--framework", "${{ matrix.tfm }}",
                     "--logger:`"console;verbosity=normal`"",
                     "--logger:`"trx;LogFileName=TestResults.trx`"",
@@ -205,17 +205,25 @@ jobs:
                     "--blame-hang-dump-type", "mini",
                     "--blame-crash",
                     "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
-                  )
+                  ) -join ' '
 
                   $coverageFile = Join-Path $coverageDir "coverage.xml"
 
+                  # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
                   if ("${{ matrix.arch }}" -eq 'arm64' -and "${{ runner.os }}" -eq 'macOS') {
-                      # Run tests without coverage, because static instrumenting is complex.
                       Write-Host "...macOS on ARM64 detected, skipping coverage..."
-                      & dotnet test @testArgs
+
+                      # Run tests without coverage, because static instrumenting is complex.
+                      dotnet test "$dllPath" `
+                        --framework ${{ matrix.tfm }} `
+                        --logger:"console;verbosity=normal" `
+                        --logger:"trx;LogFileName=TestResults.trx" `
+                        --results-directory "$resultsDirectory" `
+                        --blame-hang-timeout 10m `
+                        --blame-hang-dump-type mini `
+                        --blame-crash `
+                        -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
                   } else {
-                      # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
-                      $testCmd = "dotnet test " + ($testArgs -join ' ')
                       dotnet-coverage collect "$testCmd" `
                           --output-format cobertura `
                           --output "$coverageFile" `
