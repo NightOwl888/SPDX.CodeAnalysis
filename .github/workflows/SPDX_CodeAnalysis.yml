@@ -266,6 +266,7 @@ jobs:
 
                           # Determine status for this project
                           if ($crashed) {
+                              $includesCoverage = $false
                               $statusIcon = '⚠️'; $statusText = 'Crashed'
                           } elseif ($failedCount -gt 0) {
                               $statusIcon = '❌'; $statusText = 'Failed'
