@@ -18,4 +18,4 @@ jobs:
       - name: Run Pester
         shell: pwsh
         working-directory: ${{ github.workspace }}
-        run: Invoke-Pester -Output Detailed -CI -Configuration ./.pester.psd1
+        run: Invoke-Pester -Output Detailed -CI -Configuration './.pester.psd1'
