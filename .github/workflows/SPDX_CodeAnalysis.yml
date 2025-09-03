@@ -17,6 +17,7 @@ on:
 jobs:
   build:
     if: |
+      github.event_name == 'workflow_dispatch' ||
       github.event_name == 'pull_request' ||
       (github.event_name == 'push' &&
       (startsWith(github.ref, 'refs/heads/main') ||
