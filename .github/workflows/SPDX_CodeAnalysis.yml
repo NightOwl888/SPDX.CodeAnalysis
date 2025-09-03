@@ -121,7 +121,9 @@ jobs:
         run: |
           $dir = "C:\w"
           New-Item -ItemType Directory -Force -Path $dir
+          New-Item -ItemType Directory -Force -Path "$dir\dotnet"
           New-Item -ItemType Directory -Force -Path "$dir\work"
+          Add-Content $env:GITHUB_ENV "`nDOTNET_INSTALL_DIR=$dir\dotnet"
           Add-Content $env:GITHUB_ENV "`nWORKPATH=$dir\work"
 
       - name: Set Paths (Linux/macOS)
@@ -130,7 +132,9 @@ jobs:
         run: |
           $dir = "$env:RUNNER_TEMP/w"
           New-Item -ItemType Directory -Force -Path $dir
+          New-Item -ItemType Directory -Force -Path "$dir/dotnet"
           New-Item -ItemType Directory -Force -Path "$dir/work"
+          Add-Content $env:GITHUB_ENV "`nDOTNET_INSTALL_DIR=$dir/dotnet"
           Add-Content $env:GITHUB_ENV "`nWORKPATH=$dir/work"
 
       # Install the .NET SDK
