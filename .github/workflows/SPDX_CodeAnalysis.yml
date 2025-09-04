@@ -243,8 +243,7 @@ jobs:
                       dotnet @testCmd
 
                   } else {
-                      $testCmdStr = "dotnet ($testCmd -join ' ')"
-                      dotnet-coverage collect "$testCmdStr" `
+                      dotnet-coverage collect "dotnet $($testCmd -join ' ')" `
                           --output-format cobertura `
                           --output "$coverageFile" `
                           --settings (Join-Path "$env:GITHUB_WORKSPACE" "ci" "coverage.runsettings")
@@ -259,6 +258,7 @@ jobs:
                   if (Test-Path $trxFile) {
                       $parsed = & "$env:GITHUB_WORKSPACE/ci/Parse-Test-Results.ps1" -Path $trxFile
                       $parsed.SuiteName = $_.Name
+                      $results += $parsed
                   }
               }
           }
