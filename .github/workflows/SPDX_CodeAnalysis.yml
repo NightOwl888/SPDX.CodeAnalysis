@@ -197,18 +197,31 @@ jobs:
                   $coverageDir = Join-Path $resultsDirectory "coverage"
                   New-Item -ItemType Directory -Force -Path $coverageDir | Out-Null
 
-                  # Build the inner dotnet test command
+                  # # Build the inner dotnet test command
+                  # $testCmd = @(
+                  #   "dotnet", "test", "`"$dllPath`"",
+                  #   "--framework", "${{ matrix.tfm }}",
+                  #   "--logger:`"console;verbosity=normal`"",
+                  #   "--logger:`"trx;LogFileName=TestResults.trx`"",
+                  #   "--results-directory", "`"$resultsDirectory`"",
+                  #   "--blame-hang-timeout", "10m",
+                  #   "--blame-hang-dump-type", "mini",
+                  #   "--blame-crash",
+                  #   "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
+                  # ) -join ' '
+
+                  # Build as array of arguments (excluding the "dotnet" prefix)
                   $testCmd = @(
-                    "dotnet", "test", "`"$dllPath`"",
-                    "--framework", "${{ matrix.tfm }}",
-                    "--logger:`"console;verbosity=normal`"",
-                    "--logger:`"trx;LogFileName=TestResults.trx`"",
-                    "--results-directory", "`"$resultsDirectory`"",
-                    "--blame-hang-timeout", "10m",
-                    "--blame-hang-dump-type", "mini",
-                    "--blame-crash",
-                    "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
-                  ) -join ' '
+                      "test", $dllPath,
+                      "--framework", "${{ matrix.tfm }}",
+                      "--logger:console;verbosity=normal",
+                      "--logger:trx;LogFileName=TestResults.trx",
+                      "--results-directory", $resultsDirectory,
+                      "--blame-hang-timeout", "10m",
+                      "--blame-hang-dump-type", "mini",
+                      "--blame-crash",
+                      "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
+                  )
 
                   $coverageFile = Join-Path $coverageDir "coverage.xml"
 
@@ -216,18 +229,22 @@ jobs:
                   if ("${{ matrix.arch }}" -eq 'arm64' -and "${{ runner.os }}" -eq 'macOS') {
                       Write-Host "...macOS on ARM64 detected, skipping coverage..."
 
-                      # Run tests without coverage, because static instrumenting is complex.
-                      dotnet test "$dllPath" `
-                        --framework ${{ matrix.tfm }} `
-                        --logger:"console;verbosity=normal" `
-                        --logger:"trx;LogFileName=TestResults.trx" `
-                        --results-directory "$resultsDirectory" `
-                        --blame-hang-timeout 10m `
-                        --blame-hang-dump-type mini `
-                        --blame-crash `
-                        -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
+                      # # Run tests without coverage, because static instrumenting is complex.
+                      # dotnet test "$dllPath" `
+                      #   --framework ${{ matrix.tfm }} `
+                      #   --logger:"console;verbosity=normal" `
+                      #   --logger:"trx;LogFileName=TestResults.trx" `
+                      #   --results-directory "$resultsDirectory" `
+                      #   --blame-hang-timeout 10m `
+                      #   --blame-hang-dump-type mini `
+                      #   --blame-crash `
+                      #   -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
+
+                      dotnet @testCmd
+
                   } else {
-                      dotnet-coverage collect "$testCmd" `
+                      $testCmdStr = "dotnet ($testCmd -join ' ')"
+                      dotnet-coverage collect "$testCmdStr" `
                           --output-format cobertura `
                           --output "$coverageFile" `
                           --settings (Join-Path "$env:GITHUB_WORKSPACE" "ci" "coverage.runsettings")
