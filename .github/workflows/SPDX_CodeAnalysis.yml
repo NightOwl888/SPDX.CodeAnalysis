@@ -191,24 +191,7 @@ jobs:
               New-Item -ItemType Directory -Force -Path $resultsDirectory | Out-Null
 
               if (Test-Path $dllPath) {
-                  Write-Host "Running tests in $dllPath"
-
-                  # Ensure a coverage folder per test project output
-                  $coverageDir = Join-Path $resultsDirectory "coverage"
-                  New-Item -ItemType Directory -Force -Path $coverageDir | Out-Null
-
-                  # # Build the inner dotnet test command
-                  # $testCmd = @(
-                  #   "dotnet", "test", "`"$dllPath`"",
-                  #   "--framework", "${{ matrix.tfm }}",
-                  #   "--logger:`"console;verbosity=normal`"",
-                  #   "--logger:`"trx;LogFileName=TestResults.trx`"",
-                  #   "--results-directory", "`"$resultsDirectory`"",
-                  #   "--blame-hang-timeout", "10m",
-                  #   "--blame-hang-dump-type", "mini",
-                  #   "--blame-crash",
-                  #   "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
-                  # ) -join ' '
+                  Write-Host "Running tests in $dllPath..."
 
                   # Build as array of arguments (excluding the "dotnet" prefix)
                   $testCmd = @(
@@ -223,41 +206,28 @@ jobs:
                       "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
                   )
 
-                  $coverageFile = Join-Path $coverageDir "coverage.xml"
-
-                  # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
-                  if ("${{ matrix.arch }}" -eq 'arm64' -and "${{ runner.os }}" -eq 'macOS') {
-                      Write-Host "...macOS on ARM64 detected, skipping coverage..."
-
-                      # # Run tests without coverage, because static instrumenting is complex.
-                      # dotnet test "$dllPath" `
-                      #   --framework ${{ matrix.tfm }} `
-                      #   --logger:"console;verbosity=normal" `
-                      #   --logger:"trx;LogFileName=TestResults.trx" `
-                      #   --results-directory "$resultsDirectory" `
-                      #   --blame-hang-timeout 10m `
-                      #   --blame-hang-dump-type mini `
-                      #   --blame-crash `
-                      #   -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
-
+                  if ("${{ matrix.arch }}" -eq 'arm64' -and ($env:RUNNER_OS -eq 'macOS' -or $env:RUNNER_OS -eq 'Linux')) {
+                      # Run tests without coverage
                       dotnet @testCmd
-
                   } else {
+                      # Ensure a coverage folder per test project output
+                      $coverageDir = Join-Path $resultsDirectory "coverage"
+                      New-Item -ItemType Directory -Force -Path $coverageDir | Out-Null
+                      $coverageFile = Join-Path $coverageDir "coverage.xml"
+
+                      # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
                       dotnet-coverage collect "dotnet $($testCmd -join ' ')" `
                           --output-format cobertura `
                           --output "$coverageFile" `
                           --settings (Join-Path "$env:GITHUB_WORKSPACE" "ci" "coverage.runsettings")
-                  }
 
-                  if (Test-Path $coverageFile) {
-                      $includesCoverage = $true
+                      if (Test-Path $coverageFile) { $includesCoverage = $true }
                   }
 
                   # TRX inspection / status computation
                   $trxFile = Join-Path $resultsDirectory "TestResults.trx"
                   if (Test-Path $trxFile) {
                       $parsed = & "$env:GITHUB_WORKSPACE/ci/Parse-Test-Results.ps1" -Path $trxFile
-                      #$parsed.SuiteName = $_.Name
                       $parsed | Add-Member -NotePropertyName "SuiteName" -NotePropertyValue $_.Name
                       $results += $parsed
                   }
