@@ -44,10 +44,10 @@ Describe "Parse-Test-Results" {
         $result = Parse-Test-Results -Path $trxPath
 
         # Assert
-        $result.Passed  | Should -Be 3
-        $result.Failed  | Should -Be 0
-        $result.Ignored | Should -Be 0
-        $result.Crashed | Should -Be $false
+        $result.PassedCount     | Should -Be 3
+        $result.FailedCount     | Should -Be 0
+        $result.IgnoredCount    | Should -Be 0
+        $result.Crashed         | Should -Be $false
     }
 
     It "parses a failed run" {
@@ -66,10 +66,10 @@ Describe "Parse-Test-Results" {
         $result = Parse-Test-Results -Path $trxPath
 
         # Assert
-        $result.Passed  | Should -Be 2
-        $result.Failed  | Should -Be 1
-        $result.Ignored | Should -Be 0
-        $result.Crashed | Should -Be $false
+        $result.PassedCount     | Should -Be 2
+        $result.FailedCount     | Should -Be 1
+        $result.IgnoredCount    | Should -Be 0
+        $result.Crashed         | Should -Be $false
     }
 
     It "calculates ignored test count" {
@@ -88,10 +88,10 @@ Describe "Parse-Test-Results" {
         $result = Parse-Test-Results -Path $trxPath
 
         # Assert
-        $result.Passed  | Should -Be 2
-        $result.Failed  | Should -Be 1
-        $result.Ignored | Should -Be 4
-        $result.Crashed | Should -Be $false
+        $result.PassedCount     | Should -Be 2
+        $result.FailedCount     | Should -Be 1
+        $result.IgnoredCount    | Should -Be 4
+        $result.Crashed         | Should -Be $false
     }
 
     Context "detects a crash" {
@@ -116,10 +116,10 @@ Describe "Parse-Test-Results" {
             $result = Parse-Test-Results -Path $trxPath
 
             # Assert
-            $result.Passed  | Should -Be 0
-            $result.Failed  | Should -Be 0
-            $result.Ignored | Should -Be 0
-            $result.Crashed | Should -Be $true
+            $result.PassedCount     | Should -Be 0
+            $result.FailedCount     | Should -Be 0
+            $result.IgnoredCount    | Should -Be 0
+            $result.Crashed         | Should -Be $true
         }
 
         It "could not load assembly" {
@@ -143,10 +143,10 @@ Describe "Parse-Test-Results" {
             $result = Parse-Test-Results -Path $trxPath
 
             # Assert
-            $result.Passed  | Should -Be 0
-            $result.Failed  | Should -Be 0
-            $result.Ignored | Should -Be 0
-            $result.Crashed | Should -Be $true
+            $result.PassedCount     | Should -Be 0
+            $result.FailedCount     | Should -Be 0
+            $result.IgnoredCount    | Should -Be 0
+            $result.Crashed         | Should -Be $true
         }
 
         It "exited with error" {
@@ -170,10 +170,10 @@ Describe "Parse-Test-Results" {
             $result = Parse-Test-Results -Path $trxPath
 
             # Assert
-            $result.Passed  | Should -Be 0
-            $result.Failed  | Should -Be 0
-            $result.Ignored | Should -Be 0
-            $result.Crashed | Should -Be $true
+            $result.PassedCount     | Should -Be 0
+            $result.FailedCount     | Should -Be 0
+            $result.IgnoredCount    | Should -Be 0
+            $result.Crashed         | Should -Be $true
         }
 
         It "no test is available" {
@@ -197,10 +197,10 @@ Describe "Parse-Test-Results" {
             $result = Parse-Test-Results -Path $trxPath
 
             # Assert
-            $result.Passed  | Should -Be 0
-            $result.Failed  | Should -Be 0
-            $result.Ignored | Should -Be 0
-            $result.Crashed | Should -Be $true
+            $result.PassedCount     | Should -Be 0
+            $result.FailedCount     | Should -Be 0
+            $result.IgnoredCount    | Should -Be 0
+            $result.Crashed         | Should -Be $true
         }
     }
 
