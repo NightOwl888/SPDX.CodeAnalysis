@@ -176,6 +176,9 @@ jobs:
         shell: pwsh
         #continue-on-error: true
         run: |
+          # Imports
+          . (Join-Path $env:WORKPATH 'ci' 'Markdown-Formatting.ps1')
+
           $resultsRootDir = "$env:WORKPATH/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}"
           New-Item -ItemType Directory -Force -Path $resultsRootDir | Out-Null
 
@@ -244,21 +247,7 @@ jobs:
           }
 
           # Write summary
-          Add-Content $env:GITHUB_STEP_SUMMARY "## Test Results`n"
-          foreach ($r in $results) {
-
-              # Determine status for this project
-              if ($r.Crashed) {
-                  $statusIcon = '⚠️'; $statusText = 'Crashed'
-              } elseif ($r.FailedCount -gt 0) {
-                  $statusIcon = '❌'; $statusText = 'Failed'
-              } else {
-                  $statusIcon = '✅'; $statusText = 'Passed'
-              }
-
-              $line = "- $($statusIcon) $($statusText) - **$($r.SuiteName)** | Passed=$($r.PassedCount), Failed=$($r.FailedCount), Ignored=$($r.IgnoredCount)"
-              Add-Content $env:GITHUB_STEP_SUMMARY $line
-          }
+          Format-Test-Results $results | Add-Content $env:GITHUB_STEP_SUMMARY
 
           if ($includesCoverage) {
               # Generate a per-job coverage summary + HTML reports from all coverage.xml files created above
