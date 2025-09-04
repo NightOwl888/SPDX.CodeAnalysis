@@ -201,8 +201,6 @@ Describe "Parse-Test-Results" {
             $result.FailedCount     | Should -Be 0
             $result.IgnoredCount    | Should -Be 0
             $result.Crashed         | Should -Be $true
-            
-            $false  | Should -Be $true
         }
     }
 
