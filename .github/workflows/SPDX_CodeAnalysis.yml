@@ -295,7 +295,7 @@ jobs:
         shell: pwsh
         run: |
           dotnet tool install --global dotnet-reportgenerator-globaltool
-          echo "$HOME/.dotnet/tools" | Add-Content "`n$env:GITHUB_PATH"
+          Add-Content $env:GITHUB_PATH "`n$HOME/.dotnet/tools"
 
       - name: Build Aggregate Report
         shell: pwsh
