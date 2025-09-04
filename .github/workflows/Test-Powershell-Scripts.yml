@@ -1,0 +1,62 @@
+﻿name: Test Powershell Scripts
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+  
+jobs:
+  pester:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Restore Powershell Dependencies
+        shell: pwsh
+        run: ./.build/Ensure-Powershell-Dependencies.ps1
+
+      - name: Run Pester Tests
+        shell: pwsh
+        run: |
+          # Imports
+          . (Join-Path $env:GITHUB_WORKSPACE 'ci' 'Markdown-Formatting.ps1')
+
+          $ErrorActionPreference = 'Continue'
+          try {
+              $testResults = Invoke-Pester -Output Detailed -CI -PassThru
+          } catch  {
+              Write-Warning "Invoke-Pester threw an exception: $_"
+          }
+          $ErrorActionPreference = 'Stop'
+          Set-StrictMode -Version Latest
+
+          $failed = $false
+          $results = @()
+
+          if ($testResults -and $testResults.Containers -and $testResults.Containers.Count -gt 0) {
+              foreach ($container in $testResults.Containers) {
+                  $suiteName = $container.Item.Name
+                  $passedCount = $container.PassedCount
+                  $failedCount = $container.FailedCount
+                  $skippedCount = $container.SkippedCount
+
+                  $results += [PSCustomObject]@{
+                      SuiteName     = $suiteName
+                      PassedCount   = [int]$passedCount
+                      FailedCount   = [int]$failedCount
+                      IgnoredCount  = [int]$skippedCount
+                      Crashed       = [bool]$false
+                  }
+
+                  if ($failedCount -gt 0) {
+                      $failed = $true
+                  }
+              }
+          }
+
+          # Write summary
+          Format-Test-Results $results | Add-Content $env:GITHUB_STEP_SUMMARY
+
+          if ($failed) {
+              exit 1
+          }
