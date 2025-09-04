@@ -176,6 +176,9 @@ jobs:
         shell: pwsh
         #continue-on-error: true
         run: |
+          # Load helper scripts
+          . "$env:GITHUB_WORKSPACE/ci/Parse-Test-Results.ps1"
+
           $resultsRootDir = "$env:WORKPATH/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}"
           New-Item -ItemType Directory -Force -Path $resultsRootDir | Out-Null
 
@@ -237,65 +240,25 @@ jobs:
                   # TRX inspection / status computation
                   $trxFile = Join-Path $resultsDirectory "TestResults.trx"
                   if (Test-Path $trxFile) {
-                      $reader = [System.Xml.XmlReader]::Create($trxFile)
-                      try {
-                          $countersFound = $false
-                          $inRunInfos = $false
-                          $crashed = $false
-                          $failedCount = 0
-                          $passedCount = 0
-                          $ignoredCount = 0
+                      $parsed = & "$env:GITHUB_WORKSPACE/ci/Parse-Test-Results.ps1" -TrxPath $trxFile
 
-                          while ($reader.Read()) {
-                              if ($reader.NodeType -eq [System.Xml.XmlNodeType]::Element) {
-                                  if (!$countersFound -and $reader.Name -eq 'Counters') {
-                                      $failedCount = $reader.GetAttribute('failed')
-                                      $passedCount = $reader.GetAttribute('passed')
-                                      $ignoredCount = (([int]$reader.GetAttribute('total')) - ([int]$reader.GetAttribute('executed'))).ToString()
-                                      $countersFound = $true
-                                  }
-                                  # Report a crash of the test runner
-                                  if ($reader.Name -eq 'RunInfos') {
-                                      $inRunInfos = $true
-                                  }
-                                  if ($inRunInfos -and !$crashed -and $reader.Name -eq 'Text') {
-                                      $innerXml = $reader.ReadInnerXml()
-                                      # Test for specific error messages - we may need to adjust this, as needed
-                                      if ($innerXml -and ($innerXml.Contains('Test host process crashed') `
-                                          -or $innerXml.Contains('Could not load file or assembly') `
-                                          -or $innerXml.Contains("Could not find `'dotnet.exe`' host") `
-                                          -or $innerXml.Contains('No test is available') `
-                                          -or $innerXml.Contains('exited with error'))) {
+                      # Determine status for this project
+                      if ($parsed.Crashed) {
+                          $statusIcon = '⚠️'; $statusText = 'Crashed'
+                      } elseif ($parsed.FailedCount -gt 0) {
+                          $statusIcon = '❌'; $statusText = 'Failed'
+                      } else {
+                          $statusIcon = '✅'; $statusText = 'Passed'
+                      }
 
-                                          $crashed = $true
-                                      }
-                                  }
-                              }
-                              if ($reader.NodeType -eq [System.Xml.XmlNodeType]::EndElement -and $reader.Name -eq 'RunInfos') {
-                                  $inRunInfos = $false
-                              }
-                          }
-
-                          # Determine status for this project
-                          if ($crashed) {
-                              $statusIcon = '⚠️'; $statusText = 'Crashed'
-                          } elseif ($failedCount -gt 0) {
-                              $statusIcon = '❌'; $statusText = 'Failed'
-                          } else {
-                              $statusIcon = '✅'; $statusText = 'Passed'
-                          }
-
-                          # Store results
-                          $results += [PSCustomObject]@{
-                              Project = $_.Name
-                              Passed  = $passedCount
-                              Failed  = $failedCount
-                              Ignored = $ignoredCount
-                              Status  = $statusIcon
-                              StatusText = $statusText
-                          }
-                      } finally {
-                          $reader.Dispose()
+                      # Store results
+                      $results += [PSCustomObject]@{
+                          Project = $_.Name
+                          Passed  = $parsed.Passed
+                          Failed  = $parsed.Failed
+                          Ignored = $parsed.Ignored
+                          Status  = $statusIcon
+                          StatusText = $statusText
                       }
                   }
               }
@@ -315,19 +278,19 @@ jobs:
 
               $reportsGlob = Join-Path $resultsRootDir "**/coverage/coverage.xml"
               reportgenerator `
-                "-reports:$reportsGlob" `
-                "-targetdir:$summaryDir" `
-                "-reporttypes:MarkdownSummaryGithub;HtmlInline_AzurePipelines;HtmlChart" `
-                "-verbosity:Warning"
+                  "-reports:$reportsGlob" `
+                  "-targetdir:$summaryDir" `
+                  "-reporttypes:MarkdownSummaryGithub;HtmlInline_AzurePipelines;HtmlChart" `
+                  "-verbosity:Warning"
 
               # Append collapsible coverage section to the job summary
               $md = Join-Path $summaryDir "SummaryGithub.md"
               if (Test-Path $md) {
-                Add-Content $env:GITHUB_STEP_SUMMARY "`n<details><summary>Coverage</summary>`n"
-                Get-Content $md | Add-Content $env:GITHUB_STEP_SUMMARY
-                Add-Content $env:GITHUB_STEP_SUMMARY "`n</details>`n"
+                  Add-Content $env:GITHUB_STEP_SUMMARY "`n<details><summary>Coverage</summary>`n"
+                  Get-Content $md | Add-Content $env:GITHUB_STEP_SUMMARY
+                  Add-Content $env:GITHUB_STEP_SUMMARY "`n</details>`n"
               } else {
-                Write-Host "Coverage summary not generated (no coverage.xml found)."
+                  Write-Host "Coverage summary not generated (no coverage.xml found)."
               }
           }
 
@@ -376,17 +339,17 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path "coverage/aggregate" | Out-Null
           reportgenerator `
-            "-reports:all-results/**/coverage/coverage.xml" `
-            "-targetdir:coverage/aggregate" `
-            "-reporttypes:MarkdownSummaryGithub;HtmlInline_AzurePipelines;HtmlChart" `
-            "-verbosity:Warning"
+              "-reports:all-results/**/coverage/coverage.xml" `
+              "-targetdir:coverage/aggregate" `
+              "-reporttypes:MarkdownSummaryGithub;HtmlInline_AzurePipelines;HtmlChart" `
+              "-verbosity:Warning"
 
           $md = "coverage/aggregate/SummaryGithub.md"
           if (Test-Path $md) {
-            Add-Content $env:GITHUB_STEP_SUMMARY "## Aggregate Coverage`n"
-            Get-Content $md | Add-Content $env:GITHUB_STEP_SUMMARY
+              Add-Content $env:GITHUB_STEP_SUMMARY "## Aggregate Coverage`n"
+              Get-Content $md | Add-Content $env:GITHUB_STEP_SUMMARY
           } else {
-            Add-Content $env:GITHUB_STEP_SUMMARY "## Aggregate Coverage`n_No coverage files found._"
+              Add-Content $env:GITHUB_STEP_SUMMARY "## Aggregate Coverage`n_No coverage files found._"
           }
 
       - name: Upload Aggregate Coverage HTML
