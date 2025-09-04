@@ -12,7 +12,7 @@ Describe "Parse-Test-Results" {
                 [Parameter(Position = 0)]
                 [string]$Path
             )
-            & $PSCommandPath.Replace('.Tests.ps1','.ps1') -Path $Path
+            & $PSCommandPath.Replace('.Tests.ps1','.ps1') $Path
         }
 
         # Helper function to create a TRX file in the temp folder
