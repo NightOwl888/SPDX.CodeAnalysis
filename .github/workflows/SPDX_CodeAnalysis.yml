@@ -237,7 +237,7 @@ jobs:
                   # TRX inspection / status computation
                   $trxFile = Join-Path $resultsDirectory "TestResults.trx"
                   if (Test-Path $trxFile) {
-                      $parsed = & "$env:GITHUB_WORKSPACE/ci/Parse-Test-Results.ps1" -TrxPath $trxFile
+                      $parsed = & "$env:GITHUB_WORKSPACE/ci/Parse-Test-Results.ps1" -Path $trxFile
 
                       # Determine status for this project
                       if ($parsed.Crashed) {
