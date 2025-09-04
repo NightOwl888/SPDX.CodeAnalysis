@@ -198,6 +198,8 @@ Describe "Parse-Test-Results" {
             $result.Failed  | Should -Be 0
             $result.Ignored | Should -Be 0
             $result.Crashed | Should -Be $true
+
+            $true | Should -Be $false
         }
     }
 
