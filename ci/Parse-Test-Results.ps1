@@ -8,12 +8,12 @@
     the number of passed, failed, and ignored tests, and detects if the test
     run crashed based on specific error messages in the TRX file.
 
-.PARAMETER TrxPath
-    The path to the TRX file to parse. The script throws an error if the file
-    does not exist.
+.PARAMETER Path
+    The path to the results file to parse. The script throws an error if the file
+    does not exist. Position 0.
 
 .EXAMPLE
-    $result = .\Parse-Test-Results.ps1 -TrxPath "C:\temp\testresults.trx"
+    $result = .\Parse-Test-Results.ps1 -Path "C:\temp\testresults.trx"
 
     Returns a PSCustomObject with properties:
         Passed  - Number of passed tests
@@ -35,17 +35,18 @@
 
 #>
 param(
-    [string]$TrxPath
+    [Parameter(Position = 0)]
+    [string]$Path
 )
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
-if (-not (Test-Path $TrxPath)) {
-    throw "TRX file not found: $TrxPath"
+if (-not (Test-Path $Path)) {
+    throw "File not found: $Path"
 }
 
-$reader = [System.Xml.XmlReader]::Create($TrxPath)
+$reader = [System.Xml.XmlReader]::Create($Path)
 try {
     [bool]$countersFound = $false
     [bool]$inRunInfos = $false
