@@ -8,8 +8,11 @@ Describe "Parse-Test-Results" {
 
         # Helper function to invoke the script under test
         function Parse-Test-Results {
-            param([string]$TrxPath)
-            & $PSCommandPath.Replace('.Tests.ps1','.ps1') -TrxPath $TrxPath
+            param(
+                [Parameter(Position = 0)]
+                [string]$Path
+            )
+            & $PSCommandPath.Replace('.Tests.ps1','.ps1') -Path $Path
         }
 
         # Helper function to create a TRX file in the temp folder
@@ -38,7 +41,7 @@ Describe "Parse-Test-Results" {
         $trxPath = New-TrxFile -Content $trxContent -FileName 'passed.trx'
 
         # Act
-        $result = Parse-Test-Results -TrxPath $trxPath
+        $result = Parse-Test-Results -Path $trxPath
 
         # Assert
         $result.Passed  | Should -Be 3
@@ -60,7 +63,7 @@ Describe "Parse-Test-Results" {
         $trxPath = New-TrxFile -Content $trxContent -FileName 'failed.trx'
 
         # Act
-        $result = Parse-Test-Results -TrxPath $trxPath
+        $result = Parse-Test-Results -Path $trxPath
 
         # Assert
         $result.Passed  | Should -Be 2
@@ -82,7 +85,7 @@ Describe "Parse-Test-Results" {
         $trxPath = New-TrxFile -Content $trxContent -FileName 'failed.trx'
 
         # Act
-        $result = Parse-Test-Results -TrxPath $trxPath
+        $result = Parse-Test-Results -Path $trxPath
 
         # Assert
         $result.Passed  | Should -Be 2
@@ -110,7 +113,7 @@ Describe "Parse-Test-Results" {
             $trxPath = New-TrxFile -Content $trxContent -FileName 'crashed-could-not-find-dotnet.trx'
 
             # Act
-            $result = Parse-Test-Results -TrxPath $trxPath
+            $result = Parse-Test-Results -Path $trxPath
 
             # Assert
             $result.Passed  | Should -Be 0
@@ -137,7 +140,7 @@ Describe "Parse-Test-Results" {
             $trxPath = New-TrxFile -Content $trxContent -FileName 'crashed-could-not-load-assembly.trx'
 
             # Act
-            $result = Parse-Test-Results -TrxPath $trxPath
+            $result = Parse-Test-Results -Path $trxPath
 
             # Assert
             $result.Passed  | Should -Be 0
@@ -164,7 +167,7 @@ Describe "Parse-Test-Results" {
             $trxPath = New-TrxFile -Content $trxContent -FileName 'crashed-exited-with-error.trx'
 
             # Act
-            $result = Parse-Test-Results -TrxPath $trxPath
+            $result = Parse-Test-Results -Path $trxPath
 
             # Assert
             $result.Passed  | Should -Be 0
@@ -191,7 +194,7 @@ Describe "Parse-Test-Results" {
             $trxPath = New-TrxFile -Content $trxContent -FileName 'crashed-no-test-is-available.trx'
 
             # Act
-            $result = Parse-Test-Results -TrxPath $trxPath
+            $result = Parse-Test-Results -Path $trxPath
 
             # Assert
             $result.Passed  | Should -Be 0
