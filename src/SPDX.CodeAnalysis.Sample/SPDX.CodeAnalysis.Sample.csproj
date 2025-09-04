@@ -32,7 +32,7 @@
   <Import Project="$(SpdxPackageVersionPropsFilePath)" Condition="Exists('$(SpdxPackageVersionPropsFilePath)')"/>
 
   <ItemGroup Condition="Exists('$(SpdxPackageVersionPropsFilePath)')">
-    <PackageReference Include="SPDX.CodeAnalysis" Version="$(SPDXCodeAnalysisPackageVersion)" />
+    <PackageReference Include="SPDX.CodeAnalysis" VersionOverride="$(SPDXCodeAnalysisPackageVersion)" />
   </ItemGroup>
 
   <Target Name="EnsureNuGetPackageBuilt" BeforeTargets="PrepareForBuild" Condition="'$(DesignTimeBuild)' != 'true'">

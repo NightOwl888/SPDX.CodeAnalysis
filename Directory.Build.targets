@@ -1,7 +1,5 @@
 <Project>
 
-  <Import Project="$(MSBuildThisFileDirectory).build/dependencies.props" Condition="Exists('$(MSBuildThisFileDirectory).build/dependencies.props')" />
-
   <Target Name="AddInternalsVisibleTo" BeforeTargets="BeforeCompile" Label="Adds InternalsVisibleTo Attribute and PublicKey (if supplied)">
     <ItemGroup Condition="'@(InternalsVisibleTo->Count())' &gt; 0 ">
       <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
@@ -24,7 +22,7 @@
 
   <!-- For now, excluding this on Azure DevOps is requried for the scripts to properly insert the version numbers, even though we could use the default Nerbank.GitVersioning setup (in theory) because we are strictly following semver -->
   <ItemGroup Condition=" '$(SkipGitVersioning.ToLower())' != 'true' And '$(TF_BUILD.ToLower())' != 'true' ">
-    <PackageReference Include="Nerdbank.GitVersioning" Version="$(NerdBankGitVersioningPackageReferenceVersion)" PrivateAssets="All" />
+    <PackageReference Include="Nerdbank.GitVersioning" PrivateAssets="All" />
   </ItemGroup>
   
 </Project>

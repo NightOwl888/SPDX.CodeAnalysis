@@ -32,11 +32,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="$(MicrosoftCodeAnalysisAnalyzersPackageReferenceVersion)">
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="$(MicrosoftCodeAnalysisWorkspacesCommonPackageReferenceVersion)" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" />
   </ItemGroup>
 
   <ItemGroup>
