@@ -31,8 +31,8 @@ jobs:
           $failed = $false
           $perFile = @()
 
-          if ($pester -and $pester.Containers -and $pester.Containers.Count -gt 0) {
-              foreach ($container in $pester.Containers) {
+          if ($testResults -and $testResults.Containers -and $testResults.Containers.Count -gt 0) {
+              foreach ($container in $testResults.Containers) {
                   $projectName = $container.Item.Name
                   $passedCount = $container.PassedCount
                   $failedCount = $container.FailedCount
