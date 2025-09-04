@@ -33,17 +33,17 @@ jobs:
 
           if ($testResults -and $testResults.Containers -and $testResults.Containers.Count -gt 0) {
               foreach ($container in $testResults.Containers) {
-                  $projectName = $container.Item.Name
+                  $suiteName = $container.Item.Name
                   $passedCount = $container.PassedCount
                   $failedCount = $container.FailedCount
                   $skippedCount = $container.SkippedCount
 
                   $perFile += [PSCustomObject]@{
-                      Project      = $projectName
-                      PassedCount  = [int]$passed
-                      FailedCount  = [int]$failed
-                      IgnoredCount = [int]$skipped
-                      Crashed      = $false
+                      SuiteName     = $suiteName
+                      PassedCount   = [int]$passedCount
+                      FailedCount   = [int]$failedCount
+                      IgnoredCount  = [int]$skippedCount
+                      Crashed       = [bool]$false
                   }
 
                   if ($failedCount -gt 0) {
@@ -65,7 +65,7 @@ jobs:
                   $statusIcon = '✅'; $statusText = 'Passed'
               }
 
-              $line = "- $($statusIcon) $($statusText) - **$($r.Project)** | Passed=$($r.Passed), Failed=$($r.Failed), Ignored=$($r.Ignored)"
+              $line = "- $($statusIcon) $($statusText) - **$($r.SuiteName)** | Passed=$($r.PassedCount), Failed=$($r.FailedCount), Ignored=$($r.IgnoredCount)"
               Add-Content $env:GITHUB_STEP_SUMMARY $line
           }
 
