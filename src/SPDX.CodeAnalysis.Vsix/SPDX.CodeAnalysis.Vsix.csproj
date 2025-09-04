@@ -26,7 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(BuildingInsideVisualStudio)' == 'true' Or '$(BuildVsix)' == 'true'">
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2094" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" PrivateAssets="all" />
   </ItemGroup>
 
   <Import Project="localized.resources.targets" />
