@@ -87,8 +87,8 @@ finally {
 }
 
 [PSCustomObject]@{
-    Passed      = $passedCount
-    Failed      = $failedCount
-    Ignored     = $ignoredCount
-    Crashed     = $crashed
+    PassedCount     = $passedCount
+    FailedCount     = $failedCount
+    IgnoredCount    = $ignoredCount
+    Crashed         = $crashed
 }
