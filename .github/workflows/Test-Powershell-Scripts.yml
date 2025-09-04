@@ -15,8 +15,18 @@ jobs:
         shell: pwsh
         run: ./.build/Ensure-Powershell-Dependencies.ps1
 
-      - name: Run Pester
+      - name: Run Pester Tests
         shell: pwsh
         run: |
           $tests = Get-ChildItem -Path '.build' -Recurse -Filter '*.Tests.ps1' | ForEach-Object FullName
-          Invoke-Pester -Output Detailed -CI -Path $tests
+          $testResults = Invoke-Pester -Output Detailed -CI -Path $tests -PassThru
+          $summaryMarkdown = @"
+          ### Pester Test Results
+          | Metric | Value |
+          |---|---|
+          | Total Tests | $($testResults.TotalCount) |
+          | Passed | $($testResults.PassedCount) |
+          | Failed | $($testResults.FailedCount) |
+          | Skipped | $($testResults.SkippedCount) |
+          "@
+          $summaryMarkdown | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
