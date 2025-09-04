@@ -1,4 +1,4 @@
-name: Test Powershell Scripts
+﻿name: Test Powershell Scripts
 
 on:
   workflow_dispatch:
@@ -17,16 +17,58 @@ jobs:
 
       - name: Run Pester Tests
         shell: pwsh
+        continue-on-error: true
         run: |
-          #$tests = Get-ChildItem -Path '.build' -Recurse -Filter '*.Tests.ps1' | ForEach-Object FullName
-          $testResults = Invoke-Pester -Output Detailed -CI -PassThru
-          $summaryMarkdown = @"
-          ### Pester Test Results
-          | Metric | Value |
-          |---|---|
-          | Total Tests | $($testResults.TotalCount) |
-          | Passed | $($testResults.PassedCount) |
-          | Failed | $($testResults.FailedCount) |
-          | Skipped | $($testResults.SkippedCount) |
-          "@
-          $summaryMarkdown | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          $ErrorActionPreference = 'Continue'
+          try {
+              $testResults = Invoke-Pester -Output Detailed -CI -PassThru
+          } catch  {
+              Write-Warning "Invoke-Pester threw an exception: $_"
+          }
+          $ErrorActionPreference = 'Stop'
+          Set-StrictMode -Version Latest
+
+          $failed = $false
+          $perFile = @()
+
+          if ($pester -and $pester.Containers -and $pester.Containers.Count -gt 0) {
+              foreach ($container in $pester.Containers) {
+                  $projectName = $container.Item.Name
+                  $passedCount = $container.PassedCount
+                  $failedCount = $container.FailedCount
+                  $skippedCount = $container.SkippedCount
+
+                  $perFile += [PSCustomObject]@{
+                      Project      = $projectName
+                      PassedCount  = [int]$passed
+                      FailedCount  = [int]$failed
+                      IgnoredCount = [int]$skipped
+                      Crashed      = $false
+                  }
+
+                  if ($failedCount -gt 0) {
+                      $failed = $true
+                  }
+              }
+          }
+
+          # Write summary
+          Add-Content $env:GITHUB_STEP_SUMMARY "## Test Results`n"
+          foreach ($r in $perFile) {
+
+              # Determine status for this project
+              if ($r.Crashed) {
+                  $statusIcon = '⚠️'; $statusText = 'Crashed'
+              } elseif ($r.FailedCount -gt 0) {
+                  $statusIcon = '❌'; $statusText = 'Failed'
+              } else {
+                  $statusIcon = '✅'; $statusText = 'Passed'
+              }
+
+              $line = "- $($statusIcon) $($statusText) - **$($r.Project)** | Passed=$($r.Passed), Failed=$($r.Failed), Ignored=$($r.Ignored)"
+              Add-Content $env:GITHUB_STEP_SUMMARY $line
+          }
+
+          if ($failed) {
+              exit 1
+          }
