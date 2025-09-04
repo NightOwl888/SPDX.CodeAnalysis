@@ -177,7 +177,7 @@ jobs:
         #continue-on-error: true
         run: |
           # Imports
-          . (Join-Path $env:WORKPATH 'ci' 'Markdown-Formatting.ps1')
+          . (Join-Path $env:GITHUB_WORKSPACE 'ci' 'Markdown-Formatting.ps1')
 
           $resultsRootDir = "$env:WORKPATH/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}"
           New-Item -ItemType Directory -Force -Path $resultsRootDir | Out-Null
