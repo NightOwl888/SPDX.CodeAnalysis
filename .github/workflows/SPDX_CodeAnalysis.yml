@@ -176,9 +176,6 @@ jobs:
         shell: pwsh
         #continue-on-error: true
         run: |
-          # Load helper scripts
-          . "$env:GITHUB_WORKSPACE/ci/Parse-Test-Results.ps1"
-
           $resultsRootDir = "$env:WORKPATH/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}"
           New-Item -ItemType Directory -Force -Path $resultsRootDir | Out-Null
 
