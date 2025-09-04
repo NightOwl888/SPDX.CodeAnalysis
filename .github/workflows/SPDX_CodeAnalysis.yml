@@ -257,7 +257,8 @@ jobs:
                   $trxFile = Join-Path $resultsDirectory "TestResults.trx"
                   if (Test-Path $trxFile) {
                       $parsed = & "$env:GITHUB_WORKSPACE/ci/Parse-Test-Results.ps1" -Path $trxFile
-                      $parsed.SuiteName = $_.Name
+                      #$parsed.SuiteName = $_.Name
+                      $parsed | Add-Member -NotePropertyName "SuiteName" -NotePropertyValue $_.Name
                       $results += $parsed
                   }
               }
