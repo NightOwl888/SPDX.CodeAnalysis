@@ -120,11 +120,17 @@ jobs:
         shell: pwsh
         run: |
           $dir = "C:\w"
+          $testResultsRootDir = "$dir\work\test-results\${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}"
+          $coverageReportDir = "$testResultsRootDir\coverage-report"
           New-Item -ItemType Directory -Force -Path $dir
           New-Item -ItemType Directory -Force -Path "$dir\dotnet"
           New-Item -ItemType Directory -Force -Path "$dir\work"
+          New-Item -ItemType Directory -Force -Path "$testResultsRootDir"
+          New-Item -ItemType Directory -Force -Path "$coverageReportDir"
           Add-Content $env:GITHUB_ENV "`nDOTNET_INSTALL_DIR=$dir\dotnet"
           Add-Content $env:GITHUB_ENV "`nWORKPATH=$dir\work"
+          Add-Content $env:GITHUB_ENV "`nTEST_RESULTS_ROOT_DIR=$testResultsRootDir"
+          Add-Content $env:GITHUB_ENV "`nCOVERAGE_REPORT_DIR=$coverageReportDir"
           Add-Content $env:GITHUB_PATH "`n$($env:USERPROFILE)\.dotnet\tools"
 
       - name: Set Paths (Linux/macOS)
@@ -132,11 +138,17 @@ jobs:
         shell: pwsh
         run: |
           $dir = "$env:RUNNER_TEMP/w"
+          $testResultsRootDir = "$dir/work/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}"
+          $coverageReportDir = "$testResultsRootDir/coverage-report"
           New-Item -ItemType Directory -Force -Path $dir
           New-Item -ItemType Directory -Force -Path "$dir/dotnet"
           New-Item -ItemType Directory -Force -Path "$dir/work"
+          New-Item -ItemType Directory -Force -Path "$testResultsRootDir"
+          New-Item -ItemType Directory -Force -Path "$coverageReportDir"
           Add-Content $env:GITHUB_ENV "`nDOTNET_INSTALL_DIR=$dir/dotnet"
           Add-Content $env:GITHUB_ENV "`nWORKPATH=$dir/work"
+          Add-Content $env:GITHUB_ENV "`nTEST_RESULTS_ROOT_DIR=$testResultsRootDir"
+          Add-Content $env:GITHUB_ENV "`nCOVERAGE_REPORT_DIR=$coverageReportDir"
           Add-Content $env:GITHUB_PATH "`n$($env:HOME)/.dotnet/tools"
 
       # Install the .NET SDK
@@ -175,15 +187,12 @@ jobs:
           # Imports
           . (Join-Path $env:GITHUB_WORKSPACE 'ci' 'Markdown-Formatting.ps1')
 
-          $resultsRootDir = "$env:WORKPATH/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}"
-          New-Item -ItemType Directory -Force -Path $resultsRootDir | Out-Null
-
           $includesCoverage = $false
           $results = @()
 
           Get-ChildItem -Directory $env:WORKPATH | ForEach-Object {
               $dllPath = Join-Path $_.FullName ($_.Name + ".dll")
-              $resultsDirectory = Join-Path $resultsRootDir $_.Name
+              $resultsDirectory = Join-Path $env:TEST_RESULTS_ROOT_DIR $_.Name
               New-Item -ItemType Directory -Force -Path $resultsDirectory | Out-Null
 
               if (Test-Path $dllPath) {
@@ -235,18 +244,15 @@ jobs:
 
           if ($includesCoverage) {
               # Generate a per-job coverage summary + HTML reports from all coverage.xml files created above
-              $summaryDir = Join-Path $resultsRootDir "coverage-report"
-              New-Item -ItemType Directory -Force -Path $summaryDir | Out-Null
-
-              $reportsGlob = Join-Path $resultsRootDir "**/coverage/coverage.xml"
+              $reportsGlob = Join-Path $env:TEST_RESULTS_ROOT_DIR "**/coverage/coverage.xml"
               reportgenerator `
                   "-reports:$reportsGlob" `
-                  "-targetdir:$summaryDir" `
+                  "-targetdir:$env:COVERAGE_REPORT_DIR" `
                   "-reporttypes:MarkdownSummaryGithub;HtmlInline_AzurePipelines;HtmlChart" `
                   "-verbosity:Warning"
 
               # Append collapsible coverage section to the job summary
-              $md = Join-Path $summaryDir "SummaryGithub.md"
+              $md = Join-Path $env:COVERAGE_REPORT_DIR "SummaryGithub.md"
               if (Test-Path $md) {
                   Add-Content $env:GITHUB_STEP_SUMMARY "`n<details><summary>Coverage</summary>`n"
                   Get-Content $md | Add-Content $env:GITHUB_STEP_SUMMARY
@@ -266,7 +272,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.arch }}
-          path: ${{ env.WORKPATH }}/test-results/${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.tfm }}
+          path: ${{ env.TEST_RESULTS_ROOT_DIR }}
 
       - name: Report Test Failure
         if: always() && env.TESTS_FAILED == 'true'
