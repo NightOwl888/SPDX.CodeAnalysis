@@ -114,7 +114,7 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v5
 
-      # Set up working directories consistently
+      # Set up working directories/paths consistently
       - name: Set Paths (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
@@ -125,6 +125,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path "$dir\work"
           Add-Content $env:GITHUB_ENV "`nDOTNET_INSTALL_DIR=$dir\dotnet"
           Add-Content $env:GITHUB_ENV "`nWORKPATH=$dir\work"
+          Add-Content $env:GITHUB_PATH "`n$($env:USERPROFILE)\.dotnet\tools"
 
       - name: Set Paths (Linux/macOS)
         if: runner.os == 'Linux' || runner.os == 'macOS'
@@ -136,6 +137,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path "$dir/work"
           Add-Content $env:GITHUB_ENV "`nDOTNET_INSTALL_DIR=$dir/dotnet"
           Add-Content $env:GITHUB_ENV "`nWORKPATH=$dir/work"
+          Add-Content $env:GITHUB_PATH "`n$($env:HOME)/.dotnet/tools"
 
       # Install the .NET SDK
       - name: Setup .NET 8.0
@@ -158,19 +160,13 @@ jobs:
           name: test-assemblies
           path: ${{ env.WORKPATH }}
 
-      - name: Install Coverage + Report Tools
+      - name: Install Coverage
         shell: pwsh
-        run: |
-          dotnet tool install --global dotnet-coverage
-          dotnet tool install --global dotnet-reportgenerator-globaltool
+        run: dotnet tool install --global dotnet-coverage
 
-          # Ensure the global tools are on PATH for all OS
-          if ($env:RUNNER_OS -eq 'Windows') {
-            $tools = "$env:USERPROFILE\.dotnet\tools"
-          } else {
-            $tools = "$env:HOME/.dotnet/tools"
-          }
-          echo $tools | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: Install Coverage Reporting
+        shell: pwsh
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
       - name: Run Tests
         shell: pwsh
