@@ -20,7 +20,7 @@ jobs:
         continue-on-error: true
         run: |
           # Imports
-          . (Join-Path $env:WORKPATH 'ci' 'Markdown-Formatting.ps1')
+          . (Join-Path $env:GITHUB_WORKSPACE 'ci' 'Markdown-Formatting.ps1')
 
           $ErrorActionPreference = 'Continue'
           try {
