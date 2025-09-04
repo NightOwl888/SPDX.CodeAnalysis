@@ -238,25 +238,7 @@ jobs:
                   $trxFile = Join-Path $resultsDirectory "TestResults.trx"
                   if (Test-Path $trxFile) {
                       $parsed = & "$env:GITHUB_WORKSPACE/ci/Parse-Test-Results.ps1" -Path $trxFile
-
-                      # Determine status for this project
-                      if ($parsed.Crashed) {
-                          $statusIcon = '⚠️'; $statusText = 'Crashed'
-                      } elseif ($parsed.FailedCount -gt 0) {
-                          $statusIcon = '❌'; $statusText = 'Failed'
-                      } else {
-                          $statusIcon = '✅'; $statusText = 'Passed'
-                      }
-
-                      # Store results
-                      $results += [PSCustomObject]@{
-                          Project = $_.Name
-                          Passed  = $parsed.Passed
-                          Failed  = $parsed.Failed
-                          Ignored = $parsed.Ignored
-                          Status  = $statusIcon
-                          StatusText = $statusText
-                      }
+                      $parsed.SuiteName = $_.Name
                   }
               }
           }
@@ -264,7 +246,17 @@ jobs:
           # Write summary
           Add-Content $env:GITHUB_STEP_SUMMARY "## Test Results`n"
           foreach ($r in $results) {
-              $line = "- $($r.Status) $($r.StatusText) - **$($r.Project)** | Passed=$($r.Passed), Failed=$($r.Failed), Ignored=$($r.Ignored)"
+
+              # Determine status for this project
+              if ($r.Crashed) {
+                  $statusIcon = '⚠️'; $statusText = 'Crashed'
+              } elseif ($r.FailedCount -gt 0) {
+                  $statusIcon = '❌'; $statusText = 'Failed'
+              } else {
+                  $statusIcon = '✅'; $statusText = 'Passed'
+              }
+
+              $line = "- $($statusIcon) $($statusText) - **$($r.SuiteName)** | Passed=$($r.PassedCount), Failed=$($r.FailedCount), Ignored=$($r.IgnoredCount)"
               Add-Content $env:GITHUB_STEP_SUMMARY $line
           }
 
