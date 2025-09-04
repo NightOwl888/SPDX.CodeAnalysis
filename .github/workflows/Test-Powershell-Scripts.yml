@@ -17,7 +17,6 @@ jobs:
 
       - name: Run Pester Tests
         shell: pwsh
-        continue-on-error: true
         run: |
           # Imports
           . (Join-Path $env:GITHUB_WORKSPACE 'ci' 'Markdown-Formatting.ps1')
