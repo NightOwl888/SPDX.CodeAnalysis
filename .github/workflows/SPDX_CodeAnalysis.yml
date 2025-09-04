@@ -184,7 +184,7 @@ jobs:
         shell: pwsh
         run: |
           # Imports
-          . (Join-Path $env:GITHUB_WORKSPACE 'ci' 'Markdown-Formatting.ps1')
+          . (Join-Path $env:GITHUB_WORKSPACE 'eng' 'build' 'Markdown-Formatting.ps1')
 
           $includesCoverage = $false
           $results = @()
@@ -223,7 +223,7 @@ jobs:
                       dotnet-coverage collect "dotnet $($testCmd -join ' ')" `
                           --output-format cobertura `
                           --output "$coverageFile" `
-                          --settings (Join-Path "$env:GITHUB_WORKSPACE" "ci" "coverage.runsettings")
+                          --settings (Join-Path "$env:GITHUB_WORKSPACE" 'eng' 'build' 'coverage.runsettings')
 
                       if (Test-Path $coverageFile) { $includesCoverage = $true }
                   }
@@ -231,7 +231,7 @@ jobs:
                   # TRX inspection / status computation
                   $trxFile = Join-Path $resultsDirectory "TestResults.trx"
                   if (Test-Path $trxFile) {
-                      $parsed = & "$env:GITHUB_WORKSPACE/ci/Parse-Test-Results.ps1" -Path $trxFile
+                      $parsed = & "$env:GITHUB_WORKSPACE/eng/build/Parse-Test-Results.ps1" -Path $trxFile
                       $parsed | Add-Member -NotePropertyName "SuiteName" -NotePropertyValue $_.Name
                       $results += $parsed
                   }
