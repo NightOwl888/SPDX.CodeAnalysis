@@ -382,6 +382,12 @@ Special2 line3]]></file>
             Assert.That(result, Is.EqualTo(LicenseHeaderCache.MatchResult.NonMatchingCodeFilePath));
         }
 
+        [Test]
+        public void FailTheTests()
+        {
+            Assert.Fail();
+        }
+
         private static void DumpToConsole(IReadOnlyList<LicenseHeaderCacheText> actual)
         {
             string basePath = Path.GetFullPath(".");
