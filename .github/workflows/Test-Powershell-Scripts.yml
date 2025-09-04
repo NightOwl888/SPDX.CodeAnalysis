@@ -18,8 +18,8 @@ jobs:
       - name: Run Pester Tests
         shell: pwsh
         run: |
-          $tests = Get-ChildItem -Path '.build' -Recurse -Filter '*.Tests.ps1' | ForEach-Object FullName
-          $testResults = Invoke-Pester -Output Detailed -CI -Path $tests -PassThru
+          #$tests = Get-ChildItem -Path '.build' -Recurse -Filter '*.Tests.ps1' | ForEach-Object FullName
+          $testResults = Invoke-Pester -Output Detailed -CI -PassThru
           $summaryMarkdown = @"
           ### Pester Test Results
           | Metric | Value |
