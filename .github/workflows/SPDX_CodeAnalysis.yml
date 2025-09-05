@@ -24,6 +24,9 @@ jobs:
       startsWith(github.ref, 'refs/heads/releases/v') ||
       github.ref_type == 'tag'))
     runs-on: windows-latest
+    env:
+      DIST_DIR: ${{ github.workspace }}/dist
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
       - name: Checkout Source
         uses: actions/checkout@v5
@@ -41,7 +44,7 @@ jobs:
           dotnet-version: 9.0.x
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore --packages $NUGET_PACKAGES
 
       - name: Build
         shell: pwsh
@@ -80,8 +83,6 @@ jobs:
         with:
           name: test-assemblies
           path: ${{ env.DIST_DIR }}/testBinaries
-    env:
-      DIST_DIR: ${{ github.workspace }}/dist
 
   test:
     needs: build
