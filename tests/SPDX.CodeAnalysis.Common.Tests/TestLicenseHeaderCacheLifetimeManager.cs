@@ -5,10 +5,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using NUnit.Framework;
 using SPDX.CodeAnalysis;
-using System;
 using System.Collections.Immutable;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
@@ -16,39 +14,6 @@ namespace SPDX.Common.Tests
 {
     public class TestLicenseHeaderCacheLifetimeManager
     {
-        [Test]
-        public void VerifyProcessArchitecture_ARM64()
-        {
-            Console.WriteLine($"OS Architecture: {RuntimeInformation.OSArchitecture}");
-            Console.WriteLine($"Process Architecture: {RuntimeInformation.ProcessArchitecture}");
-            Console.WriteLine($"Framework Description: {RuntimeInformation.FrameworkDescription}");
-            Console.WriteLine($"Is 64-bit Process: {Environment.Is64BitProcess}");
-
-            Assert.That(RuntimeInformation.ProcessArchitecture, Is.EqualTo(Architecture.Arm64));
-        }
-
-        [Test]
-        public void VerifyProcessArchitecture_X86()
-        {
-            Console.WriteLine($"OS Architecture: {RuntimeInformation.OSArchitecture}");
-            Console.WriteLine($"Process Architecture: {RuntimeInformation.ProcessArchitecture}");
-            Console.WriteLine($"Framework Description: {RuntimeInformation.FrameworkDescription}");
-            Console.WriteLine($"Is 64-bit Process: {Environment.Is64BitProcess}");
-
-            Assert.That(RuntimeInformation.ProcessArchitecture, Is.EqualTo(Architecture.X86));
-        }
-
-        [Test]
-        public void VerifyProcessArchitecture_X64()
-        {
-            Console.WriteLine($"OS Architecture: {RuntimeInformation.OSArchitecture}");
-            Console.WriteLine($"Process Architecture: {RuntimeInformation.ProcessArchitecture}");
-            Console.WriteLine($"Framework Description: {RuntimeInformation.FrameworkDescription}");
-            Console.WriteLine($"Is 64-bit Process: {Environment.Is64BitProcess}");
-
-            Assert.That(RuntimeInformation.ProcessArchitecture, Is.EqualTo(Architecture.X64));
-        }
-
         [Test]
         public void TestGetHash()
         {
