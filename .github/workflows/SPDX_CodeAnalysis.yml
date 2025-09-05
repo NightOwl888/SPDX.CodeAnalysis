@@ -197,7 +197,7 @@ jobs:
               if (Test-Path $dllPath) {
                   Write-Host "Running tests in $dllPath..."
 
-                  # Build as array of arguments (excluding the "dotnet" prefix)
+                  # Build as array of arguments (excluding the "dotnet" prefix and -- arguments)
                   $testCmd = @(
                       "test", $dllPath,
                       "--framework", "${{ matrix.tfm }}",
@@ -206,13 +206,12 @@ jobs:
                       "--results-directory", $resultsDirectory,
                       "--blame-hang-timeout", "10m",
                       "--blame-hang-dump-type", "mini",
-                      "--blame-crash",
-                      "--", "RunConfiguration.TargetPlatform=${{ matrix.arch }}"
+                      "--blame-crash"
                   )
 
                   if ("${{ matrix.arch }}" -eq 'arm64' -and ($env:RUNNER_OS -eq 'macOS' -or $env:RUNNER_OS -eq 'Linux')) {
                       # Run tests without coverage
-                      dotnet @testCmd
+                      dotnet @testCmd -- RunConfiguration.TargetPlatform=${{ matrix.arch }}
                   } else {
                       # Ensure a coverage folder per test project output
                       $coverageDir = Join-Path $resultsDirectory "coverage"
@@ -220,7 +219,7 @@ jobs:
                       $coverageFile = Join-Path $coverageDir "coverage.xml"
 
                       # Collect coverage in Cobertura format; TRX is produced by the inner 'dotnet test'
-                      dotnet-coverage collect "dotnet $($testCmd -join ' ')" `
+                      dotnet-coverage collect "dotnet $($testCmd -join ' ') -- RunConfiguration.TargetPlatform=${{ matrix.arch }}" `
                           --output-format cobertura `
                           --output "$coverageFile" `
                           --settings (Join-Path "$env:GITHUB_WORKSPACE" 'eng' 'build' 'coverage.runsettings')
