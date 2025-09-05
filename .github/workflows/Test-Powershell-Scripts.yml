@@ -13,13 +13,13 @@ jobs:
 
       - name: Restore Powershell Dependencies
         shell: pwsh
-        run: ./.build/Ensure-Powershell-Dependencies.ps1
+        run: ./eng/Ensure-Powershell-Dependencies.ps1
 
       - name: Run Pester Tests
         shell: pwsh
         run: |
           # Imports
-          . (Join-Path $env:GITHUB_WORKSPACE 'ci' 'Markdown-Formatting.ps1')
+          . (Join-Path $env:GITHUB_WORKSPACE 'eng' 'build' 'Markdown-Formatting.ps1')
 
           $ErrorActionPreference = 'Continue'
           try {
