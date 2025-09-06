@@ -43,16 +43,10 @@ jobs:
         with:
           dotnet-version: 9.0.x
 
-      - name: List matched files
+      - name: Compute cache key
+        id: cache-key
         run: |
-          echo "Files used for cache key:"
-          git ls-files | grep -i "props\|targets\|csproj\|sln"
-
-      - name: Cache NuGet packages
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.NUGET_PACKAGES }}
-          key: nuget-v1-${{ runner.os }}-${{ hashFiles(
+          echo "key=nuget-v1-${{ runner.os }}-$(echo ${{ hashFiles(
             '**/*.csproj',
             '**/*.vbproj',
             '**/*.fsproj',
@@ -62,7 +56,18 @@ jobs:
             'global.json',
             '**/Directory.Build.props',
             '**/Directory.Build.targets',
-            '**/Directory.Packages.props') }}
+            '**/Directory.Packages.props'
+          ) }})" >> $GITHUB_OUTPUT
+
+      - name: Show cache key
+        run: |
+          echo "Cache key is: ${{ steps.cache-key.outputs.key }}"
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUGET_PACKAGES }}
+          key: ${{ steps.cache-key.outputs.key }}
           restore-keys: |
             nuget-v1-${{ runner.os }}-
 
