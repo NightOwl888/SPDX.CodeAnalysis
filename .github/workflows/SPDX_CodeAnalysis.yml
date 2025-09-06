@@ -43,10 +43,16 @@ jobs:
         with:
           dotnet-version: 9.0.x
 
+      - name: Debug individual file hashes
+        run: |
+          for f in $(git ls-files | grep -E '\.csproj$|\.vbproj$|\.fsproj$|\.props$|\.targets$|\.sln$|global\.json$'); do
+            echo "$f -> $(sha256sum $f | cut -d' ' -f1)"
+          done
+
       - name: Compute cache key
         id: cache-key
         run: |
-          echo "key=nuget-v1-${{ runner.os }}-$(echo ${{ hashFiles(
+          echo "key=nuget-v1-${{ runner.os }}-${{ hashFiles(
             '**/*.csproj',
             '**/*.vbproj',
             '**/*.fsproj',
@@ -57,7 +63,7 @@ jobs:
             '**/Directory.Build.props',
             '**/Directory.Build.targets',
             '**/Directory.Packages.props'
-          ) }})" >> $GITHUB_OUTPUT
+          ) }}" >> $GITHUB_OUTPUT
 
       - name: Show cache key
         run: |
