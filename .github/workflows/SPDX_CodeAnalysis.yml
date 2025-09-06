@@ -43,6 +43,11 @@ jobs:
         with:
           dotnet-version: 9.0.x
 
+      - name: List matched files
+        run: |
+          echo "Files used for cache key:"
+          git ls-files | grep -i "props\|targets\|csproj\|sln"
+
       - name: Cache NuGet packages
         uses: actions/cache@v4
         with:
