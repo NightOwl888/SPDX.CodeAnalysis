@@ -52,6 +52,7 @@ jobs:
 
       - name: Compute cache key
         id: cache-key
+        shell: bash
         run: |
           echo "key=nuget-v1-${{ runner.os }}-${{ hashFiles(
             '**/*.csproj',
