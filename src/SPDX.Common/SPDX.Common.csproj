@@ -14,8 +14,6 @@
     </PackageReference>
     <PackageReference Include="System.Buffers" />
     <PackageReference Include="System.Memory" />
-
-    <PackageReference Include="J2N" />
   </ItemGroup>
 
   <ItemGroup>
