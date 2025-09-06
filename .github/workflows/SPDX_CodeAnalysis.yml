@@ -76,8 +76,6 @@ jobs:
         with:
           path: ${{ env.NUGET_PACKAGES }}
           key: ${{ steps.cache-key.outputs.key }}
-          restore-keys: |
-            nuget-v1-${{ runner.os }}-
 
       - name: Restore
         run: dotnet restore
