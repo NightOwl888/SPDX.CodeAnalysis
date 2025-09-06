@@ -43,23 +43,16 @@ jobs:
         with:
           dotnet-version: 9.0.x
 
-      - name: Compute Cache Key
-        id: cache-key
-        shell: bash
-        run: |
-          echo "key=nuget-v1-${{ runner.os }}-${{ hashFiles(
-            '**/*.*proj'         # Includes .csproj, .vbproj, .fsproj, etc.
-            '**/*.props',        # Includes: Directory.Packages.props and Directory.Build.props
-            '**/*.targets',      # Includes: Directory.Build.targets
-            '**/*.sln', '*.sln', # Special-case that minimatch requires to match root
-            'global.json'
-          ) }}" >> $GITHUB_OUTPUT
-
       - name: Cache NuGet Packages
         uses: actions/cache@v4
         with:
+          # '**/*.*proj' includes .csproj, .vbproj, .fsproj, msbuildproj, etc.
+          # '**/*.props' includes Directory.Packages.props and Directory.Build.props
+          # '**/*.targets' includes Directory.Build.targets
+          # '**/*.sln' and '*.sln' ensure root solution files are included (minimatch glitch for file extension .sln)
+          # 'global.json' included for SDK version changes
+          key: nuget-v1-${{ runner.os }}-${{ hashFiles('**/*.*proj', '**/*.props', '**/*.targets', '**/*.sln', '*.sln', 'global.json') }}
           path: ${{ env.NUGET_PACKAGES }}
-          key: ${{ steps.cache-key.outputs.key }}
 
       - name: Restore
         run: dotnet restore
