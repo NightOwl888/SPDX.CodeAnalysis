@@ -3,8 +3,34 @@
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
+      - 'release/v*.*'       # matches release/v1.2
+      - 'release/v*.*.*'     # matches release/v1.2.3
+      - 'release-workflow*'  # special branch names for testing release workflow (this file) from a PR
+    paths:
+    - '**/*.ps1'
+    - '**/*.psm1'
+    - '**/*.ps1xml'
+    - '**/*.pssc'
+    - '**/*.cdxml'
+    - '**/*.psrc'
+    - '**/*.psc1'
   pull_request:
-  
+    paths:
+    - '**/*.ps1'
+    - '**/*.psm1'
+    - '**/*.ps1xml'
+    - '**/*.pssc'
+    - '**/*.cdxml'
+    - '**/*.psrc'
+    - '**/*.psc1'
+
+# De-duplicate runs
+concurrency:
+  group: test-powershell-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pester:
     runs-on: ubuntu-latest
