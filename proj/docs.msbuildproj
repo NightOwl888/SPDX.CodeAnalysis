@@ -11,6 +11,6 @@
     <SkipGitVersioning>true</SkipGitVersioning>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="../.github/**/*.*" Exclude="../.github/obj/**/*;../.github/bin/**/*"/>
+    <Content Include="../docs/**/*.*" Exclude="../docs/obj/**/*;../docs/bin/**/*"/>
   </ItemGroup>
 </Project>
