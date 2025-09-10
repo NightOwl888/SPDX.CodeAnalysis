@@ -40,4 +40,3 @@ finally {
         Set-PSRepository -Name PSGallery -InstallationPolicy $originalPolicy
     }
 }
-
