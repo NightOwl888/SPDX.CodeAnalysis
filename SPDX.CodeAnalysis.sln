@@ -32,6 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		FUNDING.yml = FUNDING.yml
 		LICENSE.txt = LICENSE.txt
 		README.md = README.md
+		SPDX.CodeAnalysis.ChildProcessDbgSettings = SPDX.CodeAnalysis.ChildProcessDbgSettings
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.Vsix", "src\SPDX.CodeAnalysis.Vsix\SPDX.CodeAnalysis.Vsix.csproj", "{4F5BF1EB-3758-4093-922E-8C37ED8393FC}"
