@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{13B669BE-BB05-4DDF-9536-439F39A36129}") = ".github", "proj\.github.msbuildproj", "{873A3BE7-3364-F423-9686-FFB58C0896C4}"
+Project("{13B669BE-BB05-4DDF-9536-439F39A36129}") = ".github", ".github\.github.folderproj", "{873A3BE7-3364-F423-9686-FFB58C0896C4}"
 EndProject
-Project("{13B669BE-BB05-4DDF-9536-439F39A36129}") = "docs", "proj\docs.msbuildproj", "{F1CC6D09-070B-440A-BDA2-C7A8037076ED}"
+Project("{13B669BE-BB05-4DDF-9536-439F39A36129}") = "docs", "docs\docs.folderproj", "{F1CC6D09-070B-440A-BDA2-C7A8037076ED}"
 EndProject
-Project("{13B669BE-BB05-4DDF-9536-439F39A36129}") = "eng", "proj\eng.msbuildproj", "{9A1C280A-5010-45E9-9EC8-B09F0F9517A2}"
+Project("{13B669BE-BB05-4DDF-9536-439F39A36129}") = "eng", "eng\eng.folderproj", "{9A1C280A-5010-45E9-9EC8-B09F0F9517A2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C2EF017A-5599-40FA-A1C4-E30C8587B058}"
 	ProjectSection(SolutionItems) = preProject
@@ -60,8 +60,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.CodeFixes.CSharp", "src\SPDX.CodeAnalysis.CodeFixes.CSharp\SPDX.CodeAnalysis.CodeFixes.CSharp.csproj", "{6A0C7A4D-8044-90BE-FF66-B0C8A849DADA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.CodeFixes.Common", "src\SPDX.CodeAnalysis.CodeFixes.Common\SPDX.CodeAnalysis.CodeFixes.Common.csproj", "{915EF32A-E09C-4831-BAD4-085C5327093B}"
-EndProject
-Project("{13B669BE-BB05-4DDF-9536-439F39A36129}") = "proj", "proj\proj.msbuildproj", "{4134ADDB-4290-5838-975F-EC45C9E5332F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -125,10 +123,6 @@ Global
 		{915EF32A-E09C-4831-BAD4-085C5327093B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{915EF32A-E09C-4831-BAD4-085C5327093B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{915EF32A-E09C-4831-BAD4-085C5327093B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4134ADDB-4290-5838-975F-EC45C9E5332F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4134ADDB-4290-5838-975F-EC45C9E5332F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4134ADDB-4290-5838-975F-EC45C9E5332F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4134ADDB-4290-5838-975F-EC45C9E5332F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
