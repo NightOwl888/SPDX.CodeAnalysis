@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RepositoryRoot>$(MSBuildThisFileDirectory)</RepositoryRoot>
-    <LangVersion>13.0</LangVersion>
+    <LangVersion>12.0</LangVersion>
     <GitHubOrganization>NightOwl888</GitHubOrganization>
     <GitHubProject>SPDX.CodeAnalysis</GitHubProject>
     <Product>$(GitHubProject)</Product>
