@@ -1,13 +1,20 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
 
-  // ASF-friendly defaults: conservative, no automerge, safe scheduling
+  // test defaults
   "extends": [
-    "config:recommended",       // Renovate baseline rules
-    ":dependencyDashboard",     // One dashboard issue instead of spammy PRs
-    ":prConcurrentLimit10",     // Limit concurrent PRs
-    ":prHourlyLimit2"           // Limit frequency of PRs
+     "config:recommended",
+     ":dependencyDashboard",
+     ":prConcurrentLimitNone",
+     ":prHourlyLimitNone"
   ],
+
+{
+  "extends": ["config:base"],
+  "schedule": ["at any time"],          // instead of "before 3am on Monday"
+  "prHourlyLimit": 0,                   // unlimited during tests
+  "prConcurrentLimit": 0
+}
 
   "enabledManagers": ["nuget", "github-actions"],
 
@@ -15,7 +22,7 @@
   "rangeStrategy": "bump",
 
   // Weekly PRs only
-  "schedule": ["before 3am on monday"],
+  "schedule": ["at any time"],
 
   "packageRules": [
     // --- Group 1: Test dependencies ---
