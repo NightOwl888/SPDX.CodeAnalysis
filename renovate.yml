@@ -54,6 +54,11 @@ packageRules:
     commitMessageTopic: "GitHub Action {{depName}}"
     labels: ["dependencies", "ci"]
 
+  # Renovate doesn't understand the "sources" element in global.json, so igore it
+  - matchFileNames:
+      - "global.json"
+    enabled: false
+
 # Only update main branch
 baseBranches:
   - main
