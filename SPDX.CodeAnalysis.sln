@@ -30,9 +30,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.targets = Directory.Build.targets
 		Directory.Packages.props = Directory.Packages.props
 		FUNDING.yml = FUNDING.yml
+		global.json = global.json
 		LICENSE.txt = LICENSE.txt
 		README.md = README.md
+		renovate.json = renovate.json
 		SPDX.CodeAnalysis.ChildProcessDbgSettings = SPDX.CodeAnalysis.ChildProcessDbgSettings
+		version.json = version.json
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPDX.CodeAnalysis.Vsix", "src\SPDX.CodeAnalysis.Vsix\SPDX.CodeAnalysis.Vsix.csproj", "{4F5BF1EB-3758-4093-922E-8C37ED8393FC}"
