@@ -65,3 +65,6 @@ baseBranches:
 
 # ASF-safe: never automerge
 automerge: false
+
+# Disable Renovate's onboarding PR
+onboarding: false
