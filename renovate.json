@@ -1,32 +1,25 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
 
-  // test defaults
+  "__comment_test_defaults": "ASF-friendly base, loosened for testing",
   "extends": [
-     "config:recommended",
+     "config:base",
      ":dependencyDashboard",
      ":prConcurrentLimitNone",
      ":prHourlyLimitNone"
   ],
 
-{
-  "extends": ["config:base"],
-  "schedule": ["at any time"],          // instead of "before 3am on Monday"
-  "prHourlyLimit": 0,                   // unlimited during tests
-  "prConcurrentLimit": 0
-}
-
   "enabledManagers": ["nuget", "github-actions"],
 
-  // 👇 Default strategy for NuGet: bump the lower bound of ranges
+  "__comment_rangeStrategy": "Default for NuGet: bump lower bound of ranges",
   "rangeStrategy": "bump",
 
-  // Weekly PRs only
+  "__comment_schedule": "During testing: run at any time (not weekly only)",
   "schedule": ["at any time"],
 
   "packageRules": [
-    // --- Group 1: Test dependencies ---
     {
+      "__comment": "Group 1: Test dependencies",
       "groupName": "Test dependencies",
       "matchPackageNames": [
         "NUnit",
@@ -36,40 +29,40 @@
       "labels": ["dependencies", "test-deps"]
     },
 
-    // --- Group 2: Roslyn packages ---
     {
+      "__comment": "Group 2: Roslyn packages",
       "groupName": "Roslyn dependencies",
       "matchPackagePatterns": ["^Microsoft\\.CodeAnalysis"],
       "labels": ["dependencies", "roslyn"]
     },
 
-    // --- Exclude manual packages ---
     {
+      "__comment": "Exclude manual packages (leave for manual bumping)",
       "matchPackageNames": ["Microsoft.VSSDK.BuildTools"],
       "enabled": false,
       "labels": ["dependencies", "manual-upgrade"]
     },
 
-    // --- Analyzer dependencies (bump to latest) ---
     {
+      "__comment": "Analyzer dependencies: always bump to latest",
       "matchPackagePatterns": ["Analyzer"],
       "updateTypes": ["minor", "patch", "major"],
       "labels": ["dependencies", "analyzers"]
     },
 
-    // --- GitHub Actions: ASF-compliant mode ---
     {
+      "__comment": "GitHub Actions: ASF-compliant mode (pin to commit SHA)",
       "matchManagers": ["github-actions"],
-      "pinDigests": true,             // rewrite to commit SHA
-      "rangeStrategy": "pin",         // no floating versions
+      "pinDigests": true,
+      "rangeStrategy": "pin",
       "commitMessageTopic": "GitHub Action {{depName}}",
       "labels": ["dependencies", "ci"]
     }
   ],
 
-  // Branch policy
+  "__comment_branch_policy": "Only update main branch",
   "baseBranches": ["main"],
 
-  // ASF-safe: no automerge
+  "__comment_automerge": "ASF-safe: never automerge",
   "automerge": false
 }
