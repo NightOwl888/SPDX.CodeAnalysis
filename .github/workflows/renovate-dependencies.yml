@@ -15,7 +15,6 @@ jobs:
       - name: Run Renovate
         uses: renovatebot/github-action@6927a58a017ee9ac468a34a5b0d2a9a9bd45cac3
         with:
-          configurationFile: renovate.yml
           token: ${{ secrets.RENOVATE_TOKEN }}
         env:
           RENOVATE_REPOSITORIES: NightOwl888/SPDX.CodeAnalysis
