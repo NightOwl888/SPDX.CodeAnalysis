@@ -1,0 +1,68 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+
+  "__comment_test_defaults": "ASF-friendly base, loosened for testing",
+  "extends": [
+     "config:base",
+     ":dependencyDashboard",
+     ":prConcurrentLimitNone",
+     ":prHourlyLimitNone"
+  ],
+
+  "enabledManagers": ["nuget", "github-actions"],
+
+  "__comment_rangeStrategy": "Default for NuGet: bump lower bound of ranges",
+  "rangeStrategy": "bump",
+
+  "__comment_schedule": "During testing: run at any time (not weekly only)",
+  "schedule": ["at any time"],
+
+  "packageRules": [
+    {
+      "__comment": "Group 1: Test dependencies",
+      "groupName": "Test dependencies",
+      "matchPackageNames": [
+        "NUnit",
+        "NUnit3TestAdapter",
+        "Microsoft.NET.Test.Sdk"
+      ],
+      "labels": ["dependencies", "test-deps"]
+    },
+
+    {
+      "__comment": "Group 2: Roslyn packages",
+      "groupName": "Roslyn dependencies",
+      "matchPackagePatterns": ["^Microsoft\\.CodeAnalysis"],
+      "labels": ["dependencies", "roslyn"]
+    },
+
+    {
+      "__comment": "Exclude manual packages (leave for manual bumping)",
+      "matchPackageNames": ["Microsoft.VSSDK.BuildTools"],
+      "enabled": false,
+      "labels": ["dependencies", "manual-upgrade"]
+    },
+
+    {
+      "__comment": "Analyzer dependencies: always bump to latest",
+      "matchPackagePatterns": ["Analyzer"],
+      "updateTypes": ["minor", "patch", "major"],
+      "labels": ["dependencies", "analyzers"]
+    },
+
+    {
+      "__comment": "GitHub Actions: ASF-compliant mode (pin to commit SHA)",
+      "matchManagers": ["github-actions"],
+      "pinDigests": true,
+      "rangeStrategy": "pin",
+      "commitMessageTopic": "GitHub Action {{depName}}",
+      "labels": ["dependencies", "ci"]
+    }
+  ],
+
+  "__comment_branch_policy": "Only update main branch",
+  "baseBranches": ["main"],
+
+  "__comment_automerge": "ASF-safe: never automerge",
+  "automerge": false
+}
