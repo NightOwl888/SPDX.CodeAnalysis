@@ -1,0 +1,68 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+
+  // ASF-friendly defaults: conservative, no automerge, safe scheduling
+  "extends": [
+    "config:recommended",       // Renovate baseline rules
+    ":dependencyDashboard",     // One dashboard issue instead of spammy PRs
+    ":prConcurrentLimit10",     // Limit concurrent PRs
+    ":prHourlyLimit2"           // Limit frequency of PRs
+  ],
+
+  "enabledManagers": ["nuget", "github-actions"],
+
+  // 👇 Default strategy for NuGet: bump the lower bound of ranges
+  "rangeStrategy": "bump",
+
+  // Weekly PRs only
+  "schedule": ["before 3am on monday"],
+
+  "packageRules": [
+    // --- Group 1: Test dependencies ---
+    {
+      "groupName": "Test dependencies",
+      "matchPackageNames": [
+        "NUnit",
+        "NUnit3TestAdapter",
+        "Microsoft.NET.Test.Sdk"
+      ],
+      "labels": ["dependencies", "test-deps"]
+    },
+
+    // --- Group 2: Roslyn packages ---
+    {
+      "groupName": "Roslyn dependencies",
+      "matchPackagePatterns": ["^Microsoft\\.CodeAnalysis"],
+      "labels": ["dependencies", "roslyn"]
+    },
+
+    // --- Exclude manual packages ---
+    {
+      "matchPackageNames": ["Microsoft.VSSDK.BuildTools"],
+      "enabled": false,
+      "labels": ["dependencies", "manual-upgrade"]
+    },
+
+    // --- Analyzer dependencies (bump to latest) ---
+    {
+      "matchPackagePatterns": ["Analyzer"],
+      "updateTypes": ["minor", "patch", "major"],
+      "labels": ["dependencies", "analyzers"]
+    },
+
+    // --- GitHub Actions: ASF-compliant mode ---
+    {
+      "matchManagers": ["github-actions"],
+      "pinDigests": true,             // rewrite to commit SHA
+      "rangeStrategy": "pin",         // no floating versions
+      "commitMessageTopic": "GitHub Action {{depName}}",
+      "labels": ["dependencies", "ci"]
+    }
+  ],
+
+  // Branch policy
+  "baseBranches": ["main"],
+
+  // ASF-safe: no automerge
+  "automerge": false
+}
