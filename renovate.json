@@ -20,6 +20,12 @@
       "labels": ["dependencies", "roslyn"]
     },
     {
+      "groupName": "System.Memory dependencies",
+      "matchPackagePatterns": ["System.Memory", "System.Buffers", "System.Runtime.CompilerServices.Unsafe", "System.Numerics.Vectors"],
+      "enabled": false,
+      "labels": ["dependencies", "manual-upgrade"]
+    },
+    {
       "matchPackageNames": ["Microsoft.VSSDK.BuildTools"],
       "enabled": false,
       "labels": ["dependencies", "manual-upgrade"]
