@@ -1,0 +1,47 @@
+{
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":prConcurrentLimitNone",
+    ":prHourlyLimitNone"
+  ],
+  "enabledManagers": ["nuget", "github-actions"],
+  "rangeStrategy": "bump",
+  "schedule": ["at any time"],
+  "packageRules": [
+    {
+      "groupName": "Test dependencies",
+      "matchPackageNames": ["NUnit", "NUnit3TestAdapter", "Microsoft.NET.Test.Sdk"],
+      "labels": ["dependencies", "test-deps"]
+    },
+    {
+      "groupName": "Roslyn dependencies",
+      "matchPackagePatterns": ["^Microsoft\\.CodeAnalysis"],
+      "labels": ["dependencies", "roslyn"]
+    },
+    {
+      "matchPackageNames": ["Microsoft.VSSDK.BuildTools"],
+      "enabled": false,
+      "labels": ["dependencies", "manual-upgrade"]
+    },
+    {
+      "matchPackagePatterns": ["Analyzer"],
+      "updateTypes": ["minor", "patch", "major"],
+      "labels": ["dependencies", "analyzers"]
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "pinDigests": true,
+      "rangeStrategy": "pin",
+      "commitMessageTopic": "GitHub Action {{depName}}",
+      "labels": ["dependencies", "ci"]
+    },
+    {
+      "matchFileNames": ["global.json"],
+      "enabled": false
+    }
+  ],
+  "baseBranches": ["main"],
+  "automerge": false,
+  "onboarding": false
+}
