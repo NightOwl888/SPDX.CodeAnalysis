@@ -37,6 +37,7 @@
     },
     {
       "matchManagers": ["github-actions"],
+      "prCreation": "immediate"
       "pinDigests": true,
       "rangeStrategy": "pin",
       "commitMessageTopic": "GitHub Action {{depName}}",
