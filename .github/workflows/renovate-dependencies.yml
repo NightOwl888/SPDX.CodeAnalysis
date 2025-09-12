@@ -18,5 +18,4 @@ jobs:
           configurationFile: ${{ github.workspace }}/.github/renovate.yml
           token: ${{ secrets.RENOVATE_TOKEN }}
         env:
-          RENOVATE_REPOSITORIES: NightOwl888/SPDX.CodeAnalysis
           LOG_LEVEL: debug
