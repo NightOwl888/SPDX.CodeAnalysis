@@ -55,6 +55,5 @@
     }
   ],
   "baseBranches": [ "main" ],
-  "automerge": false,
-  "onboarding": false
+  "automerge": false
 }
