@@ -27,21 +27,26 @@
       "labels": [ "dependencies", "manual-upgrade" ]
     },
     {
+      "groupName": "Visual Studio SDK Build Tools",
       "matchPackageNames": [ "Microsoft.VSSDK.BuildTools" ],
       "enabled": false,
       "labels": [ "dependencies", "manual-upgrade" ]
     },
     {
+      "groupName": "Analyzer dependencies",
       "matchPackagePatterns": [ "Analyzer" ],
-      "updateTypes": [ "minor", "patch", "major" ],
+      "updateTypes": [ "major", "minor", "patch" ],
       "labels": [ "dependencies", "analyzers" ]
     },
     {
+      "groupName": "GitHub Actions",
       "matchManagers": [ "github-actions" ],
       "prCreation": "immediate",
       "pinDigests": true,
       "rangeStrategy": "pin",
+      "semanticCommits": true,
       "commitMessageTopic": "GitHub Action {{depName}}",
+      "groupSlug": "github-actions-updates",
       "labels": [ "dependencies", "ci" ]
     },
     {
