@@ -40,13 +40,13 @@
     },
     {
       "groupName": "GitHub Actions",
+      "groupSlug": "github-actions-all",
       "matchManagers": [ "github-actions" ],
-      "prCreation": "immediate",
       "pinDigests": true,
       "rangeStrategy": "pin",
+      "prCreation": "immediate",
       "semanticCommits": true,
       "commitMessageTopic": "GitHub Action {{depName}}",
-      "groupSlug": "github-actions-updates",
       "labels": [ "dependencies", "ci" ]
     },
     {
