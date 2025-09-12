@@ -5,50 +5,51 @@
     ":prConcurrentLimitNone",
     ":prHourlyLimitNone"
   ],
-  "enabledManagers": ["nuget", "github-actions"],
+  "enabledManagers": [ "nuget", "github-actions" ],
   "rangeStrategy": "bump",
-  "schedule": ["at any time"],
+  "schedule": [ "at any time" ],
+  "commitMessagePrefix": "chore: ",
   "packageRules": [
     {
       "groupName": "Test dependencies",
-      "matchPackageNames": ["NUnit", "NUnit3TestAdapter", "Microsoft.NET.Test.Sdk"],
-      "labels": ["dependencies", "test-deps"]
+      "matchPackageNames": [ "NUnit", "NUnit3TestAdapter", "Microsoft.NET.Test.Sdk" ],
+      "labels": [ "dependencies", "test-deps" ]
     },
     {
       "groupName": "Roslyn dependencies",
-      "matchPackagePatterns": ["^Microsoft\\.CodeAnalysis"],
-      "labels": ["dependencies", "roslyn"]
+      "matchPackagePatterns": [ "^Microsoft\\.CodeAnalysis" ],
+      "labels": [ "dependencies", "roslyn" ]
     },
     {
       "groupName": "System.Memory dependencies",
-      "matchPackagePatterns": ["System.Memory", "System.Buffers", "System.Runtime.CompilerServices.Unsafe", "System.Numerics.Vectors"],
+      "matchPackagePatterns": [ "System.Memory", "System.Buffers", "System.Runtime.CompilerServices.Unsafe", "System.Numerics.Vectors" ],
       "enabled": false,
-      "labels": ["dependencies", "manual-upgrade"]
+      "labels": [ "dependencies", "manual-upgrade" ]
     },
     {
-      "matchPackageNames": ["Microsoft.VSSDK.BuildTools"],
+      "matchPackageNames": [ "Microsoft.VSSDK.BuildTools" ],
       "enabled": false,
-      "labels": ["dependencies", "manual-upgrade"]
+      "labels": [ "dependencies", "manual-upgrade" ]
     },
     {
-      "matchPackagePatterns": ["Analyzer"],
-      "updateTypes": ["minor", "patch", "major"],
-      "labels": ["dependencies", "analyzers"]
+      "matchPackagePatterns": [ "Analyzer" ],
+      "updateTypes": [ "minor", "patch", "major" ],
+      "labels": [ "dependencies", "analyzers" ]
     },
     {
-      "matchManagers": ["github-actions"],
+      "matchManagers": [ "github-actions" ],
       "prCreation": "immediate",
       "pinDigests": true,
       "rangeStrategy": "pin",
       "commitMessageTopic": "GitHub Action {{depName}}",
-      "labels": ["dependencies", "ci"]
+      "labels": [ "dependencies", "ci" ]
     },
     {
-      "matchFileNames": ["global.json"],
+      "matchFileNames": [ "global.json" ],
       "enabled": false
     }
   ],
-  "baseBranches": ["main"],
+  "baseBranches": [ "main" ],
   "automerge": false,
   "onboarding": false
 }
