@@ -2,12 +2,12 @@
   "extends": [
     "config:recommended",
     ":dependencyDashboard",
-    ":prConcurrentLimitNone",
-    ":prHourlyLimitNone"
+    ":prConcurrentLimit10",
+    ":prHourlyLimit2"
   ],
   "enabledManagers": [ "nuget", "github-actions" ],
   "rangeStrategy": "bump",
-  "schedule": [ "at any time" ],
+  "schedule": [ "before 3am on monday" ],
   "commitMessagePrefix": "chore: ",
   "packageRules": [
     {
