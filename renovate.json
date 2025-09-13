@@ -22,7 +22,7 @@
     },
     {
       "groupName": "System.Memory dependencies",
-      "matchPackagePatterns": [ "System.Memory", "System.Buffers", "System.Runtime.CompilerServices.Unsafe", "System.Numerics.Vectors" ],
+      "matchPackageNames": [ "System.Memory", "System.Buffers", "System.Runtime.CompilerServices.Unsafe", "System.Numerics.Vectors" ],
       "enabled": false,
       "labels": [ "dependencies", "manual-upgrade", "notes:ignore" ]
     },
