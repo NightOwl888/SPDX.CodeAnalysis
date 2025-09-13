@@ -13,30 +13,30 @@
     {
       "groupName": "Test dependencies",
       "matchPackageNames": [ "NUnit", "NUnit3TestAdapter", "Microsoft.NET.Test.Sdk" ],
-      "labels": [ "dependencies", "test-deps" ]
+      "labels": [ "dependencies", "test-deps", "notes:ignore" ]
     },
     {
       "groupName": "Roslyn dependencies",
       "matchPackagePatterns": [ "^Microsoft\\.CodeAnalysis" ],
-      "labels": [ "dependencies", "roslyn" ]
+      "labels": [ "dependencies", "roslyn", "notes:ignore" ]
     },
     {
       "groupName": "System.Memory dependencies",
       "matchPackagePatterns": [ "System.Memory", "System.Buffers", "System.Runtime.CompilerServices.Unsafe", "System.Numerics.Vectors" ],
       "enabled": false,
-      "labels": [ "dependencies", "manual-upgrade" ]
+      "labels": [ "dependencies", "manual-upgrade", "notes:ignore" ]
     },
     {
       "groupName": "Visual Studio SDK Build Tools",
       "matchPackageNames": [ "Microsoft.VSSDK.BuildTools" ],
       "enabled": false,
-      "labels": [ "dependencies", "manual-upgrade" ]
+      "labels": [ "dependencies", "manual-upgrade", "notes:ignore" ]
     },
     {
       "groupName": "Analyzer dependencies",
       "matchPackagePatterns": [ "Analyzer" ],
       "updateTypes": [ "major", "minor", "patch" ],
-      "labels": [ "dependencies", "analyzers" ]
+      "labels": [ "dependencies", "analyzers", "notes:ignore" ]
     },
     {
       "groupName": "GitHub Actions",
@@ -47,7 +47,7 @@
       "prCreation": "immediate",
       "semanticCommits": true,
       "commitMessageTopic": "GitHub Action {{depName}}",
-      "labels": [ "dependencies", "ci" ]
+      "labels": [ "dependencies", "ci", "notes:ignore" ]
     },
     {
       "matchFileNames": [ "global.json" ],
