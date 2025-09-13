@@ -1,4 +1,4 @@
-﻿name: SPDX.CodeAnalysis
+﻿name: CI
 
 on:
   workflow_dispatch:
