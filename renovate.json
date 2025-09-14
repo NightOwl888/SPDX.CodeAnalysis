@@ -103,6 +103,5 @@
       "enabled": false
     }
   ],
-  "baseBranchPatterns": [ "main" ],
   "automerge": false
 }
