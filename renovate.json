@@ -13,7 +13,7 @@
     {
       "customType": "regex",
       "description": "Debug manager to verify Renovate sees regex managers",
-      "managerFilePatterns": [ "/.*/" ],
+      "fileMatch": [ "^.*$" ],
       "matchStrings": [
         ".*" // match the entire file (greedy on purpose for debugging)
       ],
@@ -24,7 +24,7 @@
     {
       "customType": "regex",
       "description": "Roslyn Analyzer package version property",
-      "managerFilePatterns": [ "/.*Directory\\.Packages\\.props$/", "Directory.Packages.props" ],
+      "fileMatch": [ "(^|.*/)Directory\\.Packages\\.props$" ],
       "matchStrings": [
         "<\\s*RoslynAnalyzerPackageVersion\\s*>(?<currentValue>[^<]+)<\\/\\s*RoslynAnalyzerPackageVersion\\s*>"
       ],
@@ -34,7 +34,7 @@
     {
       "customType": "regex",
       "description": "Analyzer packages in Directory.Packages.props",
-      "managerFilePatterns": [ "/.*Directory\\.Packages\\.props$/", "Directory.Packages.props" ],
+      "fileMatch": [ "(^|.*/)Directory\\.Packages\\.props$" ],
       "matchStrings": [
         "<PackageVersion\\s+Include=\"(?<depName>[^\" ]+Analyzers)\"\\s+Version=\"(?<currentValue>[^\"]+)\"\\s*\\/>"
       ],
