@@ -6,7 +6,11 @@
     ":prConcurrentLimit10",
     ":prHourlyLimitNone"
   ],
-  "enabledManagers": [ "nuget", "github-actions", "custom.regex" ],
+  "enabledManagers": [
+    "nuget",
+    "github-actions",
+    "custom.regex"
+  ],
   "rangeStrategy": "bump",
   "schedule": [],
   "commitMessagePrefix": "chore: ",
@@ -14,7 +18,9 @@
     {
       "customType": "regex",
       "description": "Roslyn Analyzer package version property",
-      "fileMatch": [ "(^|.*/)Directory\\.Packages\\.props$" ],
+      "managerFilePatterns": [
+        "/(^|.*/)Directory\\.Packages\\.props$/"
+      ],
       "matchStrings": [
         "<\\s*RoslynAnalyzerPackageVersion\\s*>(?<currentValue>[^<]+)<\\/\\s*RoslynAnalyzerPackageVersion\\s*>"
       ],
@@ -27,14 +33,26 @@
     {
       "groupName": "Test Dependencies",
       "groupSlug": "test-dependencies",
-      "matchManagers": [ "nuget" ],
-      "matchPackageNames": [ "NUnit", "NUnit3TestAdapter", "Microsoft.NET.Test.Sdk" ],
-      "labels": [ "dependencies", "test-deps", "notes:ignore" ]
+      "matchManagers": [
+        "nuget"
+      ],
+      "matchPackageNames": [
+        "NUnit",
+        "NUnit3TestAdapter",
+        "Microsoft.NET.Test.Sdk"
+      ],
+      "labels": [
+        "dependencies",
+        "test-deps",
+        "notes:ignore"
+      ]
     },
     {
       "groupName": "Roslyn Compiler Packages",
       "groupSlug": "roslyn-compiler",
-      "matchManagers": [ "custom.regex" ],
+      "matchManagers": [
+        "custom.regex"
+      ],
       "matchPackageNames": [
         "Microsoft.CodeAnalysis.Common",
         "Microsoft.CodeAnalysis.CSharp",
@@ -45,51 +63,105 @@
         "Microsoft.CodeAnalysis.VisualBasic.Workspaces",
         "Microsoft.CodeAnalysis.Workspaces.Common"
       ],
-      "matchUpdateTypes": [ "minor", "patch" ],
-      "labels": [ "dependencies", "roslyn", "notes:ignore" ]
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "labels": [
+        "dependencies",
+        "roslyn",
+        "notes:ignore"
+      ]
     },
     {
       "groupName": "Roslyn Analyzer Testing",
       "groupSlug": "roslyn-analyzer-testing",
-      "matchManagers": [ "nuget" ],
-      "matchPackageNames": [ "Microsoft.CodeAnalysis.Analyzer.Testing" ],
-      "labels": [ "dependencies", "roslyn", "notes:ignore" ]
+      "matchManagers": [
+        "nuget"
+      ],
+      "matchPackageNames": [
+        "Microsoft.CodeAnalysis.Analyzer.Testing"
+      ],
+      "labels": [
+        "dependencies",
+        "roslyn",
+        "notes:ignore"
+      ]
     },
     {
       "groupName": "System.Memory Dependencies",
-      "matchPackageNames": [ "System.Memory", "System.Buffers", "System.Runtime.CompilerServices.Unsafe", "System.Numerics.Vectors" ],
-      "matchManagers": [ "nuget" ],
+      "matchPackageNames": [
+        "System.Memory",
+        "System.Buffers",
+        "System.Runtime.CompilerServices.Unsafe",
+        "System.Numerics.Vectors"
+      ],
+      "matchManagers": [
+        "nuget"
+      ],
       "enabled": false,
-      "labels": [ "dependencies", "manual-upgrade", "notes:ignore" ]
+      "labels": [
+        "dependencies",
+        "manual-upgrade",
+        "notes:ignore"
+      ]
     },
     {
       "groupName": "Visual Studio SDK Build Tools",
-      "matchPackageNames": [ "Microsoft.VSSDK.BuildTools" ],
-      "matchManagers": [ "nuget" ],
+      "matchPackageNames": [
+        "Microsoft.VSSDK.BuildTools"
+      ],
+      "matchManagers": [
+        "nuget"
+      ],
       "enabled": false,
-      "labels": [ "dependencies", "manual-upgrade", "notes:ignore" ]
+      "labels": [
+        "dependencies",
+        "manual-upgrade",
+        "notes:ignore"
+      ]
     },
     {
       "groupName": "Analyzer Dependencies",
       "groupSlug": "roslyn-analyzers",
-      "matchManagers": [ "nuget" ],
-      "matchDepNames": [ "/.*Analyzers$/" ],
-      "matchUpdateTypes": [ "major", "minor", "patch" ],
-      "labels": [ "dependencies", "analyzers", "notes:ignore" ]
+      "matchManagers": [
+        "nuget"
+      ],
+      "matchDepNames": [
+        "/.*Analyzers$/"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch"
+      ],
+      "labels": [
+        "dependencies",
+        "analyzers",
+        "notes:ignore"
+      ]
     },
     {
       "groupName": "GitHub Actions",
       "groupSlug": "github-actions-all",
-      "matchManagers": [ "github-actions" ],
+      "matchManagers": [
+        "github-actions"
+      ],
       "pinDigests": true,
       "rangeStrategy": "replace",
       "prCreation": "immediate",
       "semanticCommits": "enabled",
       "commitMessageTopic": "GitHub Action {{depName}}",
-      "labels": [ "dependencies", "ci", "notes:ignore" ]
+      "labels": [
+        "dependencies",
+        "ci",
+        "notes:ignore"
+      ]
     },
     {
-      "matchFileNames": [ "global.json" ],
+      "matchFileNames": [
+        "global.json"
+      ],
       "enabled": false
     }
   ],
