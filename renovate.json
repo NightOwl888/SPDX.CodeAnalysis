@@ -25,6 +25,19 @@
   ],
   "packageRules": [
     {
+      "groupName": "Dotnet Monorepo",
+      "groupSlug": "dotnet-monorepo",
+      "matchManagers": [ "nuget" ],
+      "enabled": false
+    },
+    {
+      "groupName": "Analyzer Dependencies",
+      "groupSlug": "roslyn-analyzers",
+      "matchDepNames": [ ".*Analyzers$" ],
+      "matchUpdateTypes": [ "major", "minor", "patch" ],
+      "labels": [ "dependencies", "analyzers", "notes:ignore" ]
+    },
+    {
       "groupName": "Test Dependencies",
       "matchPackageNames": [ "NUnit", "NUnit3TestAdapter", "Microsoft.NET.Test.Sdk" ],
       "labels": [ "dependencies", "test-deps", "notes:ignore" ]
@@ -62,13 +75,6 @@
       "matchPackageNames": [ "Microsoft.VSSDK.BuildTools" ],
       "enabled": false,
       "labels": [ "dependencies", "manual-upgrade", "notes:ignore" ]
-    },
-    {
-      "groupName": "Analyzer Dependencies",
-      "groupSlug": "roslyn-analyzers",
-      "matchPackageNames": [ "Analyzers$" ],
-      "matchUpdateTypes": [ "major", "minor", "patch" ],
-      "labels": [ "dependencies", "analyzers", "notes:ignore" ]
     },
     {
       "groupName": "GitHub Actions",
