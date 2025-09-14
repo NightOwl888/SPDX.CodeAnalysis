@@ -12,18 +12,20 @@
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": [ ".*Directory\\.Packages\\.props$", "Directory.Packages.props" ],
+      "description": "Roslyn Analyzer package version property",
+      "managerFilePatterns": [ "/.*Directory\\.Packages\\.props$/", "Directory.Packages.props" ],
       "matchStrings": [
-        "<\\s*RoslynAnalyzerPackageVersion\\s*>(?<currentValue>.*)<\\/\\s*RoslynAnalyzerPackageVersion\\s*>"
+        "<\\s*RoslynAnalyzerPackageVersion\\s*>(?<currentValue>[^<]+)<\\/\\s*RoslynAnalyzerPackageVersion\\s*>"
       ],
       "depNameTemplate": "Microsoft.CodeAnalysis.Common",
       "datasourceTemplate": "nuget"
     },
     {
       "customType": "regex",
-      "managerFilePatterns": [ ".*Directory\\.Packages\\.props$", "Directory.Packages.props" ],
+      "description": "Analyzer packages in Directory.Packages.props",
+      "managerFilePatterns": [ "/.*Directory\\.Packages\\.props$/", "Directory.Packages.props" ],
       "matchStrings": [
-        "<PackageVersion\\s+Include=\"(?<depName>.*Analyzers$)\"\\s+Version=\"(?<currentValue>.*)\"\\s*\\/>"
+        "<PackageVersion\\s+Include=\"(?<depName>[^\" ]+Analyzers)\"\\s+Version=\"(?<currentValue>[^\"]+)\"\\s*\\/>"
       ],
       "datasourceTemplate": "nuget"
     }
@@ -70,7 +72,7 @@
     },
     {
       "groupName": "Analyzer Dependencies",
-      "matchDepPatterns": [ ".*Analyzers$" ],
+      "matchDepPatterns": [ "/.*Analyzers$/" ],
       "matchUpdateTypes": [ "major", "minor", "patch" ],
       "labels": [ "dependencies", "analyzers", "notes:ignore" ]
     },
