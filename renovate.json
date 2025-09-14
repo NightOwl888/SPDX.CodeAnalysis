@@ -7,7 +7,7 @@
   ],
   "enabledManagers": [ "nuget", "github-actions" ],
   "rangeStrategy": "bump",
-  "schedule": [ "before 3am on monday" ],
+  "schedule": [],
   "commitMessagePrefix": "chore: ",
   "regexManagers": [
     {
