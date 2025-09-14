@@ -39,7 +39,7 @@
         "Microsoft.CodeAnalysis.VisualBasic.Workspaces",
         "Microsoft.CodeAnalysis.Workspaces.Common"
       ],
-      "updateTypes": [ "minor", "patch" ],
+      "matchUpdateTypes": [ "minor", "patch" ],
       "labels": [ "dependencies", "roslyn", "notes:ignore" ]
     },
     {
@@ -63,7 +63,7 @@
     {
       "groupName": "Analyzer Dependencies",
       "matchPackagePatterns": [ "Analyzers$" ],
-      "updateTypes": [ "major", "minor", "patch" ],
+      "matchUpdateTypes": [ "major", "minor", "patch" ],
       "labels": [ "dependencies", "analyzers", "notes:ignore" ]
     },
     {
