@@ -414,3 +414,9 @@ _artifacts/
 # Rider - allow shared inspection + code style profiles
 !.idea/.idea.SPDX.CodeAnalysis/.idea/inspectionProfiles/
 !.idea/.idea.SPDX.CodeAnalysis/.idea/codeStyles/
+
+# We use Node for debugging renovate configuration.
+# We ignore the package.json and package-lock.json files
+# because we currently don't use Node for any other purpose.
+package.json
+package-lock.json
