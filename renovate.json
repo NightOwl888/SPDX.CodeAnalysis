@@ -3,7 +3,7 @@
     "config:recommended",
     ":dependencyDashboard",
     ":prConcurrentLimit10",
-    ":prHourlyLimit2"
+    ":prHourlyLimitNone"
   ],
   "enabledManagers": [ "nuget", "github-actions" ],
   "rangeStrategy": "bump",
