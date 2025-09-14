@@ -9,9 +9,10 @@
   "rangeStrategy": "bump",
   "schedule": [],
   "commitMessagePrefix": "chore: ",
-  "regexManagers": [
+  "customManagers": [
     {
-      "fileMatch": [ ".*Directory\\.Packages\\.props$" ],
+      "customType": "regex",
+      "managerFilePatterns": [ ".*Directory\\.Packages\\.props$" ],
       "matchStrings": [
         "<\\s*RoslynAnalyzerPackageVersion\\s*>(?<currentValue>.*)<\\/\\s*RoslynAnalyzerPackageVersion\\s*>"
       ],
@@ -72,7 +73,7 @@
       "pinDigests": true,
       "rangeStrategy": "replace",
       "prCreation": "immediate",
-      "semanticCommits": true,
+      "semanticCommits": "enabled",
       "commitMessageTopic": "GitHub Action {{depName}}",
       "labels": [ "dependencies", "ci", "notes:ignore" ]
     },
@@ -81,6 +82,6 @@
       "enabled": false
     }
   ],
-  "baseBranches": [ "main" ],
+  "baseBranchPatterns": [ "main" ],
   "automerge": false
 }
