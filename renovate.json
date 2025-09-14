@@ -70,7 +70,7 @@
       "groupSlug": "github-actions-all",
       "matchManagers": [ "github-actions" ],
       "pinDigests": true,
-      "rangeStrategy": "pin",
+      "rangeStrategy": "replace",
       "prCreation": "immediate",
       "semanticCommits": true,
       "commitMessageTopic": "GitHub Action {{depName}}",
