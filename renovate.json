@@ -96,5 +96,7 @@
       "enabled": false
     }
   ],
-  "automerge": false
+  "automerge": false,
+  "recreateWhen": "always",
+  "dependencyDashboard": true
 }
