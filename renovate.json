@@ -25,26 +25,16 @@
   ],
   "packageRules": [
     {
-      "groupName": "Dotnet Monorepo",
-      "groupSlug": "dotnet-monorepo",
-      "matchManagers": [ "nuget" ],
-      "enabled": false
-    },
-    {
-      "groupName": "Analyzer Dependencies",
-      "groupSlug": "roslyn-analyzers",
-      "matchDepNames": [ ".*Analyzers$" ],
-      "matchUpdateTypes": [ "major", "minor", "patch" ],
-      "labels": [ "dependencies", "analyzers", "notes:ignore" ]
-    },
-    {
       "groupName": "Test Dependencies",
+      "groupSlug": "test-dependencies",
+      "matchManagers": [ "nuget" ],
       "matchPackageNames": [ "NUnit", "NUnit3TestAdapter", "Microsoft.NET.Test.Sdk" ],
       "labels": [ "dependencies", "test-deps", "notes:ignore" ]
     },
     {
       "groupName": "Roslyn Compiler Packages",
       "groupSlug": "roslyn-compiler",
+      "matchManagers": [ "custom.regex" ],
       "matchPackageNames": [
         "Microsoft.CodeAnalysis.Common",
         "Microsoft.CodeAnalysis.CSharp",
@@ -61,20 +51,31 @@
     {
       "groupName": "Roslyn Analyzer Testing",
       "groupSlug": "roslyn-analyzer-testing",
+      "matchManagers": [ "nuget" ],
       "matchPackageNames": [ "Microsoft.CodeAnalysis.Analyzer.Testing" ],
       "labels": [ "dependencies", "roslyn", "notes:ignore" ]
     },
     {
       "groupName": "System.Memory Dependencies",
       "matchPackageNames": [ "System.Memory", "System.Buffers", "System.Runtime.CompilerServices.Unsafe", "System.Numerics.Vectors" ],
+      "matchManagers": [ "nuget" ],
       "enabled": false,
       "labels": [ "dependencies", "manual-upgrade", "notes:ignore" ]
     },
     {
       "groupName": "Visual Studio SDK Build Tools",
       "matchPackageNames": [ "Microsoft.VSSDK.BuildTools" ],
+      "matchManagers": [ "nuget" ],
       "enabled": false,
       "labels": [ "dependencies", "manual-upgrade", "notes:ignore" ]
+    },
+    {
+      "groupName": "Analyzer Dependencies",
+      "groupSlug": "roslyn-analyzers",
+      "matchManagers": [ "nuget" ],
+      "matchDepNames": [ ".*Analyzers$" ],
+      "matchUpdateTypes": [ "major", "minor", "patch" ],
+      "labels": [ "dependencies", "analyzers", "notes:ignore" ]
     },
     {
       "groupName": "GitHub Actions",
