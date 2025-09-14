@@ -35,7 +35,6 @@
   ],
   "packageRules": [
     {
-      "enabled": false,
       "groupName": "Test Dependencies",
       "matchPackageNames": [ "NUnit", "NUnit3TestAdapter", "Microsoft.NET.Test.Sdk" ],
       "labels": [ "dependencies", "test-deps", "notes:ignore" ]
@@ -57,7 +56,6 @@
       "labels": [ "dependencies", "roslyn", "notes:ignore" ]
     },
     {
-      "enabled": false,
       "groupName": "Roslyn Analyzer Testing",
       "groupSlug": "roslyn-analyzer-testing",
       "matchPackageNames": [ "Microsoft.CodeAnalysis.Analyzer.Testing" ],
@@ -76,14 +74,12 @@
       "labels": [ "dependencies", "manual-upgrade", "notes:ignore" ]
     },
     {
-      "enabled": false,
       "groupName": "Analyzer Dependencies",
       "matchDepNames": [ "//.*Analyzers$//" ],
       "matchUpdateTypes": [ "major", "minor", "patch" ],
       "labels": [ "dependencies", "analyzers", "notes:ignore" ]
     },
     {
-      "enabled": false,
       "groupName": "GitHub Actions",
       "groupSlug": "github-actions-all",
       "matchManagers": [ "github-actions" ],
