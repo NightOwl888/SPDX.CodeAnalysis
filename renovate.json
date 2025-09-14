@@ -76,7 +76,7 @@
     {
       "groupName": "Analyzer Dependencies",
       "groupSlug": "roslyn-analyzers",
-      "matchDepNames": [ "//.*Analyzers$//" ],
+      "matchDepNames": [ ".*Analyzers$" ],
       "matchUpdateTypes": [ "major", "minor", "patch" ],
       "labels": [ "dependencies", "analyzers", "notes:ignore" ]
     },
