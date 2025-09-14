@@ -29,17 +29,17 @@ jobs:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           fetch-depth: 0
 
       - name: Setup .NET 8.0
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5
         with:
           dotnet-version: 8.0.x
 
       - name: Cache NuGet Packages
-        uses: actions/cache@v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         with:
           # '**/*.*proj' includes .csproj, .vbproj, .fsproj, msbuildproj, etc.
           # '**/*.props' includes Directory.Packages.props and Directory.Build.props
@@ -79,13 +79,13 @@ jobs:
           }
 
       - name: Upload NuGet packages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: nuget-packages
           path: ${{ env.DIST_DIR }}/nuget
 
       - name: Upload Test Assemblies
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: test-assemblies
           path: ${{ env.DIST_DIR }}/testBinaries
@@ -119,7 +119,7 @@ jobs:
 
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
 
       # Set up working directories/paths consistently
       - name: Set Paths (Windows)
@@ -161,20 +161,20 @@ jobs:
       # Install the .NET SDK
       - name: Setup .NET 8.0
         if: matrix.arch != 'x86'
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5
         with:
           dotnet-version: 8.0.x
 
       - name: Setup .NET 8.0 (x86)
         if: matrix.arch == 'x86'
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5
         with:
           dotnet-version: 8.0.x
         env:
           PROCESSOR_ARCHITECTURE: x86
 
       - name: Download Test Binaries
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
         with:
           name: test-assemblies
           path: ${{ env.WORKPATH }}
@@ -274,7 +274,7 @@ jobs:
 
       - name: Upload Test Results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: test-results-${{ matrix.os }}-${{ matrix.arch }}
           path: ${{ env.TEST_RESULTS_ROOT_DIR }}
@@ -285,7 +285,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download all test result artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
         with:
           pattern: test-results-*
           path: all-results
@@ -293,7 +293,7 @@ jobs:
 
       # Required for ReportGenerator
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5
         with:
           dotnet-version: 8.0.x
 
@@ -322,7 +322,7 @@ jobs:
           }
 
       - name: Upload Aggregate Coverage HTML
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: coverage-aggregate-html
           path: coverage/aggregate
@@ -336,7 +336,7 @@ jobs:
     - test
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           fetch-depth: 0
 
@@ -360,7 +360,7 @@ jobs:
           Add-Content $env:GITHUB_OUTPUT "version=$nugetVersion"
 
       - name: Download NuGet Packages
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
         with:
           name: nuget-packages
           path: dist/nuget
@@ -381,7 +381,7 @@ jobs:
               }
           }
       - name: Create Draft GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@6cbd405e2c4e67a21c47fa9e383d020e4e28b836 # v2
         with:
           draft: true
           prerelease: ${{ steps.tagversion.outputs.prerelease }}
@@ -395,7 +395,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Release Assets
-        uses: actions/github-script@v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         with:
           script: |
             const fs = require("fs");
