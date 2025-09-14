@@ -72,7 +72,7 @@
     },
     {
       "groupName": "Analyzer Dependencies",
-      "matchDepPatterns": [ "/.*Analyzers$/" ],
+      "matchDepNames": [ "//.*Analyzers$//" ],
       "matchUpdateTypes": [ "major", "minor", "patch" ],
       "labels": [ "dependencies", "analyzers", "notes:ignore" ]
     },
