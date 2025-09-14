@@ -15,7 +15,7 @@
       "description": "Debug manager to verify Renovate sees regex managers",
       "fileMatch": [ "^.*$" ],
       "matchStrings": [
-        ".*" // match the entire file (greedy on purpose for debugging)
+        ".*"
       ],
       "depNameTemplate": "Debug.Dependency",
       "currentValueTemplate": "1.0.0",
