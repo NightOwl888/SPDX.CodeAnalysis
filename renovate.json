@@ -73,7 +73,7 @@
       "groupName": "Analyzer Dependencies",
       "groupSlug": "roslyn-analyzers",
       "matchManagers": [ "nuget" ],
-      "matchPackagePatterns": [ ".*Analyzers$" ],
+      "matchDepNames": [ "/.*Analyzers$/" ],
       "matchUpdateTypes": [ "major", "minor", "patch" ],
       "labels": [ "dependencies", "analyzers", "notes:ignore" ]
     },
