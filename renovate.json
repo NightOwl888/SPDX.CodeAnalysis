@@ -21,16 +21,6 @@
       "depNameTemplate": "Microsoft.CodeAnalysis.Common",
       "datasourceTemplate": "nuget",
       "versioningTemplate": "nuget"
-    },
-    {
-      "customType": "regex",
-      "description": "Analyzer packages in Directory.Packages.props",
-      "fileMatch": [ "(^|.*/)Directory\\.Packages\\.props$" ],
-      "matchStrings": [
-        "<PackageVersion\\s+Include=\"(?<depName>[^\" ]+Analyzers)\"\\s+Version=\"(?<currentValue>[^\"]+)\"\\s*\\/>"
-      ],
-      "datasourceTemplate": "nuget",
-      "versioningTemplate": "nuget"
     }
   ],
   "packageRules": [
