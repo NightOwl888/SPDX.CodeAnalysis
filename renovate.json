@@ -1,26 +1,16 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
     ":dependencyDashboard",
     ":prConcurrentLimit10",
     ":prHourlyLimitNone"
   ],
-  "enabledManagers": [ "nuget", "github-actions" ],
+  "enabledManagers": [ "nuget", "github-actions", "custom.regex" ],
   "rangeStrategy": "bump",
   "schedule": [],
   "commitMessagePrefix": "chore: ",
   "customManagers": [
-    {
-      "customType": "regex",
-      "description": "Debug manager to verify Renovate sees regex managers",
-      "fileMatch": [ "^.*$" ],
-      "matchStrings": [
-        ".*"
-      ],
-      "depNameTemplate": "Debug.Dependency",
-      "currentValueTemplate": "1.0.0",
-      "datasourceTemplate": "npm"
-    },
     {
       "customType": "regex",
       "description": "Roslyn Analyzer package version property",
@@ -29,7 +19,8 @@
         "<\\s*RoslynAnalyzerPackageVersion\\s*>(?<currentValue>[^<]+)<\\/\\s*RoslynAnalyzerPackageVersion\\s*>"
       ],
       "depNameTemplate": "Microsoft.CodeAnalysis.Common",
-      "datasourceTemplate": "nuget"
+      "datasourceTemplate": "nuget",
+      "versioningTemplate": "nuget"
     },
     {
       "customType": "regex",
@@ -38,11 +29,13 @@
       "matchStrings": [
         "<PackageVersion\\s+Include=\"(?<depName>[^\" ]+Analyzers)\"\\s+Version=\"(?<currentValue>[^\"]+)\"\\s*\\/>"
       ],
-      "datasourceTemplate": "nuget"
+      "datasourceTemplate": "nuget",
+      "versioningTemplate": "nuget"
     }
   ],
   "packageRules": [
     {
+      "enabled": false,
       "groupName": "Test Dependencies",
       "matchPackageNames": [ "NUnit", "NUnit3TestAdapter", "Microsoft.NET.Test.Sdk" ],
       "labels": [ "dependencies", "test-deps", "notes:ignore" ]
@@ -64,6 +57,7 @@
       "labels": [ "dependencies", "roslyn", "notes:ignore" ]
     },
     {
+      "enabled": false,
       "groupName": "Roslyn Analyzer Testing",
       "groupSlug": "roslyn-analyzer-testing",
       "matchPackageNames": [ "Microsoft.CodeAnalysis.Analyzer.Testing" ],
@@ -82,12 +76,14 @@
       "labels": [ "dependencies", "manual-upgrade", "notes:ignore" ]
     },
     {
+      "enabled": false,
       "groupName": "Analyzer Dependencies",
       "matchDepNames": [ "//.*Analyzers$//" ],
       "matchUpdateTypes": [ "major", "minor", "patch" ],
       "labels": [ "dependencies", "analyzers", "notes:ignore" ]
     },
     {
+      "enabled": false,
       "groupName": "GitHub Actions",
       "groupSlug": "github-actions-all",
       "matchManagers": [ "github-actions" ],
