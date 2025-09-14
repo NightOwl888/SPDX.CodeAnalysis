@@ -11,9 +11,9 @@
   "commitMessagePrefix": "chore: ",
   "regexManagers": [
     {
-      "fileMatch": [ "^Directory\\.Packages\\.props$" ],
+      "fileMatch": [ ".*Directory\\.Packages\\.props$" ],
       "matchStrings": [
-        "<RoslynAnalyzerPackageVersion>(?<currentValue>.*)</RoslynAnalyzerPackageVersion>"
+        "<\\s*RoslynAnalyzerPackageVersion\\s*>(?<currentValue>.*)<\\/\\s*RoslynAnalyzerPackageVersion\\s*>"
       ],
       "depNameTemplate": "Microsoft.CodeAnalysis.Common",
       "datasourceTemplate": "nuget"
