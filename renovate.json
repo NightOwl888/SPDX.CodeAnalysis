@@ -9,19 +9,46 @@
   "rangeStrategy": "bump",
   "schedule": [ "before 3am on monday" ],
   "commitMessagePrefix": "chore: ",
+  "regexManagers": [
+    {
+      "fileMatch": [ "^Directory\\.Packages\\.props$" ],
+      "matchStrings": [
+        "<RoslynAnalyzerPackageVersion>(?<currentValue>.*)</RoslynAnalyzerPackageVersion>"
+      ],
+      "depNameTemplate": "Microsoft.CodeAnalysis.Common",
+      "datasourceTemplate": "nuget"
+    }
+  ],
   "packageRules": [
     {
-      "groupName": "Test dependencies",
+      "groupName": "Test Dependencies",
       "matchPackageNames": [ "NUnit", "NUnit3TestAdapter", "Microsoft.NET.Test.Sdk" ],
       "labels": [ "dependencies", "test-deps", "notes:ignore" ]
     },
     {
-      "groupName": "Roslyn dependencies",
-      "matchPackagePatterns": [ "^Microsoft\\.CodeAnalysis" ],
+      "groupName": "Roslyn Compiler Packages",
+      "groupSlug": "roslyn-compiler",
+      "matchPackageNames": [
+        "Microsoft.CodeAnalysis.Common",
+        "Microsoft.CodeAnalysis.CSharp",
+        "Microsoft.CodeAnalysis.CSharp.Features",
+        "Microsoft.CodeAnalysis.CSharp.Workspaces",
+        "Microsoft.CodeAnalysis.VisualBasic",
+        "Microsoft.CodeAnalysis.VisualBasic.Features",
+        "Microsoft.CodeAnalysis.VisualBasic.Workspaces",
+        "Microsoft.CodeAnalysis.Workspaces.Common"
+      ],
+      "updateTypes": [ "minor", "patch" ],
       "labels": [ "dependencies", "roslyn", "notes:ignore" ]
     },
     {
-      "groupName": "System.Memory dependencies",
+      "groupName": "Roslyn Analyzer Testing",
+      "groupSlug": "roslyn-analyzer-testing",
+      "matchPackageNames": [ "Microsoft.CodeAnalysis.Analyzer.Testing" ],
+      "labels": [ "dependencies", "roslyn", "notes:ignore" ]
+    },
+    {
+      "groupName": "System.Memory Dependencies",
       "matchPackageNames": [ "System.Memory", "System.Buffers", "System.Runtime.CompilerServices.Unsafe", "System.Numerics.Vectors" ],
       "enabled": false,
       "labels": [ "dependencies", "manual-upgrade", "notes:ignore" ]
@@ -33,8 +60,8 @@
       "labels": [ "dependencies", "manual-upgrade", "notes:ignore" ]
     },
     {
-      "groupName": "Analyzer dependencies",
-      "matchPackagePatterns": [ "Analyzer" ],
+      "groupName": "Analyzer Dependencies",
+      "matchPackagePatterns": [ "Analyzers$" ],
       "updateTypes": [ "major", "minor", "patch" ],
       "labels": [ "dependencies", "analyzers", "notes:ignore" ]
     },
