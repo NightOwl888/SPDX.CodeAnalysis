@@ -5,14 +5,19 @@
     ":prConcurrentLimit10",
     ":prHourlyLimitNone"
   ],
-  "enabledManagers": [ "nuget", "github-actions" ],
+  "enabledManagers": [
+    "nuget",
+    "github-actions"
+  ],
   "rangeStrategy": "bump",
   "schedule": [],
   "commitMessagePrefix": "chore: ",
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": [ ".*Directory\\.Packages\\.props$" ],
+      "managerFilePatterns": [
+        ".*Directory\\.Packages\\.props$"
+      ],
       "matchStrings": [
         "<\\s*RoslynAnalyzerPackageVersion\\s*>(?<currentValue>.*)<\\/\\s*RoslynAnalyzerPackageVersion\\s*>"
       ],
@@ -23,8 +28,16 @@
   "packageRules": [
     {
       "groupName": "Test Dependencies",
-      "matchPackageNames": [ "NUnit", "NUnit3TestAdapter", "Microsoft.NET.Test.Sdk" ],
-      "labels": [ "dependencies", "test-deps", "notes:ignore" ]
+      "matchPackageNames": [
+        "NUnit",
+        "NUnit3TestAdapter",
+        "Microsoft.NET.Test.Sdk"
+      ],
+      "labels": [
+        "dependencies",
+        "test-deps",
+        "notes:ignore"
+      ]
     },
     {
       "groupName": "Roslyn Compiler Packages",
@@ -39,49 +52,97 @@
         "Microsoft.CodeAnalysis.VisualBasic.Workspaces",
         "Microsoft.CodeAnalysis.Workspaces.Common"
       ],
-      "updateTypes": [ "minor", "patch" ],
-      "labels": [ "dependencies", "roslyn", "notes:ignore" ]
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "labels": [
+        "dependencies",
+        "roslyn",
+        "notes:ignore"
+      ]
     },
     {
       "groupName": "Roslyn Analyzer Testing",
       "groupSlug": "roslyn-analyzer-testing",
-      "matchPackageNames": [ "Microsoft.CodeAnalysis.Analyzer.Testing" ],
-      "labels": [ "dependencies", "roslyn", "notes:ignore" ]
+      "matchPackageNames": [
+        "Microsoft.CodeAnalysis.Analyzer.Testing"
+      ],
+      "labels": [
+        "dependencies",
+        "roslyn",
+        "notes:ignore"
+      ]
     },
     {
       "groupName": "System.Memory Dependencies",
-      "matchPackageNames": [ "System.Memory", "System.Buffers", "System.Runtime.CompilerServices.Unsafe", "System.Numerics.Vectors" ],
+      "matchPackageNames": [
+        "System.Memory",
+        "System.Buffers",
+        "System.Runtime.CompilerServices.Unsafe",
+        "System.Numerics.Vectors"
+      ],
       "enabled": false,
-      "labels": [ "dependencies", "manual-upgrade", "notes:ignore" ]
+      "labels": [
+        "dependencies",
+        "manual-upgrade",
+        "notes:ignore"
+      ]
     },
     {
       "groupName": "Visual Studio SDK Build Tools",
-      "matchPackageNames": [ "Microsoft.VSSDK.BuildTools" ],
+      "matchPackageNames": [
+        "Microsoft.VSSDK.BuildTools"
+      ],
       "enabled": false,
-      "labels": [ "dependencies", "manual-upgrade", "notes:ignore" ]
+      "labels": [
+        "dependencies",
+        "manual-upgrade",
+        "notes:ignore"
+      ]
     },
     {
       "groupName": "Analyzer Dependencies",
-      "matchPackagePatterns": [ "Analyzers$" ],
-      "updateTypes": [ "major", "minor", "patch" ],
-      "labels": [ "dependencies", "analyzers", "notes:ignore" ]
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch"
+      ],
+      "labels": [
+        "dependencies",
+        "analyzers",
+        "notes:ignore"
+      ],
+      "matchPackageNames": [
+        "/Analyzers$/"
+      ]
     },
     {
       "groupName": "GitHub Actions",
       "groupSlug": "github-actions-all",
-      "matchManagers": [ "github-actions" ],
+      "matchManagers": [
+        "github-actions"
+      ],
       "pinDigests": true,
       "rangeStrategy": "replace",
       "prCreation": "immediate",
       "semanticCommits": "enabled",
       "commitMessageTopic": "GitHub Action {{depName}}",
-      "labels": [ "dependencies", "ci", "notes:ignore" ]
+      "labels": [
+        "dependencies",
+        "ci",
+        "notes:ignore"
+      ]
     },
     {
-      "matchFileNames": [ "global.json" ],
+      "matchFileNames": [
+        "global.json"
+      ],
       "enabled": false
     }
   ],
-  "baseBranchPatterns": [ "main" ],
+  "baseBranchPatterns": [
+    "main"
+  ],
   "automerge": false
 }
