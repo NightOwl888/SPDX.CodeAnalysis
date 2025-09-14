@@ -12,6 +12,17 @@
   "customManagers": [
     {
       "customType": "regex",
+      "description": "Debug manager to verify Renovate sees regex managers",
+      "managerFilePatterns": [ "/.*/" ],
+      "matchStrings": [
+        ".*" // match the entire file (greedy on purpose for debugging)
+      ],
+      "depNameTemplate": "Debug.Dependency",
+      "currentValueTemplate": "1.0.0",
+      "datasourceTemplate": "npm"
+    },
+    {
+      "customType": "regex",
       "description": "Roslyn Analyzer package version property",
       "managerFilePatterns": [ "/.*Directory\\.Packages\\.props$/", "Directory.Packages.props" ],
       "matchStrings": [
