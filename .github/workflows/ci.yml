@@ -383,8 +383,7 @@ jobs:
         id: nbgv
         shell: pwsh
         run: |
-          $nbgvOutput = & nbgv get-version
-          $nugetVersion = ($nbgvOutput | Where-Object { $_ -match '^NuGetPackageVersion:' }) -replace '^NuGetPackageVersion:\s+', ''
+          $nugetVersion = & nbgv get-version -v NuGetPackageVersion
           Add-Content $env:GITHUB_OUTPUT "version=$nugetVersion"
 
       - name: Download NuGet Packages
