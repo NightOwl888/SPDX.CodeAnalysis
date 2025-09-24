@@ -28,29 +28,11 @@ jobs:
       DIST_DIR: ${{ github.workspace }}/dist
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
-      - name: Set Git Default Branch
-        run: git config --global init.defaultBranch main
-
       - name: Checkout Source
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           fetch-depth: 0
           fetch-tags: true
-
-      - name: Checkout Branch From Tag
-        if: github.ref_type == 'tag'
-        shell: pwsh
-        run: |
-          $tag = $env:GITHUB_REF_NAME
-          git fetch origin
-          # Find a branch that contains the tag (prefer main or release/*)
-          $branch = git branch -r --contains "refs/tags/$tag" |
-              ForEach-Object { $_.Trim() -replace '^origin/', '' } |
-              Where-Object { $_ -eq 'main' -or $_ -like 'release/*' } |
-              Select-Object -First 1
-          if (-not $branch) { throw "Cannot determine branch containing tag $tag" }
-          Write-Host "Checking out branch $branch"
-          git checkout $branch
 
       - name: Setup .NET 8.0
         uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5
@@ -354,29 +336,11 @@ jobs:
     - build
     - test
     steps:
-      - name: Set Git Default Branch
-        run: git config --global init.defaultBranch main
-
       - name: Checkout Source
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           fetch-depth: 0
           fetch-tags: true
-
-      - name: Checkout Branch From Tag
-        if: github.ref_type == 'tag'
-        shell: pwsh
-        run: |
-          $tag = $env:GITHUB_REF_NAME
-          git fetch origin
-          # Find a branch that contains the tag (prefer main or release/*)
-          $branch = git branch -r --contains "refs/tags/$tag" |
-              ForEach-Object { $_.Trim() -replace '^origin/', '' } |
-              Where-Object { $_ -eq 'main' -or $_ -like 'release/*' } |
-              Select-Object -First 1
-          if (-not $branch) { throw "Cannot determine branch containing tag $tag" }
-          Write-Host "Checking out branch $branch"
-          git checkout $branch
 
       - name: Get Tag Version
         id: tagversion
