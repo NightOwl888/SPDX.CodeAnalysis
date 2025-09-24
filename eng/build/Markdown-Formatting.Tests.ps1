@@ -25,7 +25,6 @@ Describe "Format-Test-Results" {
         $output | Should -Match "Passed=$($_.PassedCount)"
         $output | Should -Match "Failed=$($_.FailedCount)"
         $output | Should -Match "Ignored=$($_.IgnoredCount)"
-        "" | Should -Be ""
     }
 
     Context "respects custom status text/icons" {
